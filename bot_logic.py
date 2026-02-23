@@ -94,8 +94,8 @@ COMBINED_SYSTEM_PROMPT = """당신은 항공 규정 챗봇 전문가입니다.
 사용자 메시지와 대화 기록을 분석하여 다음 JSON 구조로만 정확히 출력하세요:
 {
   "slots": {
-    "departure": "출발국코드(KR/US/JP 등. 대화에 명시적으로 언급되지 않았다면 사용자의 언어나 정황으로 절대 유추하지 말고 반드시 null로 표기할 것)",
-    "arrival": "도착국코드(대화에 명시되지 않았다면 반드시 null)",
+    "departure": "출발국코드(KR/US/JP 등. 사용자가 새로운 출발지를 말하면 기존 값을 무시하고 새 출발국코드를 출력. 대화에 명시적으로 언급되지 않았다면 사용자의 언어나 정황으로 절대 유추하지 말고 반드시 null로 표기할 것)",
+    "arrival": "도착국코드(사용자가 새로운 도착지를 말하면 기존 값을 무시하고 새 도착국코드를 출력. 대화에 명시되지 않았다면 반드시 null)",
     "item": "물품명(추출된 물품명 단 하나. 모르면 null)",
     "quantity": "수량/용량(모르면 null)"
   },
@@ -404,7 +404,7 @@ def run_pipeline(
         arr = updated_slots.get("arrival")
         
         if (dep and dep not in supported) or (arr and arr not in supported):
-            yield "⚠️ **[안내]** 현재 기내뭐돼 서비스는 **한국(KR)**과 **미국(US)** 노선 정밀 규정만 지원합니다. 타 국가 노선은 아래 일반 지식 안내와 다를 수 있으니 주의해 주세요.\n\n"
+            yield "⚠️ 현재 기내뭐돼 서비스는 한국(KR)과 미국(US) 노선 정밀 규정만 지원합니다. 타 국가 노선은 아래 안내와 다를 수 있으니 주의해 주세요.\n\n"
 
         for chunk in raw_stream:
             # chunk.content가 있는 경우(AIMessageChunk)와 바로 문자열(generator)인 경우 모두 처리
@@ -435,7 +435,7 @@ if __name__ == "__main__":
         },
         {
             "desc": "insight 3: 물품과 상세 항목이 있는 질문 (출발/도착지 묻는지 확인)",
-            "message": "100Wh 보조배터리 기내 반입 가능?",
+            "message": "100Wh 보조배터 기내 반입 가능?",
             "slots": {},
         },
         {
@@ -444,19 +444,14 @@ if __name__ == "__main__":
             "slots": {},
         },
         {
-            "desc": "v4: 도착지만 누락된 경우",
-            "message": "나 한국에서 출발하는데 액체류 기내에 들고가도 돼?",
-            "slots": {},
+            "desc": "v4: 경로 중간 변경 처리 (한국->미국 대화 중 한국->중국으로 바꿈)",
+            "message": "아 미안 나 미국 아니고 중국 가는데 그래도 똑같아?",
+            "slots": {"departure": "KR", "arrival": "US", "item": "고추장"},
         },
         {
-            "desc": "v4: 출발지만 누락된 경우",
-            "message": "나 미국으로 가는데 고추장 들고가도 돼?",
-            "slots": {},
-        },
-        {
-            "desc": "v3 신규: 보조배터리 (DB 미등재)",
-            "message": "한국→미국 보조배터리 기내 반입 가능해?",
-            "slots": {},
+            "desc": "v4: 경로 중간 변경 처리 (한국->미국 대화 중 중국->캐나다로 전면 교체)",
+            "message": "중국에서 캐나다로 갈 때는 초콜릿 어떻게 해야해?",
+            "slots": {"departure": "KR", "arrival": "US", "item": "보조배터리"},
         },
     ]
 
