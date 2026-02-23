@@ -397,6 +397,15 @@ def run_pipeline(
 
     def traced_stream() -> Iterator[str]:
         t4 = time.time()
+        
+        # [v4] 타국가 등 미지원 노선에 대한 경고문 선출력
+        supported = {"KR", "US"}
+        dep = updated_slots.get("departure")
+        arr = updated_slots.get("arrival")
+        
+        if (dep and dep not in supported) or (arr and arr not in supported):
+            yield "⚠️ **[안내]** 현재 기내뭐돼 서비스는 **한국(KR)**과 **미국(US)** 노선 정밀 규정만 지원합니다. 타 국가 노선은 아래 일반 지식 안내와 다를 수 있으니 주의해 주세요.\n\n"
+
         for chunk in raw_stream:
             # chunk.content가 있는 경우(AIMessageChunk)와 바로 문자열(generator)인 경우 모두 처리
             if hasattr(chunk, "content"):
@@ -420,6 +429,21 @@ if __name__ == "__main__":
 
     test_cases = [
         {
+            "desc": "insight 1, 2: 물품만 있는 질문 (출발/도착지 묻는지 확인)",
+            "message": "고추장 기내에 들고가도 돼?",
+            "slots": {},
+        },
+        {
+            "desc": "insight 3: 물품과 상세 항목이 있는 질문 (출발/도착지 묻는지 확인)",
+            "message": "100Wh 보조배터리 기내 반입 가능?",
+            "slots": {},
+        },
+        {
+            "desc": "insight 4: 타국가(일본) 질문에 대한 처리",
+            "message": "나 한국에서 일본 가는데 액체류 돼?",
+            "slots": {},
+        },
+        {
             "desc": "v4: 도착지만 누락된 경우",
             "message": "나 한국에서 출발하는데 액체류 기내에 들고가도 돼?",
             "slots": {},
@@ -433,21 +457,6 @@ if __name__ == "__main__":
             "desc": "v3 신규: 보조배터리 (DB 미등재)",
             "message": "한국→미국 보조배터리 기내 반입 가능해?",
             "slots": {},
-        },
-        {
-            "desc": "v3 신규: 드라이기 (DB 미등재)",
-            "message": "드라이기는 가져갈 수 있어?",
-            "slots": {"departure": "KR", "arrival": "US"},
-        },
-        {
-            "desc": "v2 유지: 칼 (DB 간접 매핑)",
-            "message": "칼은?",
-            "slots": {"departure": "KR", "arrival": "US"},
-        },
-        {
-            "desc": "v2 유지: 미숫가루 (US 식품 매핑)",
-            "message": "미숫가루는?",
-            "slots": {"departure": "KR", "arrival": "US"},
         },
     ]
 
