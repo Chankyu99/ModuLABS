@@ -94,8 +94,8 @@ COMBINED_SYSTEM_PROMPT = """당신은 항공 규정 챗봇 전문가입니다.
 사용자 메시지와 대화 기록을 분석하여 다음 JSON 구조로만 정확히 출력하세요:
 {
   "slots": {
-    "departure": "출발국코드(KR/US/JP 등. 모르면 null)",
-    "arrival": "도착국코드(모르면 null)",
+    "departure": "출발국코드(KR/US/JP 등. 대화에 명시적으로 언급되지 않았다면 사용자의 언어나 정황으로 절대 유추하지 말고 반드시 null로 표기할 것)",
+    "arrival": "도착국코드(대화에 명시되지 않았다면 반드시 null)",
     "item": "물품명(추출된 물품명 단 하나. 모르면 null)",
     "quantity": "수량/용량(모르면 null)"
   },
@@ -157,12 +157,23 @@ def extract_slots_and_map(user_message: str, chat_history: list[dict], current_s
 
 def check_missing_slots(slots: dict) -> Optional[str]:
     """미확정 슬롯에 대한 재질문 문자열 반환. 모두 확정이면 None."""
-    if not slots.get("departure") or not slots.get("arrival"):
+    dep = slots.get("departure")
+    arr = slots.get("arrival")
+    item = slots.get("item")
+    
+    if not dep and not arr:
         return "✈️ 어디에서 출발하여 어디로 가시나요? (예: 한국 → 미국)"
-    if not slots.get("item"):
+    elif not dep:
+        return "🛫 출발하시는 국가(또는 공항)를 알려주세요."
+    elif not arr:
+        return "🛬 도착하시는 국가(또는 공항)를 알려주세요."
+        
+    if not item:
         return "🎒 어떤 물건의 반입 규정이 궁금하신가요?"
-    if slots.get("departure") == slots.get("arrival"):
+        
+    if dep == arr:
         return "⚠️ 출발지와 도착지가 같습니다. 다시 입력해 주세요."
+        
     return None
 
 
@@ -408,6 +419,16 @@ if __name__ == "__main__":
     print("=" * 60)
 
     test_cases = [
+        {
+            "desc": "v4: 도착지만 누락된 경우",
+            "message": "나 한국에서 출발하는데 액체류 기내에 들고가도 돼?",
+            "slots": {},
+        },
+        {
+            "desc": "v4: 출발지만 누락된 경우",
+            "message": "나 미국으로 가는데 고추장 들고가도 돼?",
+            "slots": {},
+        },
         {
             "desc": "v3 신규: 보조배터리 (DB 미등재)",
             "message": "한국→미국 보조배터리 기내 반입 가능해?",
