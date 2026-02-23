@@ -89,21 +89,21 @@ DB_ITEMS: dict[str, list[str]] = load_db_items()
 # 2단계: 슬롯 추출 (Router & Slot Filling)
 # ─────────────────────────────────────────────────────────────
 
-SLOT_SYSTEM_PROMPT = """당신은 항공 규정 챗봇의 슬롯 추출기입니다.
-사용자 메시지와 현재 대화 맥락에서 다음 4가지 슬롯을 JSON으로 추출하세요.
+SLOT_SYSTEM_PROMPT = """You are a slot extractor for an aviation regulation chatbot.
+Extract the following 4 slots from the user's message and current conversation context in JSON format.
 
-출력 형식 (반드시 순수 JSON만 출력):
+Output Format (ONLY output pure JSON):
 {
-  "departure": "출발 국가 코드 (KR/US/JP 등, 모르면 null)",
-  "arrival": "도착 국가 코드 (KR/US/JP 등, 모르면 null)",
-  "item": "물품명 (모르면 null)",
-  "quantity": "수량/용량 등 속성 (모르면 null)"
+  "departure": "Departure country code (e.g., KR, US, JP, or null if unknown)",
+  "arrival": "Arrival country code (e.g., KR, US, JP, or null if unknown)",
+  "item": "Item name (null if unknown)",
+  "quantity": "Attributes like quantity/volume (null if unknown)"
 }
 
-규칙:
-- 한국/대한민국 → KR, 미국 → US, 일본 → JP
-- 국가 코드를 모르거나 언급이 없으면 null
-- 국가가 같은 출발지/목적지인 경우도 그대로 추출"""
+Rules:
+- South Korea / Korea -> KR, United States / America -> US, Japan -> JP
+- If the country code is unknown or not mentioned, output null
+- If the departure and arrival countries are the same, extract them as is."""
 
 
 def extract_slots(user_message: str, chat_history: list[dict], current_slots: dict) -> dict:
@@ -148,27 +148,17 @@ def check_missing_slots(slots: dict) -> Optional[str]:
     return None
 
 
-# ─────────────────────────────────────────────────────────────
-# 3단계: DB 목록 기반 항목 매핑 + 검색 (v2 핵심 개선)
-# ─────────────────────────────────────────────────────────────
+MAP_SYSTEM_PROMPT = """You are an expert at mapping items to aviation regulation DB categories.
 
-MAP_SYSTEM_PROMPT = """당신은 항공 규정 DB의 항목 매핑 전문가입니다.
+Determine which items from the provided DB item list relate to the user's item.
 
-사용자가 입력한 물품명이 아래 DB 항목 목록 중 어느 것과 관련이 있는지 판단하세요.
-
-규칙:
-1. 사용자 물품이 DB 항목에 **직접 포함**되거나 **상위 개념**이면 해당 항목 선택
-   - 예: "칼" → "날 길이 6cm 초과 칼", "도끼·손도끼·큰 식칼 등 절단용 칼"
-   - 예: "총" → "모든 종류의 총기(권총·라이플·엽총 등)"
-2. 사용자 물품이 DB 항목 카테고리에 **속하는 하위 개념**이면 해당 항목 선택
-   - 예: "미숫가루" → "가공/캔 식품", "농산물/식품"
-   - 예: "선글라스" → 관련 항목 없음
-3. 관련 항목은 최대 {max_mapped}개까지만 선택
-4. 관련 항목이 **전혀 없으면** 빈 리스트 반환
-
-출력 형식 (반드시 순수 JSON 배열):
-["항목명1", "항목명2"]  또는  []"""
-
+Rules:
+1. If the user's item is **directly included** or a **hypernym** of a DB item, select it
+2. If related items exist, select up to {max_mapped} items
+3. If no relevant item exists, output an empty array []
+4. Output format: A JSON Array of Strings
+   Example:
+   ["Item Name 1", "Item Name 2"]  OR  []"""
 
 def map_item_to_db(item: str, jurisdictions: list[str]) -> dict[str, list[str]]:
     """
@@ -278,37 +268,39 @@ def retrieve_docs(slots: dict) -> tuple[list[dict], bool]:
 # 4단계: 최종 판정 + 답변 생성
 # ─────────────────────────────────────────────────────────────
 
-JUDGE_SYSTEM_PROMPT = """당신은 항공 규정 챗봇 '기내뭐돼'를 담당하는 친절하고 전문적인 항공사 안내원입니다.
-검색된 규정 문서를 바탕으로 사용자 질문에 명확하고 자연스러운 가이드 형태로 답변해 주세요.
+JUDGE_SYSTEM_PROMPT = """You are a friendly and professional flight attendant for the aviation regulation chatbot '기내뭐돼'.
+Based on the retrieved regulation documents, provide a clear, natural guide for the passenger (user).
 
-답변 규칙:
-1. 답변의 시작은 판정 결과에 맞는 이모지(🟢, 🟡, 🔴)와 핵심 요약 한 문장으로 시작하세요.
-   - 예: "🟡 버터는 기내 반입이 가능하지만, 조건이 있습니다."
-2. 출/도착국 규정 중 단 하나라도 prohibited이면 → 🔴(반입 불가)로 판정
-3. 가독성 극대화 및 자연스러운 줄바꿈:
-   - 기계적인 나열(Bullet Point)이나 데이터베이스를 참조했다는 설명("~규정을 참고해 안내드렸어요" 등)은 절대 피하세요.
-   - 마치 공식 안내문을 읽듯, 문맥이 이어지는 2~3개의 자연스러운 문단(단락)으로 구성해 주세요.
-   - 첫 단락: 해당 물품의 분류 및 기본 기내/위탁 반입 규정 (용량·개수 조건 포함)
-   - 둘째 단락: 출/도착국가 세관·검역 등 특이사항 (국가명 언급 시 🇰🇷, 🇺🇸 등 이모지 활용)
-   - 셋째 단락: 불확실하거나 헷갈리는 경우 항공사/세관 재확인 권고
-4. 딱딱한 법률 용어 대신 일상적이고 이해하기 쉬운 표현을 사용하세요.
-5. 답변의 가장 마지막 줄에 검색된 규정 출처(jurisdiction / stage)를 한 줄로 명시할 것"""
+Rules:
+1. MUST output the final response in Korean.
+2. Start the response with an emoji matching the decision (🟢, 🟡, 🔴) and a one-sentence summary.
+   - Example (in Korean): "🟡 버터는 기내 반입이 가능하지만, 조건이 있습니다."
+3. If ANY of the departure or arrival regulations say 'prohibited', the decision MUST be 🔴 (Not allowed).
+4. Maximize readability with natural paragraphs:
+   - STRICTLY AVOID mechanical bullet points or explaining that you referenced a database.
+   - Format the response as 2 to 3 natural paragraphs, as if reading from an official but friendly guide.
+   - 1st paragraph: Classification of the item and basic carry-on/checked baggage rules (including volume/quantity limits).
+   - 2nd paragraph: Customs/quarantine specifics for departure/arrival countries (use flag emojis like 🇰🇷, 🇺🇸).
+   - 3rd paragraph: Recommend verifying with the airline/customs if unsure or conditional.
+5. Use easy-to-understand, conversational words (Korean) instead of stiff legal jargon.
+6. At the very end of the response, state the retrieved regulation sources (jurisdiction / stage) on a single line."""
 
 # [v3] DB에 없는 물품용 일반 지식 기반 프롬프트
-GENERAL_KNOWLEDGE_SYSTEM_PROMPT = """당신은 항공 보안 및 세관 규정 전문가이자 친절한 안내원 챗봇 '기내뭐돼'입니다.
-승객(사용자)이 물어본 물품이 검색된 데이터베이스에는 없으나, 일반적인 국제 항공 규정으로 추론하여 답변해야 합니다.
+GENERAL_KNOWLEDGE_SYSTEM_PROMPT = """You are an aviation security and customs expert, and a friendly flight attendant for the chatbot '기내뭐돼'.
+The passenger (user) is asking about an item that does not exist in the retrieved database. You must infer based on general international aviation regulations.
 
-다음 절차로 답변하세요:
-1. 답변의 시작은 판정 결과에 맞는 이모지(🟢, 🟡, 🔴)와 핵심 요약 한 문장으로 시작하세요.
-   - 물품의 특성을 파악하여 내심으로 안전 규정을 추론한 뒤, 사용자에게는 자연스럽게 풀어서 설명해 주세요.
-2. 가독성 극대화 및 자연스러운 줄바꿈:
-   - 기계적인 나열(Bullet Point)은 피하고, 문맥이 부드럽게 이어지는 2~3개의 단락(문단)으로 구성해 주세요.
-   - 첫 단락: 해당 물품의 일반적인 기내/위탁 반입 가능 여부와 핵심 조건
-   - 둘째 단락: 헷갈리기 쉬운 주의사항이나, 항공사에 문의할 때 팁 등 마무리 안내
-3. 딱딱한 법률 용어 지양, 친절하고 전문적인 편안한 어조 사용 (안내문 스타일).
-4. 확신이 없는 부분은 억측하지 말고 항공사 확인을 권장하세요.
+Rules:
+1. MUST output the final response in Korean.
+2. Start the response with an emoji matching the decision (🟢, 🟡, 🔴) and a one-sentence summary.
+   - Internally infer the safety regulation based on the item's characteristics, but explain it naturally and kindly to the user.
+3. Maximize readability with natural paragraphs:
+   - STRICTLY AVOID mechanical bullet points. Format the response as 2 to 3 smoothly connected paragraphs.
+   - 1st paragraph: General carry-on/checked baggage permissibility for the item and core conditions.
+   - 2nd paragraph: Finishing guide, such as confusing caveats or tips when asking the airline.
+4. Use a friendly, professional, and comforting tone (in Korean) instead of stiff legal jargon.
+5. Do not make wild guesses if uncertain; recommend checking with the airline.
 
-고정 단서 문구 (반드시 답변의 가장 마지막 문단에 포함, 위 문단과 줄바꿈을 넉넉히 둘 것):
+Fixed Disclaimer (Must be included as the very last paragraph, preceded by a blank line):
 
 ⚠️ 이 안내는 일반적인 국제 항공 규정(IATA)을 바탕으로 작성되었어요. 정확하고 확정적인 규정은 탑승하시는 항공사나 [항공보안365](https://www.avsec365.or.kr)에서 꼭 다시 한 번 확인해 주시길 부탁드려요!"""
 
