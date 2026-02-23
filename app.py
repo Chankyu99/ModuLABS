@@ -239,11 +239,31 @@ if user_input := st.chat_input("노선과 물품을 입력하세요 (예: 한국
     placeholder = st.empty()
     full_response = ""
     
-    # 첫 토큰이 오기 전까지 대기하는 동안 보여줄 임시 메시지
+    # 첫 토큰이 오기 전까지 대기하는 동안 보여줄 임시 메시지 (CSS 애니메이션 스피너 포함)
     placeholder.markdown("""
+<style>
+.loader {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
 <div class="chat-bot">
   <div class="sender-label">기내뭐돼 봇</div>
-  🤔 규정 검토 및 답변 작성 중...
+  <div style="display: flex; align-items: center; color: rgba(255,255,255,0.7);">
+    <div class="loader"></div>
+    🤔 규정 검토 및 답변 작성 중...
+  </div>
 </div>
 """, unsafe_allow_html=True)
 
