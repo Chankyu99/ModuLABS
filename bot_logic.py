@@ -30,6 +30,7 @@ import concurrent.futures
 from pathlib import Path
 from typing import Optional, Iterator
 
+import streamlit as st
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_chroma import Chroma
@@ -94,7 +95,7 @@ SLOT_SYSTEM_PROMPT = """당신은 항공 규정 챗봇입니다.
 {"departure":"출발국코드(KR/US/JP 등)","arrival":"도착국코드","item":"물품명","quantity":"수량/용량"}
 모르면 null, 출발/도착이 같아도 추출."""
 
-
+@st.cache_data(show_spinner=False, ttl=3600)
 def extract_slots(user_message: str, chat_history: list[dict], current_slots: dict) -> dict:
     """대화 메시지에서 슬롯(출발지, 도착지, 물품, 속성)을 추출."""
     history_text = ""
