@@ -224,9 +224,9 @@ if user_input := st.chat_input("노선과 물품을 입력하세요 (예: 한국
 </div>
 """, unsafe_allow_html=True)
 
-    # 로딩 스피너
-    with st.spinner("🔍 규정 검색 중..."):
-        bot_response, updated_slots = run_pipeline(
+    # 로딩 스피너 (슬롯 추출 및 DB 검색까지 대기)
+    with st.spinner("🔍 항공 규정 검색 중..."):
+        bot_response_stream, updated_slots = run_pipeline(
             user_message=user_input,
             chat_history=st.session_state.messages[:-1],  # 방금 추가한 것 제외
             slots=st.session_state.slots,
@@ -235,14 +235,20 @@ if user_input := st.chat_input("노선과 물품을 입력하세요 (예: 한국
     # 슬롯 상태 업데이트
     st.session_state.slots = updated_slots
 
-    # 봇 응답 추가
-    st.session_state.messages.append({"role": "assistant", "content": bot_response})
-    content_html = bot_response.replace("\n", "<br>")
-    st.markdown(f"""
+    # 스트리밍 응답 렌더링
+    placeholder = st.empty()
+    full_response = ""
+    
+    for chunk in bot_response_stream:
+        full_response += chunk
+        content_html = full_response.replace("\n", "<br>")
+        placeholder.markdown(f"""
 <div class="chat-bot">
   <div class="sender-label">기내뭐돼 봇</div>
   {content_html}
 </div>
 """, unsafe_allow_html=True)
 
+    # 스트리밍 완료 후 메시지 히스토리에 최종 저장
+    st.session_state.messages.append({"role": "assistant", "content": full_response})
     st.rerun()
