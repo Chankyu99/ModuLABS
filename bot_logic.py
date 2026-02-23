@@ -47,27 +47,20 @@ TOP_K           = 5          # 검색 결과 수
 MAX_MAPPED      = 3          # LLM이 선택할 최대 DB 항목 수
 
 # ── 모델 초기화 ────────────────────────────────────────────────
-@st.cache_resource(show_spinner=False)
-def get_models():
-    """LLM 및 벡터스토어 로드를 싱글톤으로 관리 (Streamlit 권장)"""
-    _embeddings  = OpenAIEmbeddings(model="text-embedding-3-small")
-    _llm         = ChatOpenAI(model="gpt-5-mini", temperature=0)
-    _advanced_llm = ChatOpenAI(model="gpt-5.2", temperature=0.2)
-    _vectorstore = Chroma(
-        collection_name=COLLECTION_NAME,
-        embedding_function=_embeddings,
-        persist_directory=str(CHROMA_DIR),
-    )
-    return _llm, _advanced_llm, _vectorstore
-
-llm, advanced_llm, vectorstore = get_models()
+embeddings  = OpenAIEmbeddings(model="text-embedding-3-small")
+llm         = ChatOpenAI(model="gpt-5-mini", temperature=0)
+advanced_llm = ChatOpenAI(model="gpt-5.2", temperature=0.2)
+vectorstore = Chroma(
+    collection_name=COLLECTION_NAME,
+    embedding_function=embeddings,
+    persist_directory=str(CHROMA_DIR),
+)
 
 
 # ─────────────────────────────────────────────────────────────
 # DB 항목 목록 로드 (앱 시작 시 1회)
 # ─────────────────────────────────────────────────────────────
 
-@st.cache_data(show_spinner=False)
 def load_db_items() -> dict[str, list[str]]:
     """
     JSONL에서 국가별 item 목록을 로드.
@@ -102,7 +95,6 @@ SLOT_SYSTEM_PROMPT = """당신은 항공 규정 챗봇입니다.
 {"departure":"출발국코드(KR/US/JP 등)","arrival":"도착국코드","item":"물품명","quantity":"수량/용량"}
 모르면 null, 출발/도착이 같아도 추출."""
 
-@st.cache_data(show_spinner=False, ttl=3600)
 def extract_slots(user_message: str, chat_history: list[dict], current_slots: dict) -> dict:
     """대화 메시지에서 슬롯(출발지, 도착지, 물품, 속성)을 추출."""
     history_text = ""
@@ -149,8 +141,6 @@ MAP_SYSTEM_PROMPT = """DB 매핑 전문가입니다.
 사용자 물품과 가장 관련된 DB 항목을 최대 {max_mapped}개 골라 JSON 배열로 출력하세요.
 없으면 [] 출력."""
 
-MAPPING_CACHE: dict[tuple[str, str], list[str]] = {}
-
 def map_item_to_db(item: str, jurisdictions: list[str]) -> dict[str, list[str]]:
     """
     [v2 핵심] 사용자 물품명 → DB 항목 목록에서 관련 항목 선택.
@@ -158,25 +148,14 @@ def map_item_to_db(item: str, jurisdictions: list[str]) -> dict[str, list[str]]:
     반환: {"KR": ["날 길이 6cm 초과 칼", ...], "US": [...]}
     """
     result: dict[str, list[str]] = {}
-    item_clean = item.strip()
 
     def fetch_for_jur(jur: str) -> tuple[str, list[str]]:
         db_list = DB_ITEMS.get(jur, [])
-        if not db_list or not item_clean:
+        if not db_list:
             return jur, []
 
-        # 🚀 [초고속 최적화 1] 이전 검색 캐시 히트 (LLM 파싱 생략)
-        cache_key = (item_clean, jur)
-        if cache_key in MAPPING_CACHE:
-            return jur, MAPPING_CACHE[cache_key]
-
-        # 🚀 [초고속 최적화 2] 사용자가 DB 카테고리명과 완전히 똑같이 쳤으면 LLM 파싱 생략
-        if item_clean in db_list:
-            MAPPING_CACHE[cache_key] = [item_clean]
-            return jur, [item_clean]
-
         db_list_str = "\n".join(f"  - {it}" for it in db_list)
-        prompt = f"""사용자 물품: "{item_clean}"\n\n[{jur}] DB 항목 목록:\n{db_list_str}\n\n위 DB 항목 중, 사용자 물품 "{item_clean}"과 관련된 항목을 골라주세요."""
+        prompt = f"""사용자 물품: "{item}"\n\n[{jur}] DB 항목 목록:\n{db_list_str}\n\n위 DB 항목 중, 사용자 물품 "{item}"과 관련된 항목을 골라주세요."""
 
         try:
             response = llm.invoke([
@@ -189,11 +168,8 @@ def map_item_to_db(item: str, jurisdictions: list[str]) -> dict[str, list[str]]:
                 raw = "\n".join(raw.split("\n")[1:-1])
             mapped = json.loads(raw)
             # DB에 실제로 있는 항목만 필터
-            valid = [m for m in mapped if m in db_list][:MAX_MAPPED]
-            
-            # 캐시 저장
-            MAPPING_CACHE[cache_key] = valid
-            return jur, valid
+            valid = [m for m in mapped if m in db_list]
+            return jur, valid[:MAX_MAPPED]
         except (json.JSONDecodeError, TypeError, Exception):
             return jur, []
 
@@ -442,11 +418,6 @@ if __name__ == "__main__":
             "desc": "v3 신규: 보조배터리 (DB 미등재)",
             "message": "한국→미국 보조배터리 기내 반입 가능해?",
             "slots": {},
-        },
-        {
-            "desc": "v3 신규: 캐시 테스트 (보조배터리 재검색, 매핑 0초 확인)",
-            "message": "보조배터리",
-            "slots": {"departure": "KR", "arrival": "US"},
         },
         {
             "desc": "v3 신규: 드라이기 (DB 미등재)",
