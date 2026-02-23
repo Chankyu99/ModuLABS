@@ -47,20 +47,27 @@ TOP_K           = 5          # 검색 결과 수
 MAX_MAPPED      = 3          # LLM이 선택할 최대 DB 항목 수
 
 # ── 모델 초기화 ────────────────────────────────────────────────
-embeddings  = OpenAIEmbeddings(model="text-embedding-3-small")
-llm         = ChatOpenAI(model="gpt-5-mini", temperature=0)
-advanced_llm = ChatOpenAI(model="gpt-5.2", temperature=0.2)
-vectorstore = Chroma(
-    collection_name=COLLECTION_NAME,
-    embedding_function=embeddings,
-    persist_directory=str(CHROMA_DIR),
-)
+@st.cache_resource(show_spinner=False)
+def get_models():
+    """LLM 및 벡터스토어 로드를 싱글톤으로 관리 (Streamlit 권장)"""
+    _embeddings  = OpenAIEmbeddings(model="text-embedding-3-small")
+    _llm         = ChatOpenAI(model="gpt-5-mini", temperature=0)
+    _advanced_llm = ChatOpenAI(model="gpt-5.2", temperature=0.2)
+    _vectorstore = Chroma(
+        collection_name=COLLECTION_NAME,
+        embedding_function=_embeddings,
+        persist_directory=str(CHROMA_DIR),
+    )
+    return _llm, _advanced_llm, _vectorstore
+
+llm, advanced_llm, vectorstore = get_models()
 
 
 # ─────────────────────────────────────────────────────────────
 # DB 항목 목록 로드 (앱 시작 시 1회)
 # ─────────────────────────────────────────────────────────────
 
+@st.cache_data(show_spinner=False)
 def load_db_items() -> dict[str, list[str]]:
     """
     JSONL에서 국가별 item 목록을 로드.
