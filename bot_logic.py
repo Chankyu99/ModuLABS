@@ -48,8 +48,8 @@ MAX_MAPPED      = 3          # LLM이 선택할 최대 DB 항목 수
 
 # ── 모델 초기화 ────────────────────────────────────────────────
 embeddings  = OpenAIEmbeddings(model="text-embedding-3-small")
-llm         = ChatOpenAI(model="gpt-5-mini")
-advanced_llm = ChatOpenAI(model="gpt-5.2")
+llm         = ChatOpenAI(model="gpt-5-mini", reasoning_effort="low")
+advanced_llm = ChatOpenAI(model="gpt-5.2", reasoning_effort="low")
 vectorstore = Chroma(
     collection_name=COLLECTION_NAME,
     embedding_function=embeddings,
