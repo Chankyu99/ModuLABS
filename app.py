@@ -239,7 +239,20 @@ if user_input := st.chat_input("노선과 물품을 입력하세요 (예: 한국
     placeholder = st.empty()
     full_response = ""
     
+    # 첫 토큰이 오기 전까지 대기하는 동안 보여줄 임시 메시지
+    placeholder.markdown("""
+<div class="chat-bot">
+  <div class="sender-label">기내뭐돼 봇</div>
+  🤔 규정 검토 및 답변 작성 중...
+</div>
+""", unsafe_allow_html=True)
+
+    first_chunk = True
     for chunk in bot_response_stream:
+        if first_chunk:
+            full_response = ""
+            first_chunk = False
+            
         full_response += chunk
         content_html = full_response.replace("\n", "<br>")
         placeholder.markdown(f"""
