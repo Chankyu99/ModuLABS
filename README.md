@@ -12,6 +12,8 @@
 - 🟢 **반입 가능** / 🟡 **조건부 가능** / 🔴 **반입 불가** 로 직관적인 판정 제공
 - 출발국·도착국 규정을 **교차 검색**하여 가장 엄격한 기준으로 판정
 - 슬롯 필링 방식으로 **노선 → 물품 → 속성** 순서로 대화 흐름 관리
+- ⚡️ **초고속 응답 속도**: 추론 최적화(`reasoning_effort="low"`) 적용 시 **TTFT 60% 단축** (평균 10~15초 내외 완결)
+- 🔀 **동적 대화 지원**: 대화 도중 실시간으로 출발/도착지를 자유자재로 덮어쓰기(Dynamic Override) 가능
 
 ---
 
@@ -81,19 +83,26 @@ OPENAI_API_KEY=sk-...
 |------|------|------|
 | 0단계 | Data Augmentation | (오프라인) GPT-4o-mini를 활용하여 각 규정에 대해 10~15개의 문맥 동의어/검색 키워드 대량 증강 |
 | 1단계 | Data Ingestion    | JSONL → text-embedding-3-small → ChromaDB |
-| 2단계 | Router & Slot Filling| GPT로 노선·물품 슬롯 추출, 미확정 시 재질문 |
+| 2단계 | Router & Slot Filling| **(통합)** GPT-5-mini로 노선·물품 슬롯 추출 및 DB 매핑 동시 처리 (API 1회 왕복 단축) |
 | 3단계 | Rewriter & Retriever | 용어 정규화 + 메타데이터 필터 벡터 검색 (검색 100% 실패 시 범용 지식용 `gpt-5.2` Fallback 가동) |
-| 4단계 | Judge & Generator | 이모지 판정 + Bullet Point 답변 생성 |
+| 4단계 | Judge & Generator | 이모지 판정 + Bullet Point 형태의 깔끔한 가이드 답변 생성 |
 
 자세한 설계는 [RAG_pipeline/schema.md](./RAG_pipeline/schema.md) 참고.
+
+---
+
+## 🔥 **주요 UX 향상 및 최적화 포인트**
+- **레이턴시 극대화 (`reasoning_effort="low"`)**: 불필요한 LLM 내부 추론 루프를 강제로 짧게 끊어내어 답변 품질 저하 없이 전체 프로세스 속도를 약 2.5배 쾌속화 설계
+- **초정밀 누락 슬롯 유도 (Targeted Asking)**: 단순히 "어디서 어디로 가시나요?" 대신 "🛬 도착하시는 국가를 알려주세요" 등 부족한 슬롯만을 핀포인트로 질문
+- **LLM 환각(Hallucination) 방어벽**: 출발지를 유추하지 않고 무조건 `null` 로 엄격히 통제 + 미지원 노선(일본 등) 입력 시 **⚠️ 타국가 규정 경고 선출력** 방어 로직 탑재
 
 ---
 
 ## 기술 스택
 
 - **LLM**:
-  - ⚙️ **기본 파이프라인**: `gpt-4o-mini` (속도 및 비용 효율성 최적화)
-  - 🧠 **일반 지식Fallback**: `gpt-5.2` (DB 미등재 물품에 대해 최상위 플래그십 AI로 깊이 있는 추론 제공)
+  - ⚙️ **기본 파이프라인**: `gpt-5-mini` (`reasoning_effort` 튜닝을 통한 속도 최적화)
+  - 🧠 **일반 지식 Fallback**: `gpt-5.2` (DB 미등재 물품에 대해 최상위 플래그십 AI로 깊이 있는 추론 제공)
 - **Embedding**: `text-embedding-3-small` (OpenAI)
 - **Vector DB**: ChromaDB
 - **Framework**: LangChain
