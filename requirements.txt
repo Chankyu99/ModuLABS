@@ -1,21 +1,23 @@
-# Python 3.11 환경 사용
+# pip install 필요한 라이브러리 목록
+# 가상환경에서 아래 명령어로 설치하세요:
+#   .venv/bin/pip install -r requirements.txt
 
-# 1. Frontend & UI
-streamlit==1.31.0
+# 1. 화면 그리는 용도 (app.py)
+streamlit
 
-# 2. RAG Framework (LangChain Ecosystem)
-langchain==0.1.12
-langchain-community==0.0.28
-langchain-core==0.1.40
+# 2. RAG 파이프라인 뼈대 (bot_logic.py, ingest.py)
+langchain
+langchain-community
+langchain-core
 
-# 3. Model & Embeddings
-langchain-openai==0.0.8
-openai==1.13.3
-tiktoken==0.6.0
+# 3. OpenAI 모델 및 임베딩 (gpt-4o-mini, text-embedding-3-small)
+langchain-openai
+openai
+tiktoken
 
-# 4. Vector Database (ChromaDB)
-langchain-chroma==0.1.2
-chromadb==0.4.24
+# 4. 벡터 데이터베이스 (ChromaDB)
+langchain-chroma
+chromadb
 
-# 5. Etc (Data Handling)
-pydantic==2.6.3
+# 5. 환경변수 관리
+python-dotenv

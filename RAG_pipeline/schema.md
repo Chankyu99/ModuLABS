@@ -1,83 +1,52 @@
-# Schema
+# 🚀 '기내뭐돼' 최종 RAG 파이프라인 계획안 (UX 및 계층 구조 통합판)
 
-```mermaid
-graph TD
-    %% ==========================================
-    %% 1. 데이터 준비 (OFFLINE)
-    %% ==========================================
-    subgraph Data_Preparation ["1. 데이터 준비 및 색인 (Knowledge Base)"]
-        style Data_Preparation fill:#f9f9f9,stroke:#333,stroke-width:2px
-        
-        Source1[("📘 1. 국내선 보안 규정")]
-        Source2[("📕 2. 국제선 보안 규정")]
-        Source3[("🌍 3. 도착지 국가별 규정")]
-        Source4[("🧳 4. 위탁수하물 규정")]
-        Source5[("☠️ 5. 반입 금지 위험물")]
+## 🌟 서비스 핵심 철학 및 차별화 전략 (Core Value)
+1. **정확성 (Law-based):** RAG 기술을 활용해 공식 법령 및 보안 규정 원문 데이터만 참조하여 답변의 정확도 극대화.
+2. **중립성 (Independent):** 특정 항공사에 속하지 않은 독립 플랫폼으로서, 메타데이터 교차 검색을 통해 통합/객관적 규정 제공.
+3. **편의성 (Conversational):** 사용자 환경에 최적화된 대화형 챗봇을 통해 복잡한 규정을 누구나 이해하기 쉬운 언어로 전달.
 
-        Processor{{"⚙️ 데이터 전처리"}}
-        
-        Source1 & Source2 & Source3 & Source4 & Source5 --> Processor
-        
-        VectorDB[("🗄️ 벡터 DB (의미 검색)")]
-        KeywordDB[("🗄️ 키워드 DB (단어 검색)")]
-        
-        Processor --> VectorDB
-        Processor --> KeywordDB
-    end
+---
 
-    %% ==========================================
-    %% 2. 실시간 질문 처리 (ONLINE)
-    %% ==========================================
-    subgraph User_Flow ["2. 실시간 질문 및 답변 (Live Chat)"]
-        style User_Flow fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
-        
-        User((👤 사용자 질문)) --> |"사과 가져가도 돼?"| Safety_Check
-        
-        %% 단계 0: 위험물 1차 필터링 (가장 빠름)
-        Safety_Check{{"🚨 위험물 1차 체크<br>(국내/국제 상관없이 즉시 차단)"}}
-        Safety_Check --> |"폭발/인화성"| Route_Danger[🔍 5. 위험물 규정 즉시 검색]
-        Safety_Check --> |"일반 물품"| Context_Check
-        
-        %% 단계 1: 맥락 확인 및 되묻기 (새로 추가된 핵심 로직)
-        Context_Check{{"🤔 필수 정보 확인<br>(국내선/국제선 파악)"}}
-        Context_Check --> |"정보 부족"| Ask_User["💬 챗봇 되묻기:<br>'국제선인가요, 국내선인가요?'"]
-        Ask_User -.-> |"사용자 답변 (예: 국제선이요)"| User
-        
-        Context_Check --> |"정보 충분"| Intent_Router
-        
-        %% 단계 2: 의도에 따른 타겟 라우팅 (검색 효율 극대화)
-        Intent_Router{{"🧠 목적지 라우팅"}}
-        
-        Intent_Router --> |"국제선"| Route_Intl[🔍 2. 국제선 + 3. 도착지 규정만 검색]
-        Intent_Router --> |"국내선"| Route_Dom[🔍 1. 국내선 규정만 검색]
-        Intent_Router --> |"위탁 (짐 부치기)"| Route_Baggage[🔍 4. 위탁수하물 규정만 검색]
-        
-        %% 단계 3: 타겟팅된 검색 및 생성
-        Route_Danger --> Retriever
-        Route_Intl --> Retriever
-        Route_Dom --> Retriever
-        Route_Baggage --> Retriever
-        
-        Retriever[("📥 하이브리드 검색<br>(선택된 DB에서만 검색)")]
-        
-        Retriever --> |"정확도 높은 문서 추출"| LLM_Brain
-        
-        LLM_Brain["🤖 AI 답변 생성<br>타겟 문서 기반으로 정확하고 빠른 답변"]
-        
-        LLM_Brain --> Final_Answer[💬 최종 답변 제공]
-    end
+## 0단계: 오프라인 데이터 증강 (Data Augmentation) ⭐️ 신규
 
-    %% 스타일링
-    classDef sources fill:#fff3e0,stroke:#e65100,stroke-width:2px;
-    classDef danger fill:#ffebee,stroke:#c62828,stroke-width:2px;
-    classDef logic fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px;
-    classDef clarify fill:#fff9c4,stroke:#fbc02d,stroke-width:2px;
-    
-    class Source1,Source2,Source3,Source4 sources;
-    class Source5,Route_Danger,Safety_Check danger;
-    class Intent_Router,LLM_Brain logic;
-    class Context_Check,Ask_User clarify;
-```
+- **사전 구축 스크립트:** `data_augmenter.py`를 통해 원본 규정(`export.jsonl`)을 순회하며 GPT-4o-mini 호출.
+- **키워드 대량 생성:** 각 규정과 연관되어 사용자가 일상적으로 검색할 만한 하위 품목 예시(동의어/브랜드명) 10~15개를 자동 생성하여 `page_content` 하단에 병합 (`augmented.jsonl` 생성).
+- **목적:** 실시간 챗봇의 단어 매핑(탐색) 능력을 오프라인 단계에서 극대화하여 억측(Hallucination) 원천 차단.
 
+## 1단계: 벡터 인덱싱 (Data Ingestion & Indexing)
 
+- **데이터 소스:** 키워드가 추가된 `index_docstore_augmented.jsonl` 파일을 최우선으로 리딩.
+- **임베딩:** OpenAI의 `text-embedding-3-small`을 사용하여 증강된 텍스트를 벡터로 변환 후 ChromaDB에 저장.
+- **메타데이터 분리 저장:** 국가(KR, US) 및 ID를 추출하여 벡터 DB의 메타데이터 필드에 매핑.
 
+## 2단계: 대화 상태 관리 및 의도 파악 (Router & Slot Filling) ⭐️
+
+AI는 대화 시작 시점부터 아래 **'데이터 계층 구조'**의 우선순위에 따라 필수 인풋값을 확보합니다.
+
+- **[우선순위 1] 노선 정보 (출발지, 도착지)**
+  - 정보 부재 시: "어디에서 출발하여 어디로 가시나요?" 질문 (즉시 개입).
+  - 정보 중복 시: 출발지와 도착지가 같은 경우 에러 메시지 출력 후 대기.
+- **[우선순위 2] 대상 물품 (물품명/Item)**
+  - 정보 부재 시: "어떤 물건의 반입 규정이 궁금하신가요?" 질문.
+  - 정보 확인 시: 공식 규정 데이터인 `item_original`과 매핑 시도.
+- **[우선순위 3] 상세 속성 (Wh, ml, 수량 등)**
+  - 노선과 물품이 확정된 후, 해당 규정(`page_content`)에서 요구하는 세부 수치를 기반으로 확인.
+  - *(UX 개선 적용)*: 사용자 피로도를 줄이기 위해 직접 수치를 되묻기보다는, 4단계 생성기에서 "100ml 이하일 경우 가능합니다"와 같이 허용 범위를 먼저 안내하는 방식으로 동적 처리.
+
+- **다중 물품 분리 (Multi-Intent Parsing):** 사용자가 여러 물품을 한 번에 물어볼 경우, 각각 독립적인 검색 파이프라인을 태울 수 있도록 분리.
+- **포괄적 질문 제어 (Broad Query Handling):** "반입 금지 물품 다 알려줘" 등 광범위한 질문 시, 카테고리 버튼을 제시하여 범위 축소 유도.
+
+## 3단계: 쿼리 재작성 및 하이브리드 검색 (Rewriter & Retriever)
+
+- **카테고리 매핑(용어 정규화):** 사용자의 구체적인 물품명(예: 고추장)을 LLM을 거쳐 공식 전문 용어(예: 액체·분무·겔류)로 1차 매핑.
+- **교차 메타데이터 검색 (Self-Querying):** 확정된 '노선 정보'를 바탕으로 필터 조건을 자동 생성하여 한국/미국 등 관련 국가 규정을 동시에 교차 검색.
+- **병렬 검색 (Parallel Retrieval):** 분리된 다중 물품에 대해 각각 동시에 벡터 DB를 검색하여 속도 지연 방지.
+
+## 4단계: 최종 판정 및 답변 생성 (Judge & Generator)
+
+- **결론 선행 출력 (Bottom-Line First):** 직관적인 이모지(🟢/🟡/🔴)와 함께 결론(기내/위탁 가능 여부)을 최상단에 먼저 출력.
+- **Bullet Point 요약:** 긴 줄글을 피하고, 허용 조건(reason_and_condition)을 2~3줄의 간결한 글머리 기호(-)로 요약하여 안내.
+- **엄격한 판정 룰:** 검색된 출/도착국 규정 중 단 하나라도 prohibited면 최종 [반입 절대 불가] 처리.
+- **듀얼 LLM & 일반 지식 Fallback:** ⭐️ 신규
+  - 일반 RAG 답변(기본 파이프라인) 생성 및 슬롯 추출은 빠르고 가벼운 `gpt-4o-mini`가 전담.
+  - 고도화된 증강 데이터 교차 검색마저 실패한 경우(완전 미등재 물품), 일반 IATA/TSA 상식 기반으로 답변해야 하므로 **초거대 플래그십 LLM(`gpt-5.2`)**을 전격 투입하여 압도적인 추론 능력으로 안전한 가이드를 제공.
