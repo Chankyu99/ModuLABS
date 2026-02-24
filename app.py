@@ -173,7 +173,7 @@ with st.sidebar:
 st.markdown("""
 <div class="hero-header">
   <div class="hero-title">✈️ 기내뭐돼</div>
-  <p class="hero-subtitle">공식 항공 규정 기반 · AI 반입 가능 여부 안내 서비스</p>
+  <p class="hero-subtitle">가져갈까 말까? 비행기 짐싸기 고민 해결! 🎒</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -183,7 +183,7 @@ if not st.session_state.messages:
 <div class="chat-bot">
   <div class="sender-label">기내뭐돼 봇</div>
   안녕하세요! 저는 항공 반입 규정 안내 챗봇 <b>기내뭐돼</b>입니다. 🛫<br><br>
-  궁금하신 <b>노선</b>과 <b>물품</b>을 알려주시면 기내/위탁 반입 가능 여부를 안내해 드릴게요.<br><br>
+  <b>출발지</b>와 <b>도착지</b>, 그리고 <b>물품</b>을 알려주시면 기내/위탁 반입 가능 여부를 안내해 드릴게요.<br><br>
   예시 질문:<br>
   • <i>"한국에서 미국 갈 때 고추장 가져갈 수 있어?"</i>
 </div>
@@ -220,22 +220,10 @@ if user_input := st.chat_input("노선과 물품을 입력하세요 (예: 한국
 </div>
 """, unsafe_allow_html=True)
 
-    # 로딩 스피너 (슬롯 추출 및 DB 검색까지 대기)
-    with st.spinner("🔍 항공 규정 검색 중..."):
-        bot_response_stream, updated_slots = run_pipeline(
-            user_message=user_input,
-            chat_history=st.session_state.messages[:-1],  # 방금 추가한 것 제외
-            slots=st.session_state.slots,
-        )
-
-    # 슬롯 상태 업데이트
-    st.session_state.slots = updated_slots
-
-    # 스트리밍 응답 렌더링
+    # 스트리밍 응답 및 로딩 렌더링용 placeholder 생성
     placeholder = st.empty()
-    full_response = ""
     
-    # 첫 토큰이 오기 전까지 대기하는 동안 보여줄 임시 메시지 (CSS 애니메이션 스피너 포함)
+    # [UX 개선] LLM 호출 전부터 챗봇 말풍선 안에서 돋보기 로딩 애니메이션 먼저 출력
     placeholder.markdown("""
 <style>
 .loader {
@@ -258,10 +246,22 @@ if user_input := st.chat_input("노선과 물품을 입력하세요 (예: 한국
   <div class="sender-label">기내뭐돼 봇</div>
   <div style="display: flex; align-items: center; color: rgba(255,255,255,0.7);">
     <div class="loader"></div>
-    🤔 규정 검토 및 답변 작성 중...
+    🔍 항공 규정 검색 및 답변 작성 중...
   </div>
 </div>
 """, unsafe_allow_html=True)
+
+    # 파이프라인(슬롯 추출, DB 검색, 스트리밍) 실행
+    bot_response_stream, updated_slots = run_pipeline(
+        user_message=user_input,
+        chat_history=st.session_state.messages[:-1],  # 방금 추가한 것 제외
+        slots=st.session_state.slots,
+    )
+
+    # 슬롯 상태 업데이트
+    st.session_state.slots = updated_slots
+
+    full_response = ""
 
     first_chunk = True
     for chunk in bot_response_stream:
