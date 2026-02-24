@@ -24,3 +24,7 @@ chroma_db/
 .vscode/
 .idea/
 .streamlit/
+
+# === Media / Presentation ===
+*.mp4
+*.mov
