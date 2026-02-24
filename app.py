@@ -168,10 +168,6 @@ with st.sidebar:
 - 노선을 바꾸려면 새로 말해주세요
 """)
     st.markdown("---")
-    st.markdown(
-        "<div style='font-size:0.75rem;color:#555;'>Powered by LangChain + ChromaDB + GPT-4o-mini</div>",
-        unsafe_allow_html=True,
-    )
 
 # ── 메인 헤더 ─────────────────────────────────────────────────────
 st.markdown("""
