@@ -44,6 +44,8 @@ LANGCHAINTON_DS7/
 
 ### 1. 가상환경 세팅
 
+> **[권장 환경]** Python 3.9.6 
+
 ```bash
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt

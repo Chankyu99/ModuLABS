@@ -1,3 +1,4 @@
+# Python Version: 3.9.6
 aiohappyeyeballs==2.6.1
 aiohttp==3.13.3
 aiosignal==1.4.0
