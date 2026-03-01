@@ -1,0 +1,10 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+nc: 5
+names:
+- power_bank
+- liquid_cosmetics
+- lighter
+- laptop
+- tablet
