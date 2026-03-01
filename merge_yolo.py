@@ -111,7 +111,7 @@ if __name__ == "__main__":
     # 각 물품별 다운로드 예상 폴더명 매핑
     DATASET_FOLDERS = {
         "power_bank": "dataset_powerbank",
-        "liquid_cosmetics": "dataset_cosmetics",
+        "liquid_cosmetics": "dataset_liquid_cosmetics",
         "lighter": "dataset_lighter",
         "laptop": "dataset_laptop",
         "tablet": "dataset_tablet"

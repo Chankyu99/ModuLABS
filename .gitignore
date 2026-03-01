@@ -28,3 +28,11 @@ chroma_db/
 # === Media / Presentation ===
 *.mp4
 *.mov
+# V2 Dataset Folders
+dataset_powerbank/
+dataset_liquid_cosmetics/
+dataset_lighter/
+dataset_laptop/
+dataset_tablet/
+yolo_master_dataset/
+
