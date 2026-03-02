@@ -30,19 +30,23 @@ def merge_datasets(input_dirs, output_dir, target_class_name):
 
     total_images = 0
     
+    import random
+    
+    # 클래스당 최대 수집할 이미지 수 제한 (불균형 해소)
+    MAX_IMAGES_PER_CLASS = 1000
+    
+    # 1. 먼저 이 클래스에 속하는 모든 가능한 (image, label) 쌍을 스캔합니다.
+    all_pairs = []
+    
     for ds_idx, in_dir in enumerate(input_dirs):
         in_path = Path(in_dir)
         yaml_path = in_path / 'data.yaml'
         if not yaml_path.exists():
-            print(f"⚠️ 경고: {yaml_path} 파일이 없습니다. 스킵합니다.")
             continue
             
         data_info = load_yaml(yaml_path)
         source_names = data_info.get('names', [])
-        
-        # 각 데이터셋마다 '명칭'이 다를 수 있지만 일단 0번 인덱스를 target_class_id로 매핑한다고 가정.
-        # (만약 한 데이터셋에 여러 클래스가 섞여있다면 추가 로직이 필요하지만 현재는 단일 객체 데이터셋이라고 가정합니다)
-        print(f"[{in_path.name}] 병합 시작... (원본 클래스 목록: {source_names})")
+        print(f"[{in_path.name}] 스캔 중... (원본 클래스: {source_names})")
 
         for split in ['train', 'valid', 'test']:
             split_dir = in_path / split
@@ -58,37 +62,61 @@ def merge_datasets(input_dirs, output_dir, target_class_name):
             for img_file in img_dir.iterdir():
                 if not img_file.is_file() or img_file.name.startswith('.'):
                     continue
-                    
+                
                 # 파일 이름 충돌 방지를 위한 prefix 추가
                 new_img_name = f"ds{ds_idx}_{img_file.name}"
                 new_lbl_name = f"ds{ds_idx}_{img_file.stem}.txt"
-                
                 lbl_file = lbl_dir / f"{img_file.stem}.txt"
                 
-                if lbl_file.exists():
-                    # 라벨이 있으면 라벨 파일 읽어서 매핑 수정 후 복사
-                    with open(lbl_file, 'r', encoding='utf-8') as f:
-                        lines = f.readlines()
-                    
-                    new_lines = []
-                    for line in lines:
-                        parts = line.strip().split()
-                        if not parts:
-                            continue
-                        # 기존 클래스 ID 무시하고 target_class_id 로 덮어쓰기 (단일 타겟이므로)
-                        new_line = f"{target_class_id} " + " ".join(parts[1:])
-                        new_lines.append(new_line)
-                    
-                    with open(output_path / split / 'labels' / new_lbl_name, 'w', encoding='utf-8') as f:
-                        f.write("\n".join(new_lines) + "\n")
-                else:
-                    # 백그라운드 이미지(객체 없음)인 경우 빈 텍스트 파일 생성
-                    with open(output_path / split / 'labels' / new_lbl_name, 'w', encoding='utf-8') as f:
-                        f.write("")
+                all_pairs.append({
+                    "orig_img": img_file,
+                    "orig_lbl": lbl_file,
+                    "new_img_name": new_img_name,
+                    "new_lbl_name": new_lbl_name,
+                    "split": split
+                })
 
-                # 이미지 복사
-                shutil.copy2(img_file, output_path / split / 'images' / new_img_name)
-                total_images += 1
+    # 2. Random Sampling (최대 MAX_IMAGES_PER_CLASS 개까지만)
+    if len(all_pairs) > MAX_IMAGES_PER_CLASS:
+        print(f"총 {len(all_pairs)}장 확인됨 -> 불균형 해소를 위해 랜덤하게 {MAX_IMAGES_PER_CLASS}장만 추출합니다.")
+        random.shuffle(all_pairs)
+        selected_pairs = all_pairs[:MAX_IMAGES_PER_CLASS]
+    else:
+        print(f"총 {len(all_pairs)}장 확인됨 -> 1000장 미만이므로 모두 사용합니다.")
+        selected_pairs = all_pairs
+
+    # 3. 추출된 파일들을 출력 폴더로 복사 및 라벨 수정
+    for pair in selected_pairs:
+        orig_img = pair["orig_img"]
+        orig_lbl = pair["orig_lbl"]
+        new_img_name = pair["new_img_name"]
+        new_lbl_name = pair["new_lbl_name"]
+        split = pair["split"]
+
+        if orig_lbl.exists():
+            # 라벨이 있으면 라벨 파일 읽어서 매핑 수정 후 복사
+            with open(orig_lbl, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+            
+            new_lines = []
+            for line in lines:
+                parts = line.strip().split()
+                if not parts:
+                    continue
+                # 기존 클래스 ID 무시하고 target_class_id 로 덮어쓰기
+                new_line = f"{target_class_id} " + " ".join(parts[1:])
+                new_lines.append(new_line)
+            
+            with open(output_path / split / 'labels' / new_lbl_name, 'w', encoding='utf-8') as f:
+                f.write("\n".join(new_lines) + "\n")
+        else:
+            # 백그라운드 이미지(객체 없음)인 경우 빈 텍스트 파일 생성
+            with open(output_path / split / 'labels' / new_lbl_name, 'w', encoding='utf-8') as f:
+                f.write("")
+
+        # 이미지 복사
+        shutil.copy2(orig_img, output_path / split / 'images' / new_img_name)
+        total_images += 1
                 
     # 최종 data.yaml 생성
     final_yaml = {
