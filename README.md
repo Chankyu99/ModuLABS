@@ -1,5 +1,7 @@
 # 🎬 MovieLens 1M 기반 영화 추천 시스템 (AutoInt / AutoInt+)
 
+![Streamlit 추천 앱 시각화 화면](assets/image.png)
+
 MovieLens 1M 데이터셋과 AutoInt 모델을 활용한 영화 추천 시스템입니다.  
 멀티헤드 셀프 어텐션 기반의 피처 상호작용 학습을 통해 사용자 맞춤 영화를 추천합니다.
 
