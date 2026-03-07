@@ -1,4 +1,4 @@
-# 🎬 MovieLens 1M 기반 영화 추천 시스템 (AutoInt / AutoInt+)
+# MovieLens 1M 기반 영화 추천 시스템 (AutoInt / AutoInt+)
 
 ![Streamlit 추천 앱 시각화 화면](assets/image.png)
 
@@ -31,10 +31,10 @@ RecSys_Movie/
 
 ---
 
-## 🔄 워크플로우
+## 워크플로우
 
 ### Step 1. 데이터 분석 및 전처리
-> 📓 `data_preprocessing.ipynb`
+> `data_preprocessing.ipynb`
 
 - MovieLens 1M 원본 데이터 로드 (`users.dat`, `movies.dat`, `ratings.dat`)
 - EDA: 장르별/연도별 영화 수, 평점 분포, 장르별 평점 분석
@@ -43,7 +43,7 @@ RecSys_Movie/
 - 출력: `movielens_rcmm_v2.csv`
 
 ### Step 2. 피처 엔지니어링 + Hard Negative Sampling (선택)
-> 🐍 `build_v3_data.py`
+> `build_v3_data.py`
 
 ```bash
 python build_v3_data.py
@@ -59,7 +59,7 @@ python build_v3_data.py
 - 출력: `movielens_rcmm_v3.csv`
 
 ### Step 3. 모델 학습 및 평가
-> 📓 `AutoInt.ipynb` 또는 `AutoIntplus.ipynb`
+> `AutoInt.ipynb` 또는 `AutoIntplus.ipynb`
 
 | 모델 | 구조 | 특징 |
 |------|------|------|
@@ -77,7 +77,7 @@ streamlit run show_st.py
 
 ---
 
-## 📈 성능 개선 기록 (AutoInt+)
+## 성능 개선 기록 (AutoInt+)
 
 | 버전 | 변경 사항 | NDCG@10 | Hit Rate@10 |
 |------|-----------|---------|-------------|
@@ -89,7 +89,7 @@ streamlit run show_st.py
 
 ---
 
-## ⚙️ 환경 설정
+## 환경 설정
 
 ```bash
 # 가상환경 생성 및 활성화
@@ -104,7 +104,7 @@ pip install streamlit joblib
 
 ---
 
-## 📊 데이터셋 정보
+## 데이터셋 정보
 
 **MovieLens 1M** (GroupLens Research)
 - 6,040명의 사용자, 약 3,900편의 영화, 1,000,209개의 평점
