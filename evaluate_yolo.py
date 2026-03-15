@@ -282,17 +282,33 @@ def main():
     print("-" * 65)
     try:
         # ultralytics >= 8.0 API
-        per_class_p  = metrics.box.p          # shape: (num_classes,)
-        per_class_r  = metrics.box.r
+        per_class_p         = metrics.box.p
+        per_class_r         = metrics.box.r
         per_class_map50     = metrics.box.ap50
         per_class_map50_95  = metrics.box.ap
 
-        for i, name in enumerate(CLASS_NAMES):
-            p  = per_class_p[i]  if i < len(per_class_p)  else 0.0
-            r  = per_class_r[i]  if i < len(per_class_r)  else 0.0
-            m50 = per_class_map50[i]    if i < len(per_class_map50)    else 0.0
-            m95 = per_class_map50_95[i] if i < len(per_class_map50_95) else 0.0
-            print(f"{name:<20} {p:>10.3f} {r:>10.3f} {m50:>10.3f} {m95:>10.3f}")
+        # ⚠️ 핵심 수정: test set에 샘플이 없는 클래스는 ultralytics가
+        #   per_class 배열에서 건너뜁니다.
+        #   ap_class_index로 실제 클래스 ID를 가져와야 정확합니다.
+        present_class_ids = metrics.box.ap_class_index.tolist() \
+            if hasattr(metrics.box, "ap_class_index") else list(range(len(per_class_p)))
+
+        # 전체 클래스 결과 초기화 (없는 클래스는 0)
+        results_by_id = {}
+        for rank, cls_id in enumerate(present_class_ids):
+            results_by_id[int(cls_id)] = (
+                per_class_p[rank],
+                per_class_r[rank],
+                per_class_map50[rank],
+                per_class_map50_95[rank],
+            )
+
+        for cls_id, name in enumerate(CLASS_NAMES):
+            if cls_id in results_by_id:
+                p, r, m50, m95 = results_by_id[cls_id]
+                print(f"{name:<20} {p:>10.3f} {r:>10.3f} {m50:>10.3f} {m95:>10.3f}")
+            else:
+                print(f"{name:<20} {'N/A(test 샘플 없음)':>43}")
 
         print("-" * 65)
         print(f"{'[전체 평균]':<20} {metrics.box.mp:>10.3f} {metrics.box.mr:>10.3f} "
@@ -301,6 +317,7 @@ def main():
         print(f"   (클래스별 세부 지표 파싱 실패: {e})")
         print(f"   전체 mAP50: {metrics.box.map50:.3f}  mAP50-95: {metrics.box.map:.3f}")
     print("=" * 65)
+
 
     # confusion matrix 복사
     cm_src = out_dir / "val_output" / "confusion_matrix.png"

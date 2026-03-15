@@ -82,6 +82,17 @@ def parse_args():
         action="store_true",
         help="last.pt 에서 학습 재시작"
     )
+    parser.add_argument(
+        "--fast",
+        action="store_true",
+        help="빠른 결과 확인 모드: imgsz=320, epochs=20으로 강제 설정 (결과를 빨리 보고 싶을 때)"
+    )
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=4,
+        help="데이터 로더 워커 수 [default: 4]"
+    )
     return parser.parse_args()
 
 
@@ -103,18 +114,27 @@ def main():
         print("   merge_yolo.py를 먼저 실행했는지 확인하세요.")
         return
 
+    # ── --fast 모드 적용 ─────────────────────────────────────────
+    if args.fast:
+        print("⚡ [FAST MODE] imgsz=320, epochs=20 으로 강제 설정합니다.")
+        args.imgsz = 320
+        args.epochs = 20
+        args.patience = 10
+
     # ── 실험 이름 자동 생성 ──────────────────────────────────────
     model_tag = Path(args.model).stem  # e.g. "yolov8n"
+    mode_tag = "_fast" if args.fast else ""
     timestamp = datetime.now().strftime("%m%d_%H%M")
-    exp_name = args.name if args.name else f"{model_tag}_ep{args.epochs}_{timestamp}"
+    exp_name = args.name if args.name else f"{model_tag}_ep{args.epochs}{mode_tag}_{timestamp}"
 
     # ── 모델 로드 ─────────────────────────────────────────────────
     print(f"\n🚀 YOLO 파인튜닝 학습 시작")
     print(f"   Base model : {args.model}")
     print(f"   Data       : {data_path.resolve()}")
     print(f"   Epochs     : {args.epochs}")
-    print(f"   Image size : {args.imgsz}px")
+    print(f"   Image size : {args.imgsz}px  {'(FAST MODE)' if args.fast else ''}")
     print(f"   Batch      : {args.batch}")
+    print(f"   Workers    : {args.workers}")
     print(f"   Experiment : {exp_name}")
     print(f"   Resume     : {args.resume}")
     print("-" * 50)
@@ -138,22 +158,30 @@ def main():
         lr0=args.lr0,
         patience=args.patience,
         device=args.device if args.device else None,
+        workers=args.workers,
         project="runs/detect",
         name=exp_name,
         exist_ok=True,              # 같은 이름 실험 덮어쓰기 허용
         resume=args.resume,
-        # ----- 권장 augmentation (기본값 외 추가 설정) -----
+        # ----- Augmentation -----
+        # ⚠️ mosaic/mixup을 끔: 빈 라벨 파일과 충돌하여
+        #    'shape mismatch' RuntimeError 유발 (ultralytics 알려진 이슈)
+        mosaic=0.0,
+        mixup=0.0,
+        copy_paste=0.0,
         hsv_h=0.015,                # 색조 조정 (조명 변화 대응)
         hsv_s=0.7,                  # 채도 조정
         hsv_v=0.4,                  # 명도 조정
         flipud=0.05,                # 상하 뒤집기
         fliplr=0.5,                 # 좌우 뒤집기
-        mosaic=1.0,                 # Mosaic augmentation (배경 다양화)
-        mixup=0.1,                  # Mixup augmentation
-        copy_paste=0.0,
+        # ----- NMS 속도 최적화 (epoch 12 이후 validation 폭발적 지연 방지) -----
+        # 기본 val_conf=0.001 → 저신뢰도 박스 수만 개 생성 → NMS 타임아웃
+        conf=0.01,                  # inference confidence threshold (높일수록 NMS 박스 수 감소)
+        iou=0.7,                    # NMS IoU threshold
+        max_det=300,                # 이미지 당 최대 탐지 박스 수 제한 (기본 300)
         # ----- 저장 설정 -----
         save=True,
-        save_period=10,             # 10 epoch마다 중간 체크포인트 저장
+        save_period=-1,             # 중간 체크포인트 저장 안 함 (속도 향상)
         val=True,                   # 매 epoch 후 validation 실행
         plots=True,                 # loss curve / confusion matrix 그래프 저장
     )

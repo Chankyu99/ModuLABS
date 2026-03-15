@@ -36,3 +36,9 @@ dataset_laptop/
 dataset_tablet/
 yolo_master_dataset/
 
+
+# === Large files (GitHub 100MB limit) ===
+*.zip
+yolov8*.pt
+yolo11*.pt
+runs/
