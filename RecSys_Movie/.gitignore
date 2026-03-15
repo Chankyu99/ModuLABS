@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.csv
+*.tsv
+*.h5
+*.pkl
+*.npy
+save_repo/
+autoint/model/
+autoint/data/
