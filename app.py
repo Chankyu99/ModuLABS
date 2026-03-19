@@ -8,7 +8,10 @@ app.py
 """
 
 import streamlit as st
-from bot_logic import run_pipeline
+from core.bot_logic import run_pipeline, process_vision_result
+from vision.ocr_pipeline import VisionPipeline
+import os
+from PIL import Image
 
 # ── 페이지 기본 설정 ────────────────────────────────────────────
 st.set_page_config(
@@ -130,6 +133,9 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 if "slots" not in st.session_state:
     st.session_state.slots = {}
+if "vision_pipeline" not in st.session_state:
+    with st.spinner("📦 비전 인공지능 모델을 초기화 중입니다... (최초 1회)"):
+        st.session_state.vision_pipeline = VisionPipeline()
 
 # ── 사이드바 ─────────────────────────────────────────────────────
 with st.sidebar:
@@ -159,13 +165,14 @@ with st.sidebar:
         st.rerun()
 
     st.divider()
+
+    st.divider()
     st.markdown("""
 **사용 팁 💡**
 - 노선을 먼저 알려주세요.
   *예: 한국 → 미국 등*
-- 물품명을 직접 입력하세요.
-  *예: 라이터, 보조배터리, 화장품 등*
-- 노선이나 물품을 바꾸려면 새로운 노선과 물품을 입력해주세요.
+- 물품명을 직접 입력하거나, 라벨 사진을 업로드해 보세요!
+- 노선이나 물품을 바꾸려면 새로운 정보를 입력해주시면 됩니다.
 """)
     st.markdown("---")
 
@@ -184,6 +191,7 @@ if not st.session_state.messages:
   <div class="sender-label">기내뭐돼 봇</div>
   안녕하세요! 저는 항공 반입 규정 안내 챗봇 <b>기내뭐돼</b>입니다. 🛫<br><br>
   <b>출발지</b>와 <b>도착지</b>, 그리고 <b>물품</b>을 알려주시면 기내/위탁 반입 가능 여부를 안내해 드릴게요.<br><br>
+  💡 <b>팁</b>: 제품의 라벨 사진을 업로드하시면 용량과 모델명을 AI가 자동으로 분석해 드립니다!<br><br>
   예시 질문:<br>
   • <i>"한국에서 미국 갈 때 고추장 가져갈 수 있어?"</i>
 </div>
@@ -208,8 +216,43 @@ for msg in st.session_state.messages:
 </div>
 """, unsafe_allow_html=True)
 
+# ── 제품 사진 분석 (Main Area) ─────────────────────────────────────
+st.markdown("---")
+# 업로더를 좁게 만들기 위해 컬럼 활용
+col1, col2 = st.columns([4, 1])
+with col1:
+    uploaded_file = st.file_uploader("📸 라벨 사진을 업로드해 보세요!", type=["jpg", "png", "jpeg"], label_visibility="collapsed")
+with col2:
+    analyze_btn = st.button("🔍 분석하기")
+
+if uploaded_file:
+    # 파일 저장
+    temp_dir = "tmp"
+    os.makedirs(temp_dir, exist_ok=True)
+    temp_path = os.path.join(temp_dir, uploaded_file.name)
+    with open(temp_path, "wb") as f:
+        f.write(uploaded_file.getbuffer())
+    
+    if analyze_btn:
+        with st.spinner("이미지 분석 중..."):
+            results = st.session_state.vision_pipeline.analyze(temp_path)
+            
+            if results:
+                # 크롭 이미지 시각화 (UX - 분석 시점에만 메시지 상단에 노출되도록 구성)
+                det = results[0]
+                # 슬롯 업데이트 및 메시지 생성
+                new_slots, vision_msg = process_vision_result(results, st.session_state.slots)
+                st.session_state.slots = new_slots
+                
+                # 챗봇 메시지로 결과 추가
+                st.session_state.messages.append({"role": "assistant", "content": vision_msg})
+                st.success("분석이 완료되었습니다!")
+                st.rerun()
+            else:
+                st.error("물체를 탐지하지 못했습니다. 다른 사진으로 시도해주세요.")
+
 # ── 채팅 입력 ─────────────────────────────────────────────────────
-if user_input := st.chat_input("노선과 물품을 입력하세요 (예: 한국→미국 고추장 반입 가능해?)"):
+if user_input := st.chat_input("질문을 입력하거나 아래에서 사진을 업로드하세요. (예: 한국→미국 고추장 반입 가능해?)"):
 
     # 사용자 메시지 추가
     st.session_state.messages.append({"role": "user", "content": user_input})
