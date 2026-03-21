@@ -3,12 +3,9 @@ data_augmenter.py
 -----------------
 data/index_docstore_export.jsonl 파일을 불러와서, 
 각 규정 항목(item) 및 원문 텍스트에 대해 사람들이 자주 검색할 만한 
-구체적인 동의어/예시 품목을 GPT-4o-mini로 자동 생성(Augmentation)합니다. 
+구체적인 동의어/예시 품목을 GPT-5.2로 자동 생성(Augmentation)합니다. 
 
 증강된 결과물은 data/index_docstore_augmented.jsonl로 저장됩니다.
-
-실행:
-    .venv/bin/python data_augmenter.py
 """
 
 import json
