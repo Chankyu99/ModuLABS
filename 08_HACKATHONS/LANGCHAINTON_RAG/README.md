@@ -101,12 +101,9 @@ LANGCHAINTON_RAG/
 │   ├── index_docstore_export.jsonl     # 항공 규정 원문 데이터 (84개 문서)
 │   └── index_docstore_augmented.jsonl  # 키워드 증강된 데이터셋
 │
-├── docs/
-│   ├── architecture.png                # RAG 아키텍처 다이어그램
-│   └── demo.gif                        # 챗봇 시연 GIF
-│
-└── RAG_pipeline/
-    └── schema.md                       # RAG 파이프라인 설계 계획서
+└── docs/
+    ├── architecture.png                # RAG 아키텍처 다이어그램
+    └── demo.gif                        # 챗봇 시연 GIF
 ```
 
 ---
