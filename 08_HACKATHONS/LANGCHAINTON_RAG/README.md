@@ -111,7 +111,7 @@ LANGCHAINTON_RAG/
 
 ---
 
-## 🛠️ 기술 스택
+## 기술 스택
 
 | 분류 | 기술 | 선택 이유 |
 |---|---|---|
@@ -125,7 +125,7 @@ LANGCHAINTON_RAG/
 
 ---
 
-## 👥 팀원 소개
+## 팀원 소개
 
 **팀명: LAGs (Liquids, Aerosols, and Gels)**
 
