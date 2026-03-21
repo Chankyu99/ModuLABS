@@ -10,14 +10,14 @@ app.py
 import streamlit as st
 from bot_logic import run_pipeline
 
-# ── 페이지 기본 설정 ────────────────────────────────────────────
+# 페이지 기본 설정 
 st.set_page_config(
     page_title="기내뭐돼 ✈️",
     page_icon="✈️",
     layout="centered",
 )
 
-# ── 커스텀 CSS ──────────────────────────────────────────────────
+# 커스텀 CSS 
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
@@ -125,13 +125,13 @@ section[data-testid="stSidebar"] * {
 </style>
 """, unsafe_allow_html=True)
 
-# ── 세션 상태 초기화 ─────────────────────────────────────────────
+# 세션 상태 초기화 
 if "messages" not in st.session_state:
     st.session_state.messages = []
 if "slots" not in st.session_state:
     st.session_state.slots = {}
 
-# ── 사이드바 ─────────────────────────────────────────────────────
+# 사이드바 
 with st.sidebar:
     st.markdown("## ✈️ 기내뭐돼")
     st.markdown("항공 반입 규정 RAG 챗봇")
@@ -169,7 +169,7 @@ with st.sidebar:
 """)
     st.markdown("---")
 
-# ── 메인 헤더 ─────────────────────────────────────────────────────
+# 메인 헤더 
 st.markdown("""
 <div class="hero-header">
   <div class="hero-title">✈️ 기내뭐돼</div>
@@ -177,7 +177,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ── 초기 안내 메시지 ──────────────────────────────────────────────
+# 초기 안내 메시지 
 if not st.session_state.messages:
     st.markdown("""
 <div class="chat-bot">
@@ -189,7 +189,7 @@ if not st.session_state.messages:
 </div>
 """, unsafe_allow_html=True)
 
-# ── 대화 히스토리 렌더링 ──────────────────────────────────────────
+# 대화 히스토리 렌더링 
 for msg in st.session_state.messages:
     if msg["role"] == "user":
         st.markdown(f"""
@@ -208,7 +208,7 @@ for msg in st.session_state.messages:
 </div>
 """, unsafe_allow_html=True)
 
-# ── 채팅 입력 ─────────────────────────────────────────────────────
+# 채팅 입력 
 if user_input := st.chat_input("노선과 물품을 입력하세요 (예: 한국→미국 고추장 반입 가능해?)"):
 
     # 사용자 메시지 추가

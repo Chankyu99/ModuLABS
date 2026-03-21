@@ -1,26 +1,12 @@
 """
 bot_logic.py
-------------
-schema.md 2~4단계 RAG 파이프라인 구현.
+------
+RAG 파이프라인 구현
 
-  2단계: Router & Slot Filling  — 대화에서 {출발지, 도착지, 물품} 추출
-  3단계: Rewriter & Retriever   — DB 목록 기반 항목 매핑 + 메타데이터 필터 벡터 검색
-  4단계: Judge & Generator      — 판정(🟢/🟡/🔴) + Bullet Point 답변 생성
+  Router & Slot Filling  — 슬롯 추출 + DB 매핑 
+  Retriever   — 메타데이터 필터 기반 유사도 검색 + Two-Track Fallback
+  Judge & Generator      — 	이모지 판정 + Bullet Point 형태 가이드 답변 생성
 
-[v2 개선]
-  - normalize_item() → map_item_to_db() 로 교체
-    : LLM이 자유 생성하던 방식 → DB 84개 항목 목록 직접 참조 후 선택
-    : "칼" → DB에서 "날 길이 6cm 초과 칼", "도끼·손도끼·큰 식칼 등 절단용 칼" 매핑
-    : "미숫가루" → DB에서 US "가공/캔 식품" 카테고리 매핑
-
-[v3 개선]
-  - DB 매핑 전체 실패 시 단순 Fallback → LLM 일반 지식 기반 답변으로 격상
-    : LLM이 물품을 추론 → 유사 카테고리 판단 → 항공 전문 지식으로 답변
-    : 답변 하단에 ⚠️ "DB 미등재 항목, 일반 규정 기반 안내" 단서 명시
-    : "보조배터리", "드라이기", "뜨개바늘" 등 DB 없는 물품 처리 가능
-
-단독 테스트:
-    .venv/bin/python bot_logic.py
 """
 
 import json
@@ -38,7 +24,7 @@ from langchain_core.messages import SystemMessage, HumanMessage
 
 load_dotenv()
 
-# ── 경로 / 상수 ────────────────────────────────────────────────
+# 경로 / 상수 
 BASE_DIR        = Path(__file__).parent
 CHROMA_DIR      = BASE_DIR / "chroma_db"
 DATA_FILE       = BASE_DIR / "data" / "index_docstore_export.jsonl"
@@ -46,7 +32,7 @@ COLLECTION_NAME = "airline_regulations"
 TOP_K           = 5          # 검색 결과 수
 MAX_MAPPED      = 3          # LLM이 선택할 최대 DB 항목 수
 
-# ── 모델 초기화 ────────────────────────────────────────────────
+# 모델 초기화 
 embeddings  = OpenAIEmbeddings(model="text-embedding-3-small")
 llm         = ChatOpenAI(model="gpt-5-mini", reasoning_effort="low")
 advanced_llm = ChatOpenAI(model="gpt-5.2", reasoning_effort="low")
@@ -57,9 +43,7 @@ vectorstore = Chroma(
 )
 
 
-# ─────────────────────────────────────────────────────────────
-# DB 항목 목록 로드 (앱 시작 시 1회)
-# ─────────────────────────────────────────────────────────────
+# DB 항목 목록 로드 (시작 시 1회)
 
 def load_db_items() -> dict[str, list[str]]:
     """
@@ -86,9 +70,7 @@ def load_db_items() -> dict[str, list[str]]:
 DB_ITEMS: dict[str, list[str]] = load_db_items()
 
 
-# ─────────────────────────────────────────────────────────────
 # 2단계: 슬롯 추출 (Router & Slot Filling)
-# ─────────────────────────────────────────────────────────────
 
 COMBINED_SYSTEM_PROMPT = """당신은 항공 규정 챗봇 전문가입니다.
 사용자 메시지와 대화 기록을 분석하여 다음 JSON 구조로만 정확히 출력하세요:
@@ -180,11 +162,7 @@ def check_missing_slots(slots: dict) -> Optional[str]:
 def retrieve_docs(slots: dict, mapped: dict[str, list[str]]) -> tuple[list[dict], bool]:
     """
     확정된 슬롯과 매핑 결과로 ChromaDB에서 관련 문서 검색.
-    [v3] 매핑 전체 실패 여부를 두 번째 반환값으로 제공.
-
-    Returns:
-        (retrieved_docs, all_mapping_failed)
-        - all_mapping_failed=True  → 모든 jurisdiction에서 매핑 실패 → v3 일반지식 Fallback 필요
+    매핑 전체 실패 여부를 두 번째 반환값으로 제공.
     """
     item          = slots.get("item", "")
     departure     = slots.get("departure", "KR")
@@ -236,9 +214,7 @@ def retrieve_docs(slots: dict, mapped: dict[str, list[str]]) -> tuple[list[dict]
     return all_docs, all_mapping_failed
 
 
-# ─────────────────────────────────────────────────────────────
 # 4단계: 최종 판정 + 답변 생성
-# ─────────────────────────────────────────────────────────────
 
 JUDGE_SYSTEM_PROMPT = """친절한 항공 규정 안내원입니다. 가장 쉽고 가독성 좋게 답변하세요.
 
@@ -419,9 +395,7 @@ def run_pipeline(
     return traced_stream(), updated_slots
 
 
-# ─────────────────────────────────────────────────────────────
 # 단독 테스트
-# ─────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     print("=" * 60)
     print("🛫 기내뭐돼 v3 — 일반지식 Fallback 테스트")

@@ -3,9 +3,6 @@ ingest.py
 ---------
 data/index_docstore_export.jsonl 파일을 읽어
 ChromaDB에 임베딩을 저장합니다.
-
-실행:
-    .venv/bin/python ingest.py
 """
 
 import json
@@ -17,10 +14,10 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 
-# ── 환경변수 로드 ──────────────────────────────────────────────
+# 환경변수 로드 
 load_dotenv()
 
-# ── 경로 설정 ──────────────────────────────────────────────────
+# 경로 설정 
 BASE_DIR   = Path(__file__).parent
 DATA_FILE_ORIGINAL = BASE_DIR / "data" / "index_docstore_export.jsonl"
 DATA_FILE_AUGMENTED = BASE_DIR / "data" / "index_docstore_augmented.jsonl"
@@ -76,13 +73,13 @@ def main():
 
     # 이미 DB가 존재하면 스킵
     if CHROMA_DIR.exists() and any(CHROMA_DIR.iterdir()):
-        print(f"✅ ChromaDB가 이미 존재합니다: {CHROMA_DIR}")
+        print(f" ChromaDB가 이미 존재합니다: {CHROMA_DIR}")
         print("   재생성하려면 chroma_db/ 폴더를 삭제 후 다시 실행하세요.")
         return
 
     # 1) 데이터 로드 찾기
     DATA_FILE = get_data_file()
-    print(f"\n📂 데이터 파일 로드 중: {DATA_FILE}")
+    print(f"\n 데이터 파일 로드 중: {DATA_FILE}")
     records = load_jsonl(DATA_FILE)
     print(f"   → {len(records)}개 레코드 발견")
 
@@ -95,7 +92,7 @@ def main():
     embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 
     # 4) ChromaDB 저장
-    print(f"\n💾 ChromaDB 저장 중: {CHROMA_DIR}")
+    print(f"\n ChromaDB 저장 중: {CHROMA_DIR}")
     vectorstore = Chroma.from_documents(
         documents=docs,
         embedding=embeddings,
@@ -103,7 +100,7 @@ def main():
         persist_directory=str(CHROMA_DIR),
     )
 
-    print(f"\n✅ 임베딩 완료! 총 {len(docs)}개 문서가 chroma_db/에 저장되었습니다.")
+    print(f"\n 임베딩 완료. 총 {len(docs)}개 문서가 chroma_db/에 저장되었습니다.")
     print("=" * 50)
 
 
