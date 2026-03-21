@@ -68,7 +68,7 @@ def build_documents(records: list[dict]) -> list[Document]:
 
 def main():
     print("=" * 50)
-    print("🛫 기내뭐돼 — 데이터 임베딩 시작")
+    print("데이터 임베딩 시작")
     print("=" * 50)
 
     # 이미 DB가 존재하면 스킵
