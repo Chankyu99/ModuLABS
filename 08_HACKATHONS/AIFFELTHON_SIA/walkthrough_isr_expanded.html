@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>분석 보고서 - 중동 분쟁 통합 (ISR Full)</title>
+    <style>
+        body { font-family: 'Inter', sans-serif; line-height: 1.6; max-width: 950px; margin: 40px auto; padding: 20px; color: #333; }
+        h1, h2, h3 { color: #1b5e20; border-bottom: 2px solid #a5d6a7; padding-bottom: 10px; }
+        .section { margin-bottom: 40px; padding: 20px; background: #f9f9f9; border-radius: 12px; }
+        .insight-box { background: #e8f5e9; padding: 15px; border-radius: 8px; border-left: 5px solid #2e7d32; margin-top: 15px; }
+        img { max-width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: 15px 0; }
+        @media print { body { margin: 0; } .section { page-break-inside: avoid; } }
+    </style>
+</head>
+<body>
+    <h1>이스라엘(ISR) 포함 중동 분쟁 통합 분석 보고서</h1>
+    <p>본 보고서는 사용자의 피드백을 반영하여 지표를 정교화하고 실전적 인사이트를 도출한 최종 버전입니다.</p>
+
+    <div class="section">
+        <h2>1. 시계열 갈등 패턴 및 선행 징후</h2>
+        <img src="isr_full_temporal.png">
+        <div class="insight-box">
+            <strong>인사이트</strong>: 3자 구도에서는 사건량이 약 3배 폭증하며 갈등이 상시화됩니다. 즉각적인 자동화 위성 예약 체계가 필수적입니다.
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>2. 지역별 민감도 분석 (이상치 제거 완료)</h2>
+        <img src="final_isr_volatility_refined.png">
+        <div class="insight-box">
+            <strong>인사이트</strong>: 예루살렘 등 핵심 지역의 뉴스 변동폭이 커지는 시점이 위성 촬영의 골든타임입니다. (데이터 노이즈 제거 완료)
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>3. 상황 격화 매커니즘 (에스컬레이션 경로)</h2>
+        <img src="final_isr_markov_refined.png">
+        <div class="insight-box">
+            <strong>인사이트</strong>: 단순 발생 여부뿐 아니라, 다음 단계(교전 등)로 격화될 확률을 계산하여 위성 자원 배분의 우선순위를 정할 수 있습니다.
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>4. 실전 골든타임 최적화 (2~3일 Window)</h2>
+        <img src="final_isr_golden_refined.png">
+        <div class="insight-box">
+            <strong>인사이트</strong>: 사건의 대부분이 징후 포착 후 3일 이내에 발생합니다. 위성 관제소는 징후 포착 후 48~72시간 이내 촬영을 목표로 해야 합니다.
+        </div>
+    </div>
+
+</body>
+</html>
