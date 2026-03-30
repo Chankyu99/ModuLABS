@@ -1,455 +1,228 @@
-LOAD DATA LOCAL INFILE '/Users/chankyulee/Downloads/data.csv' 
-INTO TABLE data
-CHARACTER SET latin1                 -- ✨ 핵심: 이 줄을 꼭 추가해 주세요!
-FIELDS TERMINATED BY ',' 
-ENCLOSED BY '"' 
-LINES TERMINATED BY '\n' 
-IGNORE 1 ROWS
-(
-    @InvoiceNo, 
-    @StockCode, 
-    @Description, 
-    @Quantity, 
-    @InvoiceDate, 
-    @UnitPrice, 
-    @CustomerID, 
-    @Country
-)
-SET 
-    InvoiceNo = @InvoiceNo,
-    StockCode = @StockCode,
-    Description = @Description,
-    Quantity = @Quantity,
-    InvoiceDate = @InvoiceDate,
-    UnitPrice = @UnitPrice,
-    CustomerID = NULLIF(@CustomerID, ''),
-    Country = @Country;
-    
--- Schema 확인
-SELECT *
-FROM data
-LIMIT 1;
+-- 고객 세그먼테이션(RFM) 프로젝트 — 데이터 전처리 및 피쳐 추출
+-- DBMS : MySQL 8.0+
 
--- 데이터 수 세기
-SELECT COUNT(InvoiceNO) AS COUNT_InvoiceNO,
-       COUNT(StockCode) AS COUNT_StockCode,
-       COUNT(Description) AS COUNT_Description,
-       COUNT(Quantity) AS COUNT_Quantity,
-       COUNT(InvoiceDate) AS COUNT_InvoiceDate,
-       COUNT(UnitPrice) AS COUNT_UnitPrice,
-       COUNT(CustomerID) AS COUNT_CustomerID,
-       COUNT(Country) AS COUNT_Country
-FROM data;
-
--- 1. 결측치 제거
--- 결측치 비율 확인 -> 24.93%
-SELECT
-    'InvoiceNo' AS column_name,
-    ROUND(SUM(CASE WHEN CustomerID IS NULL THEN 1 ELSE 0 END) / COUNT(*) * 100, 2) AS missing_percentage
-FROM data;
-
-SELECT column_name, ROUND((total - column_value) / total * 100, 2)
-FROM
-(
-    SELECT 'InvoiceNo' AS column_name, COUNT(InvoiceNo) AS column_value, COUNT(*) AS total FROM data UNION ALL
-    SELECT 'StockCode' AS column_name, COUNT(StockCode) AS column_value, COUNT(*) AS total FROM data UNION ALL
-    SELECT 'Description' AS column_name, COUNT(Description) AS column_value, COUNT(*) AS total FROM data UNION ALL
-    SELECT 'Quantity' AS column_name, COUNT(Quantity) AS column_value, COUNT(*) AS total FROM data UNION ALL
-    SELECT 'InvoiceDate' AS column_name, COUNT(InvoiceDate) AS column_value, COUNT(*) AS total FROM data UNION ALL
-    SELECT 'UnitPrice' AS column_name, COUNT(UnitPrice) AS column_value, COUNT(*) AS total FROM data UNION ALL
-    SELECT 'CustomerID' AS column_name, COUNT(CustomerID) AS column_value, COUNT(*) AS total FROM data UNION ALL
-    SELECT 'Country' AS column_name, COUNT(Country) AS column_value, COUNT(*) AS total FROM data
-) AS column_data;
-
--- Description : 같은 제품(StockCode)이 항상 같은 상세설명(Description)을 가지고 있지 않아 데이터 일관성 문제 발생
-SELECT Description
-FROM data
-WHERE StockCode = '85123A'
-GROUP BY Description;
-
--- 결측치 삭제
-DELETE FROM data
-WHERE CustomerID IS NULL OR Description IS NULL;
-
--- 2. 중복값 처리
--- 중복값 확인
-WITH temp AS (
-	SELECT *, COUNT(*) AS cnt_row
-    FROM data
-    GROUP BY InvoiceNO, StockCode, Description, QUantity, InvoiceDate, UnitPrice, CustomerID, Country
-	HAVING cnt_row > 1
-)
--- 중복개수 확인 : 4837개
-SELECT COUNT(*) FROM temp;
-
--- 중복 없는 데이터만 모아 임시 테이블 생성
-CREATE TABLE data_tmp AS
-SELECT DISTINCT * FROM data;
-
--- 기존 원본 테이블 삭제 (혹은 데이터를 비움)
-DROP TABLE data;
-
--- 임시 테이블 이름을 원본 이름으로 변경
-RENAME TABLE data_tmp TO data;
-
--- 최종 남은 행 개수 확인
-SELECT COUNT(*) FROM data;
-
--- 3. 컬럼별 오류값 처리
--- 3-1. InvoiceNo 
--- 고유 개수 확인 : 18537개
-SELECT COUNT(DISTINCT InvoiceNo) FROM data;
-
--- 데이터 잘못넣어서 다시 처음부터 시도
-
-ALTER TABLE data MODIFY COLUMN InvoiceNo VARCHAR(20);
 SET SQL_SAFE_UPDATES = 0;
+
+-- 0. 테이블 생성 및 데이터 적재
+
+-- InvoiceNo 에 'C' 접두어(취소)가 포함되므로 VARCHAR로 설정
+ALTER TABLE data MODIFY COLUMN InvoiceNo VARCHAR(20);
 TRUNCATE TABLE data;
 
-LOAD DATA LOCAL INFILE '/Users/chankyulee/Downloads/data.csv' 
+LOAD DATA LOCAL INFILE '/Users/chankyulee/Downloads/data.csv'
 INTO TABLE data
-CHARACTER SET latin1                 -- 문자열 에러 방지 
-FIELDS TERMINATED BY ',' 
-ENCLOSED BY '"' 
-LINES TERMINATED BY '\n' 
+CHARACTER SET latin1                             -- 문자열 인코딩 에러 방지
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
 IGNORE 1 ROWS
 (
-    InvoiceNo, 
-    StockCode, 
-    Description, 
-    Quantity, 
-    InvoiceDate, 
-    UnitPrice, 
-    @CustomerID,                     -- 빈칸 처리를 위해 변수 사용 
+    InvoiceNo,
+    StockCode,
+    Description,
+    Quantity,
+    InvoiceDate,
+    UnitPrice,
+    @CustomerID,                                 -- 빈칸 처리를 위해 변수 사용
     Country
 )
-SET CustomerID = NULLIF(@CustomerID, ''); -- 빈칸은 NULL로 치환
+SET CustomerID = NULLIF(@CustomerID, '');         -- 빈칸은 NULL로 치환
 
-SELECT COUNT(*) FROM data WHERE CustomerID IS NULL;
--- 대략 13만 개 정도 나오면 정상입니다.
 
--- 임시 테이블 생성 (중복 제거본)
-CREATE TABLE data_clean AS 
+-- 1. EDA : 데이터 탐색 (실행 전 확인용)
+
+-- 1-1. 스키마 및 샘플 확인
+SELECT * FROM data LIMIT 5;
+
+-- 1-2. 컬럼별 결측치 비율
+SELECT
+    column_name,
+    ROUND((total - non_null_cnt) / total * 100, 2) AS missing_pct
+FROM (
+    SELECT 'InvoiceNo'   AS column_name, COUNT(InvoiceNo)   AS non_null_cnt, COUNT(*) AS total FROM data UNION ALL
+    SELECT 'StockCode',                  COUNT(StockCode),                    COUNT(*)         FROM data UNION ALL
+    SELECT 'Description',                COUNT(Description),                  COUNT(*)         FROM data UNION ALL
+    SELECT 'Quantity',                   COUNT(Quantity),                     COUNT(*)         FROM data UNION ALL
+    SELECT 'InvoiceDate',                COUNT(InvoiceDate),                  COUNT(*)         FROM data UNION ALL
+    SELECT 'UnitPrice',                  COUNT(UnitPrice),                    COUNT(*)         FROM data UNION ALL
+    SELECT 'CustomerID',                 COUNT(CustomerID),                   COUNT(*)         FROM data UNION ALL
+    SELECT 'Country',                    COUNT(Country),                      COUNT(*)         FROM data
+) AS col_stats;
+
+-- 1-3. 취소 건(InvoiceNo LIKE 'C%') 비율 : 약 2.2%
+SELECT
+    ROUND(SUM(CASE WHEN InvoiceNo LIKE 'C%' THEN 1 ELSE 0 END) / COUNT(*) * 100, 1) AS canceled_ratio
+FROM data;
+
+-- 1-4. StockCode 내 숫자가 0~1개인 비정상 코드 탐색
+WITH UniqueStockCodes AS (
+    SELECT DISTINCT StockCode
+    FROM data
+)
+SELECT StockCode,
+       LENGTH(StockCode) - LENGTH(REGEXP_REPLACE(StockCode, '[0-9]', '')) AS digit_cnt
+FROM UniqueStockCodes
+WHERE LENGTH(StockCode) - LENGTH(REGEXP_REPLACE(StockCode, '[0-9]', '')) <= 1;
+
+-- 1-5. UnitPrice 통계
+SELECT
+    MIN(UnitPrice)              AS min_price,
+    MAX(UnitPrice)              AS max_price,
+    ROUND(AVG(UnitPrice), 2)    AS avg_price
+FROM data;
+
+
+-- 2. 데이터 클리닝
+
+-- 2-1. 중복 행 제거
+CREATE TABLE data_clean AS
 SELECT DISTINCT * FROM data;
 
--- 원본 삭제 및 이름 변경
 DROP TABLE data;
 RENAME TABLE data_clean TO data;
 
--- 다시 중복값, 결측치 제거
+-- 2-2. 결측치(CustomerID, Description) 제거
+DELETE FROM data
+WHERE CustomerID IS NULL
+   OR Description IS NULL;
 
-SELECT COUNT(*) FROM data WHERE InvoiceNo LIKE 'C%';
-
--- 취소건의 비율 : 2.2 -> RFM 분석의 취지에 맞게 취소건도 분석
-SELECT ROUND(SUM(CASE WHEN InvoiceNO LIKE "C%" THEN 1 ELSE 0 END) / COUNT(*) * 100, 1) AS canceled_ratio
-FROM data;
-
--- 3-2. StockCode
-SELECT COUNT(DISTINCT StockCode) 
-FROM data;
-
--- 어떤 제품이 가장 많이 팔렸지?
-SELECT StockCode, COUNT(*) AS sell_cnt
-FROM data
-GROUP BY StockCode
-ORDER BY sell_cnt DESC
-LIMIT 10;
-
--- 문자열 내 숫자 길이
-WITH UniqueStockCodes AS (
-  SELECT DISTINCT StockCode
-  FROM data
-)
-SELECT
-  LENGTH(StockCode) - LENGTH(REGEXP_REPLACE(StockCode, '[0-9]', '')) AS number_count,
-  COUNT(*) AS stock_cnt
-FROM UniqueStockCodes
-GROUP BY number_count
-ORDER BY stock_cnt DESC;
-
--- 숫자가 0~1개인 값들에는 어떤 코드들이 들어가 있는지를 확인
-WITH StockCount AS (
-    SELECT StockCode,
-           LENGTH(StockCode) - LENGTH(REGEXP_REPLACE(StockCode, '[0-9]', '')) AS number_count
-    FROM data
-)
-SELECT DISTINCT StockCode, number_count
-FROM StockCount
-WHERE number_count <= 1;
-
--- 해당 코드 값들을 가지고 있는 데이터 수는 전체 데이터 수 대비 비율?
-SELECT StockCode, ROUND (COUNT(*) / (SELECT COUNT(*) FROM data) * 100, 2) AS ratio
-FROM data
-GROUP BY StockCode
-HAVING StockCode IN ('POST','D','C2','M','BANK CHARGES','PADS','DOT','CRUK');
-
--- 제품과 관련되지 않은 거래 기록을 제거
-DELETE FROM data 
+-- 2-3. 비정상 StockCode 제거 (숫자 0~1개 : POST, D, C2, M 등)
+DELETE FROM data
 WHERE StockCode IN (
     SELECT StockCode FROM (
-        -- 서브쿼리를 한 번 더 감싸서 별칭(tmp)을 붙입니다.
-        SELECT StockCode 
-        FROM data 
-        WHERE (LENGTH(StockCode) - LENGTH(REGEXP_REPLACE(StockCode, '[0-9]', ''))) <= 1
+        SELECT DISTINCT StockCode
+        FROM data
+        WHERE LENGTH(StockCode) - LENGTH(REGEXP_REPLACE(StockCode, '[0-9]', '')) <= 1
     ) AS tmp
 );
 
--- 3-3. Description
-SELECT Description, COUNT(*) AS description_cnt
-FROM data
-GROUP BY Description
-ORDER BY description_cnt DESC
-LIMIT 30;
-
--- 대소문자가 혼합된 Description이 있는지 확인 : 19개
-SELECT DISTINCT Description
-FROM data
--- 컬럼 자체를 바이너리화하여 비교하면 대소문자를 엄격히 구분합니다.
-WHERE REGEXP_LIKE(BINARY Description, '[a-z]');
-
--- 1. 'Next Day Carriage'와 'High Resolution Image'와 같은 서비스 관련 정보를 포함하는 행들을 제거
--- 2. 대소문자를 혼합해서 사용하는 경우, 대문자로 표준화하여 데이터셋 전체에서 일관성을 유지할 수 있다. 이는 대소문자에 의한 중복 항목의 가능성을 줄이는 데에도 도움
-
--- 서비스 관련 정보를 포함하는 행들을 제거
+-- 2-4. 서비스 관련 Description 제거 & 대문자 표준화
 DELETE FROM data
-WHERE Description IN ('Next Day Carriage','High Resolution Image');
+WHERE Description IN ('Next Day Carriage', 'High Resolution Image');
 
--- 대소문자를 혼합하고 있는 데이터를 대문자로 표준화
-UPDATE data 
+UPDATE data
 SET Description = UPPER(Description);
 
--- 3-4. Unitprice
--- 최솟값, 최댓값, 평균
-SELECT MAX(Unitprice) AS max_price, MIN(Unitprice) AS min_price, AVG(Unitprice) AS avg_price
-FROM data;
+-- 2-5. UnitPrice 이상값(0 이하) 제거
+DELETE FROM data
+WHERE UnitPrice <= 0;
 
--- 단가가 0원인 거래의 개수, 구매 수량(Quantity)의 최솟값, 최댓값, 평균
-SELECT COUNT(*) AS cnt_quantity,  
-       MIN(Quantity) AS min_quantity, 
-       MAX(Quantity) AS max_quantity, 
-       AVG(Quantity) AS avg_quantity
-FROM data
-WHERE UnitPrice = 0;
+-- 2-6. 최종 행 수 확인
+SELECT COUNT(*) AS cleaned_row_count FROM data;
 
--- 33개의 오류값 제거
--- 1. 삭제 전, 마지막으로 대상 데이터(33건 예상) 확인
-SELECT * FROM data WHERE UnitPrice <= 0;
 
--- 2. 안전 모드 해제 및 데이터 삭제
-SET SQL_SAFE_UPDATES = 0;
-DELETE FROM data WHERE UnitPrice <= 0;
+-- 3. RFM 피쳐 추출 & 추가 파생 변수 → 최종 user_data 테이블 생성
 
--- 3. 최종 남은 데이터 행 개수 확인 (포트폴리오 기록용)
-SELECT COUNT(*) AS final_row_count FROM data;
+CREATE TABLE user_data AS
+WITH
 
--- 4. RFM 분석
-
--- 4-1. Recency
--- 시/분/초 제외하기
-SELECT 
-    DATE(STR_TO_DATE(InvoiceDate, '%m/%d/%Y')) AS InvoiceDay, 
-    t.* 
-FROM data AS t;
-
--- 가장 최근 구매 일자
-SELECT MAX(InvoiceDate) AS most_recent_date
-FROM data;
-
--- 유저 별 가장 큰 InvoiceDay를 찾아 가장 최근 구매일로 저장
-SELECT
-  CustomerID,
-  MAX(InvoiceDate) AS InvoiceDay
-FROM data
-GROUP BY CUstomerID
-ORDER BY CustomerID;
-
--- 가장 최근 일자(most_recent_date)와 유저별 마지막 구매일(InvoiceDay)간의 차이를 계산
-SELECT 
-    CustomerID,
-    -- 전체 데이터 중 가장 최근 날짜와 고객별 마지막 날짜의 차이(일수) 계산
-    DATEDIFF(
-        (SELECT MAX(DATE(STR_TO_DATE(InvoiceDate, '%m/%d/%Y %H:%i'))) FROM data), 
-        MaxInvoiceDay
-    ) AS recency
-FROM (
-    SELECT 
+-- (R) Recency : 마지막 구매일 ↔ 데이터 내 최신 날짜 간 차이(일)
+recency_cte AS (
+    SELECT
         CustomerID,
-        MAX(DATE(STR_TO_DATE(InvoiceDate, '%m/%d/%Y %H:%i'))) AS MaxInvoiceDay
-    FROM data
-    WHERE CustomerID IS NOT NULL -- 분석의 정확도를 위해 결측치 제외
-    GROUP BY CustomerID
-) AS t;
-
--- 최종 데이터 셋에 필요한 데이터들을 각각 정제해서 이어붙이도록 하겠습니다. 지금까지의 결과를 user_r이라는 이름의 테이블로 저장
-CREATE TABLE user_r AS
-SELECT 
-    CustomerID,
-    -- 전체 최신 날짜와 각 고객의 최신 날짜 차이(일수) 계산
-    DATEDIFF(
-        (SELECT MAX(DATE(STR_TO_DATE(InvoiceDate, '%m/%d/%Y %H:%i'))) FROM data), 
-        MaxInvoiceDay
-    ) AS recency
-FROM (
-    SELECT 
-        CustomerID, 
-        MAX(DATE(STR_TO_DATE(InvoiceDate, '%m/%d/%Y %H:%i'))) AS MaxInvoiceDay
+        DATEDIFF(
+            (SELECT MAX(DATE(STR_TO_DATE(InvoiceDate, '%m/%d/%Y %H:%i'))) FROM data),
+            MAX(DATE(STR_TO_DATE(InvoiceDate, '%m/%d/%Y %H:%i')))
+        ) AS recency
     FROM data
     WHERE CustomerID IS NOT NULL
     GROUP BY CustomerID
-) AS t;
-
--- 4-2. Frequency
--- 4-2-1. 전체 거래 건수 계산
-SELECT
-  CustomerID,
-  COUNT(DISTINCT InvoiceNo) AS purchase_cnt
-FROM data
-GROUP BY CustomerID
-ORDER BY purchase_cnt DESC;
-
--- 4-2-2. 구매한 아이템의 총 수량 계산
-SELECT  CustomerID,
-  SUM(Quantity) AS item_cnt
-FROM data
-GROUP BY CustomerID;
-
--- 합쳐서 user_rf 라는 테이블에 저장
-CREATE TABLE user_rf AS
-
-WITH purchase_cnt AS ( 
-  -- (1) 전체 거래 건수 (F: Frequency)
-  SELECT
-    CustomerID,
-    COUNT(DISTINCT InvoiceNo) AS purchase_cnt
-  FROM data
-  GROUP BY CustomerID
 ),
 
-item_cnt AS (
-  -- (2) 총 수량 (M: Monetary 관련)
-  SELECT 
-    CustomerID,
-    SUM(Quantity) AS item_cnt
-  FROM data
-  GROUP BY CustomerID
-)
-
-SELECT
-  pc.CustomerID,
-  pc.purchase_cnt,          
-  ic.item_cnt,
-  ur.recency
-FROM purchase_cnt AS pc
-JOIN item_cnt AS ic
-  ON pc.CustomerID = ic.CustomerID
-JOIN user_r AS ur
-  ON pc.CustomerID = ur.CustomerID;
-  
--- 4-3. Monetary
--- 4-3-1. 고객별 총 지출액 계산
-SELECT CustomerID, ROUND(SUM(Unitprice * Quantity),1) AS user_total
-FROM data
-GROUP BY CustomerID;
-
--- 4-3-2. 고객별 평균 거래 금액 계산
--- 고객별 총 지출액 계산
-SELECT CustomerID, ROUND(SUM(UnitPrice * Quantity),1) AS user_total
-FROM data
-GROUP BY CustomerID;
-
--- 고객별 평균 거래 금액 계산
-CREATE TABLE user_rfm AS
-SELECT 
-  rf.CustomerID AS CustomerId,
-  rf.purchase_cnt,
-  rf.item_cnt,
-  rf.recency,
-  ut.user_total,
-  ROUND(ut.user_total / rf.purchase_cnt, 1) AS user_average
-FROM user_rf AS rf
-LEFT JOIN (
-  -- 고객 별 총 지출액
-  SELECT CustomerID, ROUND(SUM(UnitPrice * Quantity),1) AS user_total
-FROM data
-GROUP BY CustomerID
-) AS ut
-ON rf.CustomerID = ut.CustomerID;
-
--- 4.4 RFM 통합 테이블 출력하기
-SELECT *
-FROM user_rfm;
-
--- 총 4362명 고유 고객의 RFM 테이블 완성
-
--- 5. 추가 Feature 추출
--- RFM 이외에 유저별 구매 패턴 찾기
--- 5-1. 구매하는 제품의 다양성
-CREATE TABLE user_data AS  
-WITH unique_products AS (
-  SELECT
-    CustomerID,
-    COUNT(DISTINCT StockCode) AS unique_products
-  FROM data
-  GROUP BY CustomerID
-)
-SELECT ur.*, up.unique_products
-FROM user_rfm AS ur
-JOIN unique_products AS up
-ON ur.CustomerID = up.CustomerID;
-
--- 5-2. 평균 구매 주기
-CREATE TABLE user_data_final AS  
-WITH purchase_intervals AS (
+-- (F) Frequency : 고유 주문 건수, 총 구매 수량
+frequency_cte AS (
     SELECT
         CustomerID,
-        -- (2) 평균 소요 일수 계산 (NULL이면 0으로 처리)
+        COUNT(DISTINCT InvoiceNo) AS purchase_cnt,
+        SUM(Quantity)             AS item_cnt
+    FROM data
+    WHERE CustomerID IS NOT NULL
+    GROUP BY CustomerID
+),
+
+-- (M) Monetary : 총 지출액, 건당 평균 지출액
+monetary_cte AS (
+    SELECT
+        CustomerID,
+        ROUND(SUM(UnitPrice * Quantity), 1) AS user_total
+    FROM data
+    WHERE CustomerID IS NOT NULL
+    GROUP BY CustomerID
+),
+
+-- 제품 다양성 : 고유 StockCode 수
+diversity_cte AS (
+    SELECT
+        CustomerID,
+        COUNT(DISTINCT StockCode) AS unique_products
+    FROM data
+    WHERE CustomerID IS NOT NULL
+    GROUP BY CustomerID
+),
+
+-- 평균 구매 주기(일) : LAG 윈도우 함수 활용
+interval_cte AS (
+    SELECT
+        CustomerID,
         IFNULL(ROUND(AVG(interval_days), 2), 0) AS average_interval
     FROM (
-        -- (1) 이전 구매일(LAG)과의 차이 계산
         SELECT
             CustomerID,
             DATEDIFF(
-                DATE(STR_TO_DATE(InvoiceDate, '%m/%d/%Y %H:%i')), 
-                LAG(DATE(STR_TO_DATE(InvoiceDate, '%m/%d/%Y %H:%i'))) OVER (PARTITION BY CustomerID ORDER BY STR_TO_DATE(InvoiceDate, '%m/%d/%Y %H:%i'))
+                DATE(STR_TO_DATE(InvoiceDate, '%m/%d/%Y %H:%i')),
+                LAG(DATE(STR_TO_DATE(InvoiceDate, '%m/%d/%Y %H:%i')))
+                    OVER (PARTITION BY CustomerID
+                          ORDER BY STR_TO_DATE(InvoiceDate, '%m/%d/%Y %H:%i'))
             ) AS interval_days
         FROM data
         WHERE CustomerID IS NOT NULL
     ) AS sub
     GROUP BY CustomerID
-)
-SELECT 
-    u.*, 
-    pi.average_interval -- EXCEPT 대신 필요한 컬럼만 선택
-FROM user_data AS u
-LEFT JOIN purchase_intervals AS pi
-ON u.CustomerID = pi.CustomerID;
+),
 
--- 기존 테이블 교체
-DROP TABLE user_data;
-RENAME TABLE user_data_final TO user_data;
-
--- 5-3. 구매 취소 경향성
--- 취소 빈도, 취소 비율을 계산하고 통합
-CREATE TABLE user_data_updated AS
-WITH TransactionInfo AS (
+-- 취소 경향성 : 취소 빈도 / 전체 거래
+cancel_cte AS (
     SELECT
         CustomerID,
-        COUNT(*) AS total_transactions,
-        -- 취소 건수(C로 시작) 계산
-        SUM(CASE WHEN InvoiceNo LIKE 'C%' THEN 1 ELSE 0 END) AS cancel_frequency
+        COUNT(*)                                                      AS total_transactions,
+        SUM(CASE WHEN InvoiceNo LIKE 'C%' THEN 1 ELSE 0 END)         AS cancel_frequency,
+        ROUND(
+            SUM(CASE WHEN InvoiceNo LIKE 'C%' THEN 1 ELSE 0 END)
+            / NULLIF(COUNT(*), 0), 2
+        )                                                             AS cancel_rate
     FROM data
     WHERE CustomerID IS NOT NULL
     GROUP BY CustomerID
 )
-SELECT 
-    u.*, 
-    t.total_transactions,
-    t.cancel_frequency,
-    ROUND(t.cancel_frequency / NULLIF(t.total_transactions, 0), 2) AS cancel_rate
-FROM user_data AS u
-LEFT JOIN TransactionInfo AS t
-ON u.CustomerID = t.CustomerID;
 
-DROP TABLE user_data;
-RENAME TABLE user_data_updated TO user_data;
+-- 최종 조합
+SELECT
+    r.CustomerID,
+    r.recency,
+    f.purchase_cnt,
+    f.item_cnt,
+    m.user_total,
+    ROUND(m.user_total / f.purchase_cnt, 1)  AS user_average,
+    d.unique_products,
+    i.average_interval,
+    c.total_transactions,
+    c.cancel_frequency,
+    c.cancel_rate
+FROM recency_cte     AS r
+JOIN frequency_cte   AS f ON r.CustomerID = f.CustomerID
+JOIN monetary_cte    AS m ON r.CustomerID = m.CustomerID
+JOIN diversity_cte   AS d ON r.CustomerID = d.CustomerID
+LEFT JOIN interval_cte   AS i ON r.CustomerID = i.CustomerID
+LEFT JOIN cancel_cte     AS c ON r.CustomerID = c.CustomerID;
 
+
+-- 4. 최종 결과 확인
+
+-- 총 4,362명 고유 고객의 RFM + 파생 변수 테이블
+SELECT * FROM user_data LIMIT 10;
+SELECT COUNT(*) AS total_customers FROM user_data;
+
+-- 중간 테이블 정리 (존재 시)
+DROP TABLE IF EXISTS user_r;
+DROP TABLE IF EXISTS user_rf;
+DROP TABLE IF EXISTS user_rfm;
