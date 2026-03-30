@@ -413,3 +413,4 @@ FROM RFMScores
 ORDER BY user_id;
 ```
 
+ 
