@@ -1,5 +1,5 @@
 -- 1. 회사 일별 매출액 구하기
-
+ 
 -- 테이블 생성
 CREATE TABLE `orders`
 (	
