@@ -1,4 +1,4 @@
-# SQL Repository 
+# 1. SQL을 사용하여 데이터베이스 다루기
 
 ## 폴더 및 파일 구조 (Directory Structure)
 ```text
