@@ -1,6 +1,6 @@
 # SQL Repository 
 
-## 📂 폴더 및 파일 구조 (Directory Structure)
+## 폴더 및 파일 구조 (Directory Structure)
 ```text
 📦 01_SQL
  ┣ 📜 README.md
