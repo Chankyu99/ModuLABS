@@ -1,4 +1,0 @@
-C안 = 핀셋 보정
-ISR 전체는 유지
-단, Gaza/Jerusalem/West Bank 로컬 사건 중 IRN/USA 직접 actor 연결이 약한 건만 holdout으로 분리
-목적: triad 구조는 보존하면서 Gaza/Jerusalem 과증폭만 줄이기
