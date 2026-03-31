@@ -7,6 +7,8 @@ import os
 from pathlib import Path
 from google import genai
 
+BASE = Path(__file__).parent
+
 # ── .env에서 API Key 로드 ──
 ENV_PATH = BASE / ".env"
 if ENV_PATH.exists():
@@ -19,9 +21,7 @@ API_KEY = os.environ.get("GEMINI_API_KEY")
 if not API_KEY:
     print("❌ GEMINI_API_KEY가 없습니다. .env 파일을 확인하세요.")
     sys.exit(1)
-MODEL = "gemini-2.5-flash-preview-04-17"
-
-BASE = Path(__file__).parent
+MODEL = "gemini-3.1-pro-preview"
 CODEBOOKS = [
     BASE / "CAMEO.Manual.1.1b3.pdf",
     BASE / "GDELT-Data_Format_Codebook.pdf",
@@ -30,7 +30,7 @@ CODEBOOKS = [
 SYSTEM_PROMPT = """당신은 GDELT와 CAMEO 코드 체계의 전문가입니다.
 주어진 PDF 코드북을 참고하여 질문에 정확하게 답변해주세요.
 - 코드 번호와 공식 명칭을 반드시 포함하세요
-- 예시 이벤트가 있으면 함께 제시하세요
+- 예시 이벤트가 있다면, 2026년 2월 이후 이란-미국 분쟁 관련 실제 뉴스 기사를 바탕으로 예시를 들어주세요
 - 답변은 한국어로 해주세요
 - 위성 촬영 관점에서의 활용 가능성도 언급해주세요"""
 
