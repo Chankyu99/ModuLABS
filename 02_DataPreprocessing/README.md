@@ -1,9 +1,20 @@
-![alt text](image.png)
+# 2. 비정형데이터 체험하기
 
-## 레포 정리 시 참고할 노드 학습 범위
-1. Data cleaning - 타이타닉 데이터 다루기
-2. 미니 프로젝트: 택시요금 데이터 다루기
-3. Data transformation - 연봉 데이터 다루기
-4. 미니 프로젝트: 영국시장의 중고 자동차 가격 데이터 다루기
-5. Feature Engineering - 스피드 데이팅 데이터 다루기
-6. 프로젝트: 신용거래 이상탐지 데이터 다루기
+## 폴더 및 파일 구조 (Directory Structure)
+
+```text
+02_DataPreprocessing/
+├── Data/                       # 데이터 파일 저장소
+│   ├── csv/                    # CSV 형식 데이터
+│   └── pkl/                    # Pickle 형식 데이터
+├── Projects/                   # 실전 프로젝트 노트북
+│   ├── Project_Cars.ipynb      # 중고차 가격 예측 프로젝트
+│   ├── Project_CreditFraud.ipynb # 신용카드 부정결제 탐지 프로젝트
+│   └── Project_Taxi.ipynb      # 택시 운행 데이터 분석 프로젝트
+├── Study/                      # 데이터 전처리 학습 자료
+│   ├── 01_DataCleaning.ipynb   # 데이터 클리닝 (결측치, 이상치 처리)
+│   ├── 02_DataTransformation.ipynb # 데이터 변환 (스케일링, 인코딩)
+│   ├── 03_FeatureEngineering.ipynb # 피처 엔지니어링 기법
+│   └── README.md               # 학습 관련 추가 설명
+└── README.md                   # 레포지토리 메인 설명 파일
+```
