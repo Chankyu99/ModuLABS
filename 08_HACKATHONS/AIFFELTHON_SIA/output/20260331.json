@@ -1,0 +1,178 @@
+{
+  "date": "20260331",
+  "generated_at": "2026-04-03T14:32:03.942202",
+  "total_cities": 108,
+  "alert_count": 12,
+  "alerts": [
+    {
+      "city": "Isfahan",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 642.3,
+      "innovation_z": 332.21,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 55
+    },
+    {
+      "city": "Beirut",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 1592.2,
+      "innovation_z": 116.1,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 79
+    },
+    {
+      "city": "Baghdad",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 538.7,
+      "innovation_z": 101.89,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 65
+    },
+    {
+      "city": "Tabriz",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 43.0,
+      "innovation_z": 26.17,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 3
+    },
+    {
+      "city": "Kharg Island",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 566.9,
+      "innovation_z": 24.16,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 70
+    },
+    {
+      "city": "Gaza City",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 133.0,
+      "innovation_z": 21.44,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 4
+    },
+    {
+      "city": "Jerusalem",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 1492.1,
+      "innovation_z": 12.43,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 114
+    },
+    {
+      "city": "Dubai",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 93.6,
+      "innovation_z": 10.42,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 23
+    },
+    {
+      "city": "Karbala",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 27.0,
+      "innovation_z": 10.31,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 4
+    },
+    {
+      "city": "Jabalia",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 14.0,
+      "innovation_z": 7.97,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 3
+    },
+    {
+      "city": "Zanjan",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 61.2,
+      "innovation_z": 7.54,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 13
+    },
+    {
+      "city": "Nablus",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 23.0,
+      "innovation_z": 5.12,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 4
+    }
+  ],
+  "summary": [
+    {
+      "city": "Tehran",
+      "risk_level": 0,
+      "conflict_index": 2911.8,
+      "z_score": -433.49
+    },
+    {
+      "city": "Beirut",
+      "risk_level": 2,
+      "conflict_index": 1592.2,
+      "z_score": 116.1
+    },
+    {
+      "city": "Jerusalem",
+      "risk_level": 1,
+      "conflict_index": 1492.1,
+      "z_score": 12.43
+    },
+    {
+      "city": "Gaza",
+      "risk_level": 0,
+      "conflict_index": 1385.8,
+      "z_score": -13.18
+    },
+    {
+      "city": "Isfahan",
+      "risk_level": 3,
+      "conflict_index": 642.3,
+      "z_score": 332.21
+    },
+    {
+      "city": "Kharg Island",
+      "risk_level": 2,
+      "conflict_index": 566.9,
+      "z_score": 24.16
+    },
+    {
+      "city": "Tel Aviv",
+      "risk_level": 0,
+      "conflict_index": 551.8,
+      "z_score": -52.44
+    },
+    {
+      "city": "Baghdad",
+      "risk_level": 2,
+      "conflict_index": 538.7,
+      "z_score": 101.89
+    },
+    {
+      "city": "Gaza City",
+      "risk_level": 2,
+      "conflict_index": 133.0,
+      "z_score": 21.44
+    },
+    {
+      "city": "Kharg",
+      "risk_level": 0,
+      "conflict_index": 122.1,
+      "z_score": 2.69
+    }
+  ]
+}

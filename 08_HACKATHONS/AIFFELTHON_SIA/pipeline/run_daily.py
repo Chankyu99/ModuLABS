@@ -1,76 +1,77 @@
 #!/usr/bin/env python3
 """
-일별 실행 스크립트
-──────────────────
+SIA 갈등 모니터링 파이프라인 - 일별 실행 및 백테스트 엔진
+──────────────────────────────────────────────────────
 사용법:
-  python -m pipeline.run_daily                     # 오늘 날짜 기준
-  python -m pipeline.run_daily --date 20260401     # 특정 날짜
-  python -m pipeline.run_daily --backtest          # 2026년 2~3월 백테스트
+  python -m pipeline.run_daily                     # 당일 데이터 실행
+  python -m pipeline.run_daily --date 20260401     # 특정 날짜 데이터 실행
+  python -m pipeline.run_daily --backtest          # 과거 데이터 백테스트 (2026-02-28 ~)
 """
 
 import argparse
 import json
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
 
-from pipeline.config import OUTPUT_DIR, Z_THRESHOLD
+from pipeline.config import OUTPUT_DIR, RISK_LEVELS
 from pipeline.conflict_index import compute_conflict_index, detect_anomalies
 from pipeline.gdelt_fetcher import load_all_data, fetch_daily
 
 
 def format_report(anomalies: pd.DataFrame, target_date: str) -> str:
-    """이상 탐지 결과를 사람이 읽기 좋은 보고서로 포맷"""
+    """이상 징후 탐지 결과를 일독용 보고서 형식으로 변환"""
     lines = []
-    lines.append(f"\n{'═'*70}")
-    lines.append(f"  🛰️  SIA 일일 분쟁 모니터링 보고서")
-    lines.append(f"  📅 {target_date}")
-    lines.append(f"{'═'*70}")
+    lines.append(f"\n{'═'*85}")
+    lines.append(f"  🛰️  SIA 일일 갈등 모니터링 보고서")
+    lines.append(f"  📅 분석 기준일: {target_date}")
+    lines.append(f"{'═'*85}")
 
     today = anomalies[anomalies['date'] == target_date]
 
     if today.empty:
-        lines.append(f"\n  📊 해당 날짜에 Triad 이벤트 없음")
+        lines.append(f"\n  📊 해당 날짜에 모니터링 대상 이벤트가 없습니다.")
         return '\n'.join(lines)
 
     alerts = today[today['is_anomaly'] == True]
     normals = today[today['is_anomaly'] == False]
 
     if not alerts.empty:
-        lines.append(f"\n  🚨 이상 징후 도시 ({len(alerts)}개)")
-        lines.append(f"  {'─'*65}")
-        lines.append(f"  {'도시':20s} | {'I':>8s} | {'예측':>8s} | {'Innovation':>10s} | {'Z':>6s} | {'건수':>4s} | {'Tone':>5s}")
-        lines.append(f"  {'-'*20}-+-{'-'*8}-+-{'-'*8}-+-{'-'*10}-+-{'-'*6}-+-{'-'*4}-+-{'-'*5}")
+        lines.append(f"\n  🚨 이상 징후 포착 ({len(alerts)}개 도시)")
+        lines.append(f"  {'─'*85}")
+        lines.append(f"  {'위험 등급':15s} | {'도시 명칭':15s} | {'갈등(I)':>6s} | {'오차(Z)':>6s} | {'이벤트':>3s} | {'대응 가이드'}")
+        lines.append(f"  {'-'*15}-+-{'-'*15}-+-{'-'*8}-+-{'-'*8}-+-{'-'*5}-+-{'-'*30}")
 
-        for _, row in alerts.iterrows():
-            city_short = row['city'].split(',')[0][:20]
+        # 위험 등급이 높은 순서로 출력
+        for _, row in alerts.sort_values('risk_level', ascending=False).iterrows():
+            city_short = row['city'].split(',')[0][:15]
             lines.append(
-                f"  {city_short:20s} | {row['conflict_index']:>8.0f} | "
-                f"{row['kalman_est']:>8.0f} | {row['innovation']:>10.0f} | "
-                f"{row['innov_z']:>5.1f} | {row['events']:>4.0f} | "
-                f"{row['avg_tone']:>5.1f}"
+                f"  {row['risk_emoji']} {row['risk_label']:12s} | {city_short:15s} | "
+                f"{row['conflict_index']:>8.0f} | {row['innov_z']:>8.1f} | "
+                f"{row['events']:>5.0f} | {row['risk_guide']}"
             )
     else:
-        lines.append(f"\n  ✅ 이상 징후 없음")
+        lines.append(f"\n  ✅ 모든 도시 정상 (이상 징후 없음)")
 
     if not normals.empty:
-        lines.append(f"\n  📊 정상 모니터링 중 ({len(normals)}개 도시)")
+        lines.append(f"\n  📊 정기 관측 정보 ({len(normals)}개 도시)")
+        # 상위 5개 주요 도시만 요약 출력
         top_normals = normals.nlargest(5, 'conflict_index')
         for _, row in top_normals.iterrows():
             city_short = row['city'].split(',')[0][:20]
             lines.append(
-                f"     ⚪ {city_short:20s} | I={row['conflict_index']:>6.0f} | "
-                f"Z={row['innov_z']:>5.1f} | {row['events']:.0f}건"
+                f"     ⚪ {city_short:20s} | 지수={row['conflict_index']:>6.0f} | "
+                f"표준오차={row['innov_z']:>5.1f}"
             )
 
-    lines.append(f"\n{'═'*70}\n")
+    lines.append(f"\n{'═'*85}\n")
     return '\n'.join(lines)
 
 
 def save_result(anomalies: pd.DataFrame, target_date: str):
-    """결과를 JSON으로 저장"""
+    """분석 결과를 JSON 형식으로 저장 (대시보드 또는 시스템 연동 목적)"""
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     today = anomalies[anomalies['date'] == target_date]
@@ -81,128 +82,101 @@ def save_result(anomalies: pd.DataFrame, target_date: str):
         'generated_at': datetime.now().isoformat(),
         'total_cities': len(today),
         'alert_count': len(alerts),
-        'alerts': [],
-        'summary': [],
+        'alerts': [
+            {
+                'city': r['city'],
+                'risk_level': int(r['risk_level']),
+                'risk_label': r['risk_label'],
+                'conflict_index': round(float(r['conflict_index']), 1),
+                'innovation_z': round(float(r['innov_z']), 2),
+                'guide': r['risk_guide'],
+                'events': int(r['events']),
+            } for _, r in alerts.iterrows()
+        ],
+        'summary': [
+            {
+                'city': r['city'],
+                'risk_level': int(r['risk_level']),
+                'conflict_index': round(float(r['conflict_index']), 1),
+                'z_score': round(float(r['innov_z']), 2),
+            } for _, r in today.nlargest(10, 'conflict_index').iterrows()
+        ]
     }
-
-    for _, row in alerts.iterrows():
-        result['alerts'].append({
-            'city': row['city'],
-            'conflict_index': round(float(row['conflict_index']), 1),
-            'kalman_estimate': round(float(row['kalman_est']), 1),
-            'innovation': round(float(row['innovation']), 1),
-            'innovation_z': round(float(row['innov_z']), 2),
-            'events': int(row['events']),
-            'mentions': int(row['mentions']),
-            'avg_tone': round(float(row['avg_tone']), 2),
-        })
-
-    for _, row in today.nlargest(10, 'conflict_index').iterrows():
-        result['summary'].append({
-            'city': row['city'],
-            'conflict_index': round(float(row['conflict_index']), 1),
-            'z_score': round(float(row['innov_z']), 2),
-            'is_anomaly': bool(row['is_anomaly']),
-        })
 
     save_path = OUTPUT_DIR / f"{target_date}.json"
     with open(save_path, 'w', encoding='utf-8') as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
 
-    print(f"  💾 결과 저장: {save_path.name}")
+    print(f"  [결과 저장] {save_path.name}")
     return save_path
 
 
 def run_single_day(target_date: str, fetch: bool = False):
-    """특정 날짜에 대해 파이프라인 실행"""
-    print(f"\n  ⏳ 파이프라인 실행: {target_date}")
+    """특정 날짜의 파이프라인 전체 실행"""
+    print(f"\n--- 파이프라인 가동: {target_date} ---")
 
-    # 1. 데이터 수집 (fetch=True면 GDELT에서 다운로드)
-    if fetch:
-        fetch_daily(target_date)
+    if fetch: fetch_daily(target_date)
 
-    # 2. 전체 데이터 로드
+    # 데이터 로드 (기존 대용량 Parquet + 수집된 일별 Parquet)
     raw = load_all_data()
     if raw.empty:
-        print("  ❌ 데이터 없음")
+        print("  [오류] 분석 가능한 데이터가 없습니다.")
         return
 
-    # 3. 갈등지수 산출
-    print(f"  🔧 갈등지수 산출 중...")
+    # 1. 갈등 지수 산출
     city_daily = compute_conflict_index(raw)
-    print(f"     {len(city_daily):,}건 (도시-일자 조합)")
+    
+    # 2. 칼만 필터 기반 이상 징후 탐지
+    results = detect_anomalies(city_daily)
 
-    # 4. 이상탐지
-    print(f"  🔍 칼만 필터 + Innovation Z-score 계산 중...")
-    results = detect_anomalies(city_daily, threshold=Z_THRESHOLD)
-
-    # 5. 보고서 출력
+    # 3. 리포트 생성 및 저장
     report = format_report(results, target_date)
     print(report)
-
-    # 6. 결과 저장
     save_result(results, target_date)
 
     return results
 
 
 def run_backtest():
-    """2026년 2~3월 데이터로 백테스트"""
-    print("\n" + "=" * 70)
-    print("  🔬 백테스트 모드: 2026년 2월 25일 ~ 3월 24일")
-    print("=" * 70)
+    """과거 이란 전쟁 기간의 소급 분석(Backtest) 수행"""
+    print("\n" + "=" * 85)
+    print(f"  🛰️  SIA 분쟁 탐지 모델 소급 검증(Backtest): 2026-02-25 ~ 2026-03-24")
+    print("=" * 85)
 
-    # 기존 데이터만 사용 (다운로드 안 함)
     raw = load_all_data(include_daily=False)
-    if raw.empty:
-        print("  ❌ 데이터 없음")
-        return
+    if raw.empty: return
 
     city_daily = compute_conflict_index(raw)
-    results = detect_anomalies(city_daily, threshold=Z_THRESHOLD)
+    results = detect_anomalies(city_daily)
 
-    # 날짜별 경보 요약
+    # 검증 대상 기간 필터링
     test_dates = sorted(results[
         (results['date'] >= '20260225') & (results['date'] <= '20260324')
     ]['date'].unique())
 
-    print(f"\n  {'날짜':>10s} | {'경보 도시':>8s} | 상세")
-    print(f"  {'-'*10}-+-{'-'*8}-+{'-'*50}")
+    print(f"\n  {'분석 기준일':>10s} | {'경보 건수':>8s} | 주요 포착 도시 (Z-Score)")
+    print(f"  {'-'*10}-+-{'-'*8}-+{'-'*60}")
 
-    total_alerts = 0
     for date in test_dates:
-        day_alerts = results[
-            (results['date'] == date) & (results['is_anomaly'] == True)
-        ]
+        day_alerts = results[(results['date'] == date) & (results['is_anomaly'] == True)]
         count = len(day_alerts)
-        total_alerts += count
 
         if count > 0:
+            # 상위 5개 도시만 한 줄에 요약
             cities = ", ".join([
                 f"{r['city'].split(',')[0][:12]}(Z={r['innov_z']:.1f})"
-                for _, r in day_alerts.iterrows()
+                for _, r in day_alerts.sort_values('innov_z', ascending=False).head(5).iterrows()
             ])
-            print(f"  {date:>10s} | {count:>6}개 | {cities}")
+            print(f"  {date:>10s} | {count:>6} alert | {cities}")
 
-    alert_days = len([d for d in test_dates
-                      if len(results[(results['date'] == d) & results['is_anomaly']]) > 0])
-
-    print(f"\n  📊 백테스트 요약:")
-    print(f"     기간: {test_dates[0]} ~ {test_dates[-1]} ({len(test_dates)}일)")
-    print(f"     경보 발생일: {alert_days}일")
-    print(f"     총 경보 건수: {total_alerts}건")
-    print(f"     일평균 경보: {total_alerts/len(test_dates):.1f}건")
+    return results
 
 
 def main():
-    parser = argparse.ArgumentParser(description='SIA 분쟁 모니터링 파이프라인')
-    parser.add_argument('--date', type=str, default=None,
-                       help='실행 날짜 (YYYYMMDD). 기본값: 오늘')
-    parser.add_argument('--fetch', action='store_true',
-                       help='GDELT에서 데이터 다운로드')
-    parser.add_argument('--backtest', action='store_true',
-                       help='2026년 2~3월 백테스트')
-
+    parser = argparse.ArgumentParser(description='SIA 갈등 감시 파이프라인')
+    parser.add_argument('--date', type=str, default=None, help='대상 날짜 (YYYYMMDD)')
+    parser.add_argument('--fetch', action='store_true', help='GDELT에서 데이터 직접 수집')
+    parser.add_argument('--backtest', action='store_true', help='과거 데이터 백테스트 실행')
     args = parser.parse_args()
 
     if args.backtest:

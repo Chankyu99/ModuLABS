@@ -1,8 +1,8 @@
 """
-GDELT 2.0 Event 데이터 수집 모듈
-──────────────────────────────────
-GDELT 2.0 마스터 파일 리스트에서 일별 Event CSV를 다운로드하고,
-Triad 필터를 적용하여 로컬에 저장.
+SIA GDELT 2.0 이벤트 데이터 수량 모듈
+───────────────────────────────────
+GDELT 2.0 마스터 리스트에서 일별 이벤트 CSV를 다운로드하고,
+관심 지역(ROI) 필터링을 적용하여 로컬에 저장합니다.
 """
 
 import io
@@ -14,14 +14,13 @@ import pandas as pd
 import requests
 
 from pipeline.config import (
-    DATA_DIR, PARQUET_PATH, CONFIRMED_CODES, TRIAD_COUNTRIES,
+    DATA_DIR, PARQUET_PATH, CONFIRMED_CODES, MONITORED_COUNTRIES,
 )
 
-# GDELT 2.0 Event 파일 URL 패턴
+# GDELT 2.0 마스터 파일 리스트 URL
 GDELT_MASTER_URL = "http://data.gdeltproject.org/gdeltv2/masterfilelist.txt"
-GDELT_EVENT_BASE = "http://data.gdeltproject.org/gdeltv2/"
 
-# GDELT 2.0 Event 컬럼 (61개 중 사용하는 것만 정의)
+# GDELT 2.0 이벤트 주요 컬럼
 GDELT_COLUMNS = [
     'GLOBALEVENTID', 'SQLDATE', 'MonthYear', 'Year', 'FractionDate',
     'Actor1Code', 'Actor1Name', 'Actor1CountryCode', 'Actor1KnownGroupCode',
@@ -45,197 +44,97 @@ GDELT_COLUMNS = [
     'DATEADDED', 'SOURCEURL',
 ]
 
-
-def get_event_urls_for_date(target_date: str) -> list:
-    """
-    특정 날짜의 GDELT 2.0 Event 파일 URL 목록을 반환.
-
-    Parameters
-    ----------
-    target_date : str
-        'YYYYMMDD' 형식
-
-    Returns
-    -------
-    list of str : URL 목록
-    """
-    print(f"  📡 GDELT 마스터 파일 조회 중...")
-    resp = requests.get(GDELT_MASTER_URL, timeout=30)
-    resp.raise_for_status()
-
-    urls = []
-    for line in resp.text.strip().split('\n'):
-        parts = line.strip().split()
-        if len(parts) >= 3:
-            url = parts[2]
-            if '.export.CSV.zip' in url and target_date in url:
-                urls.append(url)
-
-    return urls
-
-
-def download_and_parse(url: str) -> pd.DataFrame:
-    """
-    GDELT Event CSV.zip 파일을 다운로드하고 파싱.
-
-    Returns
-    -------
-    pd.DataFrame : 원본 이벤트 데이터
-    """
-    resp = requests.get(url, timeout=60)
-    resp.raise_for_status()
-
-    with zipfile.ZipFile(io.BytesIO(resp.content)) as z:
-        csv_name = z.namelist()[0]
-        with z.open(csv_name) as f:
-            df = pd.read_csv(
-                f, sep='\t', header=None,
-                names=GDELT_COLUMNS,
-                dtype=str,
-                on_bad_lines='skip',
-            )
-
-    # 숫자형 변환
-    for col in ['NumMentions', 'NumSources', 'NumArticles',
-                 'ActionGeo_Type', 'QuadClass']:
-        df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0).astype(int)
-
-    for col in ['AvgTone', 'GoldsteinScale', 'ActionGeo_Lat', 'ActionGeo_Long']:
-        df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0.0)
-
-    return df
-
-
-def apply_triad_filter(df: pd.DataFrame) -> pd.DataFrame:
-    """Triad 국가 + 확정 코드 필터 적용"""
+def apply_monitored_filter(df: pd.DataFrame) -> pd.DataFrame:
+    """모니터링 국가, 분쟁 코드, 도시 단위(ActionGeo_Type=4) 필터 적용"""
     mask = (
-        df['Actor1CountryCode'].isin(TRIAD_COUNTRIES) &
-        df['Actor2CountryCode'].isin(TRIAD_COUNTRIES) &
-        df['EventCode'].isin(CONFIRMED_CODES) &
+        (df['Actor1CountryCode'].isin(MONITORED_COUNTRIES) |
+         df['Actor2CountryCode'].isin(MONITORED_COUNTRIES)) &
+        df['EventCode'].astype(str).str.split('.').str[0].isin(CONFIRMED_CODES) &
         (df['ActionGeo_Type'] == 4)
     )
     return df[mask].copy()
 
-
 def fetch_daily(target_date: str, save: bool = True) -> pd.DataFrame:
-    """
-    특정 날짜의 GDELT 데이터를 수집하고 Triad 필터 적용.
+    """특정 날짜의 GDELT 이벤트를 다운로드하고 필터링하여 수집"""
+    print(f"--- GDELT 데이터 수집 시작: {target_date} ---")
 
-    Parameters
-    ----------
-    target_date : str
-        'YYYYMMDD' 형식
-    save : bool
-        True면 data/daily/ 에 parquet로 저장
-
-    Returns
-    -------
-    pd.DataFrame : 필터링된 이벤트 데이터
-    """
-    print(f"\n{'─'*60}")
-    print(f"  📥 {target_date} GDELT 데이터 수집")
-    print(f"{'─'*60}")
-
-    # 이미 있는지 확인
     save_path = DATA_DIR / f"{target_date}.parquet"
     if save_path.exists():
-        print(f"  ✅ 이미 존재: {save_path.name}")
+        print(f"  [로컬 경로] {save_path.name} 파일이 이미 존재합니다.")
         return pd.read_parquet(save_path)
 
-    # URL 수집
-    urls = get_event_urls_for_date(target_date)
+    # 마스터 리스트 조회
+    resp = requests.get(GDELT_MASTER_URL, timeout=30)
+    resp.raise_for_status()
+
+    # 타겟 날짜의 export 파일 URL 필터링
+    urls = [line.split()[2] for line in resp.text.strip().split('\n')
+            if '.export.CSV.zip' in line and target_date in line]
+
     if not urls:
-        print(f"  ⚠️  {target_date}에 해당하는 GDELT 파일 없음")
+        print(f"  [오류] {target_date}에 해당하는 GDELT 내보내기 파일이 없습니다.")
         return pd.DataFrame()
 
-    print(f"  📦 {len(urls)}개 파일 다운로드 중...")
+    print(f"  [다운로드] {len(urls)}개 파일을 내려받는 중...")
 
-    # 다운로드 & 파싱
     dfs = []
-    for i, url in enumerate(urls):
+    for url in urls:
         try:
-            df = download_and_parse(url)
-            dfs.append(df)
-            if (i + 1) % 10 == 0:
-                print(f"     {i+1}/{len(urls)} 완료...")
+            r = requests.get(url, timeout=60)
+            with zipfile.ZipFile(io.BytesIO(r.content)) as z:
+                with z.open(z.namelist()[0]) as f:
+                    batch = pd.read_csv(f, sep='\t', header=None, names=GDELT_COLUMNS, 
+                                        dtype=str, on_bad_lines='skip')
+                    
+                    # 수치형 데이터 변환
+                    for c in ['NumMentions', 'NumSources', 'NumArticles', 'ActionGeo_Type']:
+                        batch[c] = pd.to_numeric(batch[c], errors='coerce').fillna(0).astype(int)
+                    for c in ['AvgTone', 'GoldsteinScale', 'ActionGeo_Lat', 'ActionGeo_Long']:
+                        batch[c] = pd.to_numeric(batch[c], errors='coerce').fillna(0.0)
+                    
+                    dfs.append(batch)
         except Exception as e:
-            print(f"     ⚠️ {url.split('/')[-1]} 실패: {e}")
+            print(f"  [오류] {url.split('/')[-1]} 다운로드 실패: {e}")
 
-    if not dfs:
-        return pd.DataFrame()
+    if not dfs: return pd.DataFrame()
 
+    # 데이터 병합 및 필터링
     all_data = pd.concat(dfs, ignore_index=True)
-    print(f"  📊 전체: {len(all_data):,}건")
-
-    # Triad 필터
-    filtered = apply_triad_filter(all_data)
-    print(f"  🔍 Triad 필터 후: {len(filtered):,}건")
+    filtered = apply_monitored_filter(all_data)
+    print(f"  [완료] 총 {len(filtered):,}건의 유효한 이벤트를 선별했습니다.")
 
     # 저장
     if save and not filtered.empty:
         DATA_DIR.mkdir(parents=True, exist_ok=True)
         filtered.to_parquet(save_path, index=False)
-        print(f"  💾 저장: {save_path.name}")
 
     return filtered
 
-
-def load_historical(parquet_path: str = None) -> pd.DataFrame:
-    """
-    기존 parquet 파일 로드 (2025~2026 Q1 데이터)
-
-    Returns
-    -------
-    pd.DataFrame
-    """
-    path = Path(parquet_path) if parquet_path else PARQUET_PATH
-    if not path.exists():
-        raise FileNotFoundError(f"parquet 파일 없음: {path}")
-
-    print(f"  📂 기존 데이터 로드: {path.name}")
-    df = pd.read_parquet(path)
-    print(f"     {len(df):,}건 로드 완료")
-    return df
-
-
 def load_all_data(include_daily: bool = True) -> pd.DataFrame:
-    """
-    기존 parquet + data/daily/*.parquet를 합쳐서 반환.
-
-    Parameters
-    ----------
-    include_daily : bool
-        True면 data/daily/ 의 일별 파일도 합침
-
-    Returns
-    -------
-    pd.DataFrame
-    """
+    """기존 대용량 Parquet 파일과 로컬 일별 파일들을 병합하여 로드"""
     dfs = []
-
-    # 기존 데이터
+    
+    # 1. 히스토리 데이터 로드
     if PARQUET_PATH.exists():
-        dfs.append(load_historical())
+        print(f"  [히스토리 요약] {PARQUET_PATH.name} 로드 중...")
+        dfs.append(pd.read_parquet(PARQUET_PATH))
 
-    # 일별 수집 데이터
+    # 2. 일별 수집 데이터 로드
     if include_daily and DATA_DIR.exists():
         daily_files = sorted(DATA_DIR.glob("*.parquet"))
         if daily_files:
-            print(f"  📂 일별 데이터 {len(daily_files)}개 로드 중...")
-            for f in daily_files:
-                dfs.append(pd.read_parquet(f))
+            print(f"  [일별 데이터] {len(daily_files)}개 파일을 병합 중...")
+            for f in daily_files: dfs.append(pd.read_parquet(f))
 
-    if not dfs:
-        return pd.DataFrame()
+    if not dfs: return pd.DataFrame()
 
+    # 3. 병합 및 중복 제거
     combined = pd.concat(dfs, ignore_index=True)
-
-    # 중복 제거 (GLOBALEVENTID 기준)
     if 'GLOBALEVENTID' in combined.columns:
         before = len(combined)
         combined = combined.drop_duplicates(subset=['GLOBALEVENTID'])
         after = len(combined)
         if before > after:
-            print(f"  🔄 중복 제거: {before:,} → {after:,}")
+            print(f"  [중복 제거] {before:,} -> {after:,} 건으로 압축 완료.")
 
     return combined
