@@ -1,6 +1,6 @@
-# DAY1 통계학 실습 정리 (1~4장)
+# DAY1 통계학 정리 (1~4장)
 
-> 「통계X101 데이터분석」 교재의 1~4장 내용 + [DAY1 실습 코드](https://github.com/Chankyu99/ModuLABS/blob/master/03_Statistics/DAY1_Statistics.ipynb)와 연계하여 정리한 학습 노트!
+> 「통계X101 데이터분석」 교재의 1~4장 내용 + [DAY1 실습 코드](https://github.com/Chankyu99/ModuLABS/blob/master/03_Statistics/DAY1_Statistics.ipynb)
 
 ---
 
@@ -18,10 +18,10 @@
 
 **통계학의 전체 모습**
 
-- **기술통계(descriptive statistics)** : 수집한 데이터를 정리하고 요약하는 방법
-- **추론통계(inferential statistics)** : 수집한 데이터로부터 데이터의 발생원을 추정하는 방법
-  - **통계적 추론(statistical inference)** : 데이터에서 가정한 확률 모형의 성질 추정
-  - **가설검정(statistical test)** : 세운 가설과 얻은 데이터가 잘맞는지 평가
+- **기술통계** : 수집한 데이터를 정리하고 요약하는 방법
+- **추론통계** : 수집한 데이터로부터 데이터의 발생원을 추정하는 방법
+  - **통계적 추론** : 데이터에서 가정한 확률 모형의 성질 추정
+  - **가설검정** : 세운 가설과 얻은 데이터가 잘맞는지 평가
 
 ### 코드 구현
 
@@ -33,6 +33,10 @@ median_val = data['total'].median()
 skewness = data['total'].skew()
 kurtosis = data['total'].kurt()
 ```
+
+![DAY1-1](DAY1-1.png)
+
+
 
 > **핵심**: 통계학은 단순히 숫자를 뽑는 것이 아니라, 데이터의 특징을 요약·설명·예측하기 위한 체계적인 방법론이다.
 
@@ -69,6 +73,8 @@ sample_mean = np.mean(sample)
 sample_std = np.std(sample, ddof=1)  # 비편향 표본 표준편차 (ddof=1)
 se = sample_std / np.sqrt(30)        # 표준오차
 ```
+
+
 
 > **핵심**: 모집단 전체를 조사할 수 없으니, 표본으로 모집단의 성질을 **추정**하는 것이 추론통계의 핵심이다. 이때 표본크기 $n$은 추정의 정확도에 직접적인 영향을 준다.
 
@@ -138,6 +144,8 @@ class2 = np.concatenate([
     [0, 130]  # 극단적인 이상값
 ])
 ```
+
+![DAY1-2](DAY1-2.png)
 
 **데이터 요약 결과**
 1. **2반의 분산이 훨씬 크다** — 이상값이 포함되면 표준편차, 범위가 크게 증가
@@ -224,7 +232,7 @@ ci_high_t = sample_mean + t * se
 
 > 여기서 `stats.t.ppf(0.975, df=29)`의 `ppf`는 **Percent Point Function**으로, 누적분포함수(CDF)의 **역함수**이다. "누적 확률이 97.5%인 지점의 t-값"을 구해주는 함수다.
 
-#### 실습 결과 해석
+#### 결과 해석
 
 - **$z$-분포 vs $t$-분포**: $t$-분포 신뢰구간이 **약간 더 넓다** → 모집단 σ를 모르는 불확실성을 보정
 - **신뢰수준이 높아질수록**: 구간 폭이 **넓어진다** → 높은 확신을 위해서는 더 넓은 그물을 쳐야 한다
