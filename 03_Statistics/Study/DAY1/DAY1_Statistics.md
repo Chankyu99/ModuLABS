@@ -1,7 +1,7 @@
 # DAY1 통계학 정리 (1~4장) 
 
 > 「통계X101 데이터분석」 교재의 1~4장 내용 + [DAY1 실습 코드](https://github.com/Chankyu99/ModuLABS/blob/master/03_Statistics/DAY1_Statistics.ipynb)
-
+ 
 ---
 
 ## 1장 통계학이란?
@@ -219,7 +219,7 @@ $$\bar{x} \pm t \times \frac{s}{\sqrt{n}}$$
 
 ```python
 # z-분포 기반 (σ를 아는 경우)
-z = 1.96
+z = 1.96 
 ci_low = sample_mean - z * (sigma / np.sqrt(30))
 ci_high = sample_mean + z * (sigma / np.sqrt(30))
 
