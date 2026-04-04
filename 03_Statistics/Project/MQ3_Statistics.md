@@ -1,4 +1,4 @@
-# Main Quest 03 : 통계학 활용 실습
+# Main Quest 03 : 통계학 활용 실습 
 
 > 온라인 리테일 데이터셋(Kaggle)을 활용하여 그동안 학습한 통계학 개념들을 실전에 적용하는 종합 실습 + [MQ3 실습 코드](https://github.com/Chankyu99/ModuLABS/blob/master/03_Statistics/MQ3.ipynb)
 
