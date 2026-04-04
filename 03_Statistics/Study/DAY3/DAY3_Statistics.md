@@ -53,7 +53,7 @@ r, p = stats.pearsonr(df['House_Size_sqm'], df['Price_in_USD'])
 # → 상관계수: 0.990, p값: 0.000 → 매우 강한 양의 선형 상관관계
 ```
 
-![DAY3-1](DAY3-1.png)
+![DAY3-1](../../Img/DAY3/DAY3-1.png)
 
 > **주택 크기(sqm)와 가격(USD)** 사이에는 매우 강한 양의 선형 상관관계가 확인된다.
 
@@ -63,7 +63,7 @@ r, p = stats.pearsonr(df['Years_Old'], df['Price_in_USD'])
 # → 상관계수: -0.151, p값: 0.133 → 약한 음의 상관관계, 통계적으로 유의미하지 않음
 ```
 
-![DAY3-2](DAY3-2.png)
+![DAY3-2](../../Img/DAY3/DAY3-2.png)
 
 > **주택 연식(Years_Old)과 가격** 사이에는 약한 음의 상관관계가 보이지만, p값이 0.133으로 통계적으로 유의미하지 않다.
 
@@ -71,9 +71,9 @@ r, p = stats.pearsonr(df['Years_Old'], df['Price_in_USD'])
 
 `pairplot`으로 여러 양적 변수 간의 산점도를 한눈에 확인하고, 상관계수 행렬을 히트맵으로 시각화하였다.
 
-![DAY3-3](DAY3-3.png)
+![DAY3-3](../../Img/DAY3/DAY3-3.png)
 
-![DAY3-4](DAY3-4.png)
+![DAY3-4](../../Img/DAY3/DAY3-4.png)
 
 > **핵심**: 상관계수 행렬과 히트맵은 다수의 변수 간 관계를 시각적으로 빠르게 파악하는 데 매우 유용하다.
 
@@ -83,19 +83,19 @@ r, p = stats.pearsonr(df['Years_Old'], df['Price_in_USD'])
 
 **시나리오 1: 완벽한 선형 관계**
 
-![DAY3-5](DAY3-5.png)
+![DAY3-5](../../Img/DAY3/DAY3-5.png)
 
 > 선형 관계에서는 피어슨과 스피어만 모두 높은 값을 보인다.
 
 **시나리오 2: 비선형이지만 단조 관계 (곡선 형태)**
 
-![DAY3-6](DAY3-6.png)
+![DAY3-6](../../Img/DAY3/DAY3-6.png)
 
 > 비선형 단조 관계에서는 **스피어만이 피어슨보다 더 높은 값**을 보인다. 순위 기반이므로 비선형 관계도 잘 포착한다.
 
 **시나리오 3: 선형 관계에 이상치(Outlier) 추가**
 
-![DAY3-7](DAY3-7.png)
+![DAY3-7](../../Img/DAY3/DAY3-7.png)
 
 > 이상치가 있는 경우 **피어슨은 크게 영향**을 받지만, **스피어만은 상대적으로 robust**하다.
 
@@ -146,7 +146,7 @@ print(model.summary())
 
 회귀 전제 조건인 (1) 선형성, (2) 정규성, (3) 등분산성, (4) 독립성을 2×2 subplot으로 시각화하여 확인하였다.
 
-![DAY3-8](DAY3-8.png)
+![DAY3-8](../../Img/DAY3/DAY3-8.png)
 
 #### 회귀계수의 가설검정
 
@@ -164,11 +164,11 @@ print(model.summary())
 
 `statsmodels`의 `get_prediction` 메서드를 사용하여 신뢰구간과 예측구간을 함께 시각화하였다.
 
-![DAY3-9](DAY3-9.png)
+![DAY3-9](../../Img/DAY3/DAY3-9.png)
 
 `seaborn`의 `regplot`을 사용하면 부트스트랩을 통한 신뢰구간을 간단하게 표현할 수 있다.
 
-![DAY3-10](DAY3-10.png)
+![DAY3-10](../../Img/DAY3/DAY3-10.png)
 
 > **핵심**: 신뢰구간은 "평균 예측값이 이 범위 안에 있을 것"이고, 예측구간은 "개별 데이터가 이 범위 안에 있을 것"을 의미한다. 따라서 예측구간이 항상 신뢰구간보다 넓다.
 
@@ -193,7 +193,7 @@ $$ R'^2 = 1 - \frac {\frac {1}{n-k-1} \sum_{i=1}^{n}(y_i - f(x_i))^2}{\frac {1}{
 
 실제 데이터(폐활량과 먼지노출)를 사용한 단순선형회귀 결과와 가정 검정(선형성, 정규성, 등분산성, 독립성)을 시각화하였다.
 
-![DAY3-11](DAY3-11.png)
+![DAY3-11](../../Img/DAY3/DAY3-11.png)
 
 #### 설명변수와 반응변수
 
@@ -231,11 +231,11 @@ $$ y = a + b_1x_1 + b_2x_2 + \cdots + b_kx_k + \epsilon $$
 
 TV, Radio, Newspaper 광고비가 매출에 미치는 영향을 다중선형회귀로 분석하였다.
 
-![DAY3-12](DAY3-12.png)
+![DAY3-12](../../Img/DAY3/DAY3-12.png)
 
 잔차 분석을 통해 모델의 가정(선형성, 정규성, 등분산성, 독립성)을 검증하고, **VIF**(분산팽창인수)를 통해 다중공선성도 확인하였다.
 
-![DAY3-13](DAY3-13.png)
+![DAY3-13](../../Img/DAY3/DAY3-13.png)
 
 #### 범주형 변수를 설명변수로
 
@@ -311,7 +311,7 @@ model = LogisticRegression()
 model.fit(X, y)
 ```
 
-![DAY3-14](DAY3-14.png)
+![DAY3-14](../../Img/DAY3/DAY3-14.png)
 
 `statsmodels`의 `Logit`을 사용하면 오즈비를 계산하여 해석할 수 있다:
 

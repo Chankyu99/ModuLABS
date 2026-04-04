@@ -34,7 +34,7 @@ skewness = data['total'].skew()
 kurtosis = data['total'].kurt()
 ```
 
-![DAY1-1](DAY1-1.png)
+![DAY1-1](../../Img/DAY1/DAY1-1.png)
 
 
 
@@ -145,7 +145,7 @@ class2 = np.concatenate([
 ])
 ```
 
-![DAY1-2](DAY1-2.png)
+![DAY1-2](../../Img/DAY1/DAY1-2.png)
 
 **데이터 요약 결과**
 1. **2반의 분산이 훨씬 크다** — 이상값이 포함되면 표준편차, 범위가 크게 증가
