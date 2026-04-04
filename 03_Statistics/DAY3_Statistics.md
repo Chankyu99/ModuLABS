@@ -358,7 +358,7 @@ $$ \text{GLM} : \underbrace{f(z)}_{\text{연결함수}} = \underbrace{a+bx}_{\te
 
 두 모형의 **가능도(Likelihood)** 비율을 비교하는 방법이다. 비교할 두 모형은 **내포 관계**여야 한다.
 
-$$ \Delta D_{1,2} = -2 \times (\log L_{1}^{*} - \log L_{2}^{*}) $$
+$$ \Delta D_{1,2} = -2 \times (\log L_{1}^{\ast} - \log L_{2}^{\ast}) $$
 
 #### AIC (아카이케 정보기준)
 
