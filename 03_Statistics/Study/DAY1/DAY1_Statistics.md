@@ -1,4 +1,4 @@
-# DAY1 통계학 정리 (1~4장)
+# DAY1 통계학 정리 (1~4장) 
 
 > 「통계X101 데이터분석」 교재의 1~4장 내용 + [DAY1 실습 코드](https://github.com/Chankyu99/ModuLABS/blob/master/03_Statistics/DAY1_Statistics.ipynb)
 
