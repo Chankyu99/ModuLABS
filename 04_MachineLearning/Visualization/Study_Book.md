@@ -37,7 +37,7 @@ plt.legend()             # 범례
 plt.show()               # 출력
 ```
 
-#### 코드 구현 : pyplot 기본 사용
+#### pyplot 기본 사용
 
 ```python
 plt.plot([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
@@ -119,7 +119,7 @@ ax2.plot([3, 2, 1])
 
 `plt.plot()`에 들어갈 x, y 데이터는 **리스트 / ndarray / DataFrame / Series** 모두 가능하다. 단, 두 변수 간의 데이터 길이가 다르면 오류가 발생하므로 길이가 동일해야 한다.
 
-#### 코드 구현 : 기본 선 그래프
+#### 기본 선 그래프
 
 ```python
 x_value = np.arange(1, 100)
@@ -129,7 +129,7 @@ plt.plot(x_value, y_value)
 
 ![MPL-8](Img/MPL-8.png)
 
-#### 코드 구현 : DataFrame 활용
+#### DataFrame 활용
 
 ```python
 df = pd.DataFrame({'x': np.arange(1, 100), 'y_log': np.log(np.arange(1, 100))})
@@ -138,9 +138,9 @@ plt.plot(df['x'], df['y_log'])
 
 ![MPL-9](Img/MPL-9.png)
 
-#### 코드 구현 : 색상·마커·선 스타일 변경 (API 기반)
+#### 색상·마커·선 스타일 변경 (API 기반)
 
-보통 `color`, `marker`, `linestyle` 인자를 사용해서 그래프를 꾸미는데, 이를 **API 기반 시각화**라고 한다. 함수의 인자들을 알고 있어야 하는 부작용이 있다.
+보통 `color`, `marker`, `linestyle` 인자를 사용해서 그래프를 꾸미는데, 이를 **API 기반 시각화**라고 한다. 함수의 인자들을 알고 있어야 하는 단점이 있다.
 
 ```python
 plt.plot(x_value, y_value, color='green', marker='o', linestyle='dashed')
@@ -164,7 +164,7 @@ plt.xticks(rotation=45)   # 틱값 회전 (x축값이 문자열이고 많을 때
 
 ![MPL-12](Img/MPL-12.png)
 
-#### 코드 구현 : 틱값 회전 적용
+#### 틱값 회전 적용
 
 x축에 100개의 값이 있을 때 글자가 겹치는 문제를 `rotation`으로 해결한다.
 
@@ -183,7 +183,7 @@ plt.legend()
 
 ![MPL-15](Img/MPL-15.png)
 
-#### 코드 구현 : 여러 그래프를 하나의 Axes 내에서 시각화
+#### 여러 그래프를 하나의 Axes 내에서 시각화
 
 하나의 Axes 안에 여러 `plot()`을 호출하면 겹쳐서 표현된다. 이때 `label`과 `legend()`를 활용하여 각 그래프를 구분한다.
 
@@ -213,7 +213,7 @@ ax.set_title('제목')
 
 ![MPL-18](Img/MPL-18.png)
 
-#### 코드 구현 : 여러 subplots에 개별 그래프 시각화
+#### 여러 subplots에 개별 그래프 시각화
 
 ```python
 fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(6, 3))
@@ -251,7 +251,7 @@ titanic_df = pd.read_csv('titanic.csv')
 
 연속형 변수의 분포를 시각적으로 확인하는 가장 기본적인 방법이다.
 
-#### 코드 구현 : histplot (Axes 레벨)
+#### histplot (Axes 레벨)
 
 ```python
 sns.histplot(x='Age', data=titanic_df)
@@ -267,7 +267,7 @@ sns.histplot(x='Age', data=titanic_df, bins=30, kde=True)
 
 ![SNS-2](Img/SNS-2.png)
 
-#### 코드 구현 : displot (Figure 레벨)
+#### displot (Figure 레벨)
 
 `displot`은 **Figure 레벨 함수**로, Matplotlib API 사용을 최소화하고 기본 기능들을 인자로 대체한다. 따라서 `plt.figure()`로 크기 조절이 불가능하다.
 
@@ -304,7 +304,7 @@ sns.countplot(x='Pclass', data=titanic_df)
 
 x축은 이산값(주로 카테고리값), y축은 연속값(기본적으로 **평균**)을 표현한다.
 
-#### 코드 구현 : 기본 barplot
+#### 기본 barplot
 
 ```python
 sns.barplot(x='Pclass', y='Age', data=titanic_df)    # 클래스별 Age 평균
@@ -323,7 +323,7 @@ sns.barplot(x='Pclass', y='Survived', data=titanic_df)  # 클래스별 생존율
 
 ![SNS-9](Img/SNS-9.png)
 
-#### 코드 구현 : 신뢰구간 제거 & 통합 색상
+#### 신뢰구간 제거 & 통합 색상
 
 ```python
 sns.barplot(x='Pclass', y='Survived', data=titanic_df, ci=None, color='green')
@@ -331,7 +331,7 @@ sns.barplot(x='Pclass', y='Survived', data=titanic_df, ci=None, color='green')
 
 ![SNS-10](Img/SNS-10.png)
 
-#### 코드 구현 : estimator 변경 (평균 → 총합)
+#### estimator 변경 (평균 → 총합)
 
 ```python
 sns.barplot(x='Pclass', y='Survived', data=titanic_df, ci=None, estimator=sum)
@@ -339,7 +339,7 @@ sns.barplot(x='Pclass', y='Survived', data=titanic_df, ci=None, estimator=sum)
 
 ![SNS-11](Img/SNS-11.png)
 
-#### 코드 구현 : hue를 이용한 세분화
+#### hue를 이용한 세분화
 
 `hue` 파라미터를 설정하면 x축의 각 값을 특정 컬럼별로 세분화하여 시각화할 수 있다.
 
@@ -398,7 +398,7 @@ sns.violinplot(x='Pclass', y='Age', hue='Sex', data=titanic_df)
 
 Seaborn의 **Axes 레벨 함수**들은 `ax` 인자를 통해 특정 subplot 위치에 그래프를 배치할 수 있다.
 
-#### 코드 구현 : 이산형 컬럼의 건수 시각화
+#### 이산형 컬럼의 건수 시각화
 
 ```python
 cat_columns = ['Survived', 'Pclass', 'Sex']
@@ -410,7 +410,7 @@ for index, column in enumerate(cat_columns):
 
 ![SNS-20](Img/SNS-20.png)
 
-#### 코드 구현 : 이산형 컬럼별 생존율 시각화
+#### 이산형 컬럼별 생존율 시각화
 
 ```python
 cat_columns = ['Pclass', 'Sex', 'Embarked']
@@ -422,7 +422,7 @@ for index, column in enumerate(cat_columns):
 
 ![SNS-21](Img/SNS-21.png)
 
-#### 코드 구현 : 연속형 컬럼의 Survived별 분포도
+#### 연속형 컬럼의 Survived별 분포도
 
 왼쪽에는 Violin Plot, 오른쪽에는 Survived별 Histogram을 함께 표현한다.
 
@@ -471,7 +471,7 @@ sns.heatmap(corr)
 
 ![SNS-26](Img/SNS-26.png)
 
-#### 코드 구현 : 컬러맵 변경
+#### 컬러맵 변경
 
 ```python
 sns.heatmap(corr, cmap='rocket')
@@ -479,7 +479,7 @@ sns.heatmap(corr, cmap='rocket')
 
 ![SNS-27](Img/SNS-27.png)
 
-#### 코드 구현 : 상관계수 값 표시
+#### 상관계수 값 표시
 
 ```python
 sns.heatmap(corr, annot=True, fmt='.1f', cbar=True)
