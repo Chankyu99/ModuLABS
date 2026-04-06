@@ -1,0 +1,300 @@
+{
+  "date": "20260329",
+  "generated_at": "2026-04-06T17:12:42.991396",
+  "total_cities": 117,
+  "alert_count": 23,
+  "alerts": [
+    {
+      "city": "Tehran",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 8255.3,
+      "innovation_z": 561.77,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 331,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Beirut",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 2864.0,
+      "innovation_z": 402.19,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 76,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Isfahan",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 591.9,
+      "innovation_z": 305.12,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 27,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Arabian Peninsula",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 894.0,
+      "innovation_z": 218.74,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 12,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Gaza",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 9788.2,
+      "innovation_z": 120.59,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 252,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Sheikh Jarrah",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 87.6,
+      "innovation_z": 76.13,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 14,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Erbil",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 55.8,
+      "innovation_z": 71.72,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 5,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Kurdistan",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 199.2,
+      "innovation_z": 61.67,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 20,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Beersheba",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 324.6,
+      "innovation_z": 47.21,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 30,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Riyadh",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 108.2,
+      "innovation_z": 46.3,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 13,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Ben Gurion",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 94.0,
+      "innovation_z": 38.42,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 8,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Manama",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 94.0,
+      "innovation_z": 36.78,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 2,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Sanaa",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 641.4,
+      "innovation_z": 36.67,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 31,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Shalamcheh",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 146.4,
+      "innovation_z": 31.32,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 5,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Kharg Island",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 522.4,
+      "innovation_z": 26.55,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 62,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Eshtaol",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE) ⚡",
+      "conflict_index": 5374.6,
+      "innovation_z": 20.0,
+      "guide": "신규 핫스팟 감지 (히스토리 부족, 절대치 기반). 즉시 확인 필요.",
+      "events": 30,
+      "trigger": "absolute"
+    },
+    {
+      "city": "Jerusalem",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE) ⚡",
+      "conflict_index": 1228.3,
+      "innovation_z": 20.0,
+      "guide": "절대치 오버라이드: 갈등 지수가 임계치를 초과. 즉시 확인 필요.",
+      "events": 107,
+      "trigger": "absolute_override"
+    },
+    {
+      "city": "Jezzine",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE) ⚡",
+      "conflict_index": 1001.8,
+      "innovation_z": 20.0,
+      "guide": "절대치 오버라이드: 갈등 지수가 임계치를 초과. 즉시 확인 필요.",
+      "events": 41,
+      "trigger": "absolute_override"
+    },
+    {
+      "city": "Beer Sheva",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 20.0,
+      "innovation_z": 15.87,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 4,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Parchin",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 53.0,
+      "innovation_z": 14.31,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 5,
+      "trigger": "kalman"
+    },
+    {
+      "city": "As Iran",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 164.7,
+      "innovation_z": 11.67,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 16,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Duhok",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 23.0,
+      "innovation_z": 7.73,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 7,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Hezbollah",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 94.0,
+      "innovation_z": 6.9,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 4,
+      "trigger": "kalman"
+    }
+  ],
+  "summary": [
+    {
+      "city": "Gaza",
+      "risk_level": 2,
+      "conflict_index": 9788.2,
+      "z_score": 120.59
+    },
+    {
+      "city": "Tehran",
+      "risk_level": 3,
+      "conflict_index": 8255.3,
+      "z_score": 561.77
+    },
+    {
+      "city": "Eshtaol",
+      "risk_level": 2,
+      "conflict_index": 5374.6,
+      "z_score": 20.0
+    },
+    {
+      "city": "Beirut",
+      "risk_level": 3,
+      "conflict_index": 2864.0,
+      "z_score": 402.19
+    },
+    {
+      "city": "Jerusalem",
+      "risk_level": 2,
+      "conflict_index": 1228.3,
+      "z_score": 20.0
+    },
+    {
+      "city": "Jezzine",
+      "risk_level": 2,
+      "conflict_index": 1001.8,
+      "z_score": 20.0
+    },
+    {
+      "city": "Arabian Peninsula",
+      "risk_level": 3,
+      "conflict_index": 894.0,
+      "z_score": 218.74
+    },
+    {
+      "city": "Sanaa",
+      "risk_level": 2,
+      "conflict_index": 641.4,
+      "z_score": 36.67
+    },
+    {
+      "city": "Isfahan",
+      "risk_level": 3,
+      "conflict_index": 591.9,
+      "z_score": 305.12
+    },
+    {
+      "city": "Kharg Island",
+      "risk_level": 2,
+      "conflict_index": 522.4,
+      "z_score": 26.55
+    }
+  ]
+}

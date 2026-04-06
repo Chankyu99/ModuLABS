@@ -91,6 +91,7 @@ def save_result(anomalies: pd.DataFrame, target_date: str):
                 'innovation_z': round(float(r['innov_z']), 2),
                 'guide': r['risk_guide'],
                 'events': int(r['events']),
+                'trigger': r.get('trigger', 'kalman'),
             } for _, r in alerts.iterrows()
         ],
         'summary': [

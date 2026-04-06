@@ -1,0 +1,340 @@
+{
+  "date": "20260228",
+  "generated_at": "2026-04-06T16:38:53.393106",
+  "total_cities": 101,
+  "alert_count": 27,
+  "alerts": [
+    {
+      "city": "Tehran",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 28935.7,
+      "innovation_z": 5111.54,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 1218,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Basij",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 513.8,
+      "innovation_z": 748.25,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 21,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Ramat Gan",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 463.0,
+      "innovation_z": 378.73,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 15,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Dubai",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 457.0,
+      "innovation_z": 339.57,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 85,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Tel Aviv",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 3196.8,
+      "innovation_z": 289.69,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 240,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Beirut",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 877.7,
+      "innovation_z": 174.6,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 64,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Doha",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 253.2,
+      "innovation_z": 153.71,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 69,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Tabriz",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 97.3,
+      "innovation_z": 153.64,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 28,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Isfahan",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 130.8,
+      "innovation_z": 102.42,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 60,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Shahed",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 635.2,
+      "innovation_z": 96.46,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 49,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Ben Gurion",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 95.4,
+      "innovation_z": 60.94,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 21,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Teheran",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 43.3,
+      "innovation_z": 54.25,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 15,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Manama",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 107.8,
+      "innovation_z": 53.92,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 44,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Natanz",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 482.6,
+      "innovation_z": 53.02,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 55,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Riyadh",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 51.1,
+      "innovation_z": 48.67,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 25,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Ramallah",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 50.0,
+      "innovation_z": 36.12,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 6,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Jerusalem",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 1098.4,
+      "innovation_z": 35.91,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 215,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Gaza",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE) ⚡",
+      "conflict_index": 1193.5,
+      "innovation_z": 20.0,
+      "guide": "절대치 오버라이드: 갈등 지수가 임계치를 초과. 즉시 확인 필요.",
+      "events": 170,
+      "trigger": "absolute_override"
+    },
+    {
+      "city": "Minab",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE) ⚡",
+      "conflict_index": 1660.9,
+      "innovation_z": 20.0,
+      "guide": "절대치 오버라이드: 갈등 지수가 임계치를 초과. 즉시 확인 필요.",
+      "events": 175,
+      "trigger": "absolute_override"
+    },
+    {
+      "city": "Baghdad",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 74.5,
+      "innovation_z": 18.68,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 26,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Kharg Island",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 134.5,
+      "innovation_z": 17.63,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 16,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Mashhad",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 92.0,
+      "innovation_z": 11.81,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 16,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Abu Dhabi",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 14.6,
+      "innovation_z": 8.95,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 4,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Pahlavi",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 159.0,
+      "innovation_z": 8.13,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 46,
+      "trigger": "kalman"
+    },
+    {
+      "city": "As Iran",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 34.1,
+      "innovation_z": 6.13,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 25,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Ministry Of Foreign Affairs",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 40.4,
+      "innovation_z": 5.73,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 5,
+      "trigger": "kalman"
+    },
+    {
+      "city": "Ashkelon",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 20.0,
+      "innovation_z": 5.13,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 1,
+      "trigger": "kalman"
+    }
+  ],
+  "summary": [
+    {
+      "city": "Tehran",
+      "risk_level": 3,
+      "conflict_index": 28935.7,
+      "z_score": 5111.54
+    },
+    {
+      "city": "Tel Aviv",
+      "risk_level": 3,
+      "conflict_index": 3196.8,
+      "z_score": 289.69
+    },
+    {
+      "city": "Minab",
+      "risk_level": 2,
+      "conflict_index": 1660.9,
+      "z_score": 20.0
+    },
+    {
+      "city": "Gaza",
+      "risk_level": 2,
+      "conflict_index": 1193.5,
+      "z_score": 20.0
+    },
+    {
+      "city": "Jerusalem",
+      "risk_level": 2,
+      "conflict_index": 1098.4,
+      "z_score": 35.91
+    },
+    {
+      "city": "Beirut",
+      "risk_level": 3,
+      "conflict_index": 877.7,
+      "z_score": 174.6
+    },
+    {
+      "city": "Shahed",
+      "risk_level": 2,
+      "conflict_index": 635.2,
+      "z_score": 96.46
+    },
+    {
+      "city": "Basij",
+      "risk_level": 3,
+      "conflict_index": 513.8,
+      "z_score": 748.25
+    },
+    {
+      "city": "Natanz",
+      "risk_level": 2,
+      "conflict_index": 482.6,
+      "z_score": 53.02
+    },
+    {
+      "city": "Ramat Gan",
+      "risk_level": 3,
+      "conflict_index": 463.0,
+      "z_score": 378.73
+    }
+  ]
+}

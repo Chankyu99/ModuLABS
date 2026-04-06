@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 from pipeline.config import (
     tone_weight, CONFIRMED_CODES, MONITORED_COUNTRIES,
-    KALMAN_Q_RATIO, KALMAN_R_RATIO, KALMAN_P0_RATIO,
+    KALMAN_Q_RATIO, KALMAN_R_RATIO, KALMAN_P0_RATIO, KALMAN_MIN_INIT_VAR,
     MIN_HISTORY, get_risk_level,
 )
 
@@ -20,7 +20,7 @@ def compute_conflict_index(df: pd.DataFrame) -> pd.DataFrame:
     """
     GDELT 원본 이벤트 데이터를 도시별 일별 갈등 지수(I)로 변환.
     
-    공식: I = Sigma(NumMentions * W(AvgTone))
+    공식: I = Sigma(NumMentions * NumSources * W(AvgTone))
     """
     if df.empty:
         return pd.DataFrame(columns=['date', 'city', 'conflict_index',
@@ -42,7 +42,11 @@ def compute_conflict_index(df: pd.DataFrame) -> pd.DataFrame:
     # 날짜 형식 정리 및 가중치 적용
     filtered['date'] = filtered['SQLDATE'].astype(str).str[:8]
     filtered['weight'] = filtered['AvgTone'].apply(tone_weight)
-    filtered['weighted_mention'] = filtered['NumMentions'] * filtered['weight']
+    filtered['weighted_mention'] = (
+        filtered['NumMentions'] 
+        * np.log1p(filtered['NumSources'])  # log(1+NumSources)로 다매체 보도 가중
+        * filtered['weight']
+    )
 
     # 도시별/일별로 데이터 집계
     agg = (
@@ -58,7 +62,27 @@ def compute_conflict_index(df: pd.DataFrame) -> pd.DataFrame:
         .rename(columns={'ActionGeo_FullName': 'city'})
     )
 
-    return agg.sort_values(['date', 'city']).reset_index(drop=True)
+    # 빈 날짜를 I=0으로 채워 연속 일자 시계열 보장
+    # 각 도시의 첫 등장~마지막 날짜 범위만 채움
+    filled_parts = []
+    for city, grp in agg.groupby('city'):
+        city_dates = pd.date_range(
+            start=pd.to_datetime(grp['date'].min(), format='%Y%m%d'),
+            end=pd.to_datetime(grp['date'].max(), format='%Y%m%d'),
+            freq='D'
+        ).strftime('%Y%m%d')
+        
+        grp_idx = grp.set_index('date').reindex(city_dates)
+        grp_idx['city'] = city
+        grp_idx['conflict_index'] = grp_idx['conflict_index'].fillna(0.0)
+        grp_idx['events'] = grp_idx['events'].fillna(0).astype(int)
+        grp_idx['mentions'] = grp_idx['mentions'].fillna(0).astype(int)
+        grp_idx['avg_tone'] = grp_idx['avg_tone'].fillna(0.0)
+        grp_idx.index.name = 'date'
+        filled_parts.append(grp_idx.reset_index())
+
+    result = pd.concat(filled_parts, ignore_index=True)
+    return result.sort_values(['date', 'city']).reset_index(drop=True)
 
 
 # ─── 2. 칼만 필터 (예측 오차 추출) ──────────────────────────
@@ -68,7 +92,7 @@ def kalman_innovation(signal: np.ndarray,
                       R: float = None) -> dict:
     """
     1차원 칼만 필터를 적용하여 표준화된 예측 오차(Z-Score)를 추출.
-    Z = (실측값 - 예측값) / sqrt(혁신 공분산)
+    Z = (실측값 - 예측값) / sqrt(오차 공분산)
     """
     n = len(signal)
     if n < 2:
@@ -76,7 +100,7 @@ def kalman_innovation(signal: np.ndarray,
 
     # 초기 30일 데이터를 기준으로 노이즈(Q, R) 자동 추정
     init_window = min(30, n)
-    init_var = max(np.var(signal[:init_window]), 1e-6)
+    init_var = max(np.var(signal[:init_window]), KALMAN_MIN_INIT_VAR)
 
     # 파라미터가 없으면 설정값 비율에 따라 할당
     Q = Q if Q is not None else init_var * KALMAN_Q_RATIO
@@ -116,6 +140,7 @@ def detect_anomalies(city_daily: pd.DataFrame,
                      target_date: str = None) -> pd.DataFrame:
     """
     집계된 갈등 지수 데이터를 처리하여 이상 징후와 리스크 레벨을 매칭.
+    칼만 필터 Z-Score 단독으로 판정.
     """
     results = []
 
@@ -123,19 +148,16 @@ def detect_anomalies(city_daily: pd.DataFrame,
         group = group.sort_values('date').reset_index(drop=True)
         signal = group['conflict_index'].values.astype(float)
 
-        # 충분한 통계 데이터(30일)가 쌓이지 않은 경우 스킵
         if len(signal) < MIN_HISTORY:
             continue
 
-        # 칼만 필터 실행
         kf = kalman_innovation(signal)
-        
+
         group = group.copy()
         group['kalman_est'] = kf['estimate']
         group['innovation'] = kf['innovation']
         group['innov_z'] = kf['norm_innov']
 
-        # 리스크 등급 분류
         risk_info = group['innov_z'].apply(get_risk_level)
         group['risk_level']  = risk_info.apply(lambda x: x['level'])
         group['risk_label']  = risk_info.apply(lambda x: x['label'])
@@ -150,8 +172,8 @@ def detect_anomalies(city_daily: pd.DataFrame,
 
     all_results = pd.concat(results, ignore_index=True)
 
-    # 특정 날짜가 지정된 경우 필터링
     if target_date:
         all_results = all_results[all_results['date'] == target_date]
 
     return all_results.sort_values(['date', 'innov_z'], ascending=[True, False])
+

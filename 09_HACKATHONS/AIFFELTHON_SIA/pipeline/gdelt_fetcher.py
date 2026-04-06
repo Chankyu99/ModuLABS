@@ -1,7 +1,7 @@
 """
-SIA GDELT 2.0 이벤트 데이터 수량 모듈
+SIA GDELT 1.0 이벤트 데이터 수량 모듈
 ───────────────────────────────────
-GDELT 2.0 마스터 리스트에서 일별 이벤트 CSV를 다운로드하고,
+GDELT 1.0 마스터 리스트에서 일별 이벤트 CSV를 다운로드하고,
 관심 지역(ROI) 필터링을 적용하여 로컬에 저장합니다.
 """
 
@@ -17,10 +17,11 @@ from pipeline.config import (
     DATA_DIR, PARQUET_PATH, CONFIRMED_CODES, MONITORED_COUNTRIES,
 )
 
-# GDELT 2.0 마스터 파일 리스트 URL
-GDELT_MASTER_URL = "http://data.gdeltproject.org/gdeltv2/masterfilelist.txt"
+# GDELT 1.0 마스터 파일 리스트 URL
+GDELT_MASTER_URL = "http://data.gdeltproject.org/events/index.html"
+GDELT_BASE_URL = "http://data.gdeltproject.org/events/"
 
-# GDELT 2.0 이벤트 주요 컬럼
+# GDELT 1.0 이벤트 주요 컬럼 (58개)
 GDELT_COLUMNS = [
     'GLOBALEVENTID', 'SQLDATE', 'MonthYear', 'Year', 'FractionDate',
     'Actor1Code', 'Actor1Name', 'Actor1CountryCode', 'Actor1KnownGroupCode',
@@ -33,14 +34,11 @@ GDELT_COLUMNS = [
     'QuadClass', 'GoldsteinScale', 'NumMentions', 'NumSources',
     'NumArticles', 'AvgTone',
     'Actor1Geo_Type', 'Actor1Geo_FullName', 'Actor1Geo_CountryCode',
-    'Actor1Geo_ADM1Code', 'Actor1Geo_ADM2Code',
-    'Actor1Geo_Lat', 'Actor1Geo_Long', 'Actor1Geo_FeatureID',
+    'Actor1Geo_ADM1Code', 'Actor1Geo_Lat', 'Actor1Geo_Long', 'Actor1Geo_FeatureID',
     'Actor2Geo_Type', 'Actor2Geo_FullName', 'Actor2Geo_CountryCode',
-    'Actor2Geo_ADM1Code', 'Actor2Geo_ADM2Code',
-    'Actor2Geo_Lat', 'Actor2Geo_Long', 'Actor2Geo_FeatureID',
+    'Actor2Geo_ADM1Code', 'Actor2Geo_Lat', 'Actor2Geo_Long', 'Actor2Geo_FeatureID',
     'ActionGeo_Type', 'ActionGeo_FullName', 'ActionGeo_CountryCode',
-    'ActionGeo_ADM1Code', 'ActionGeo_ADM2Code',
-    'ActionGeo_Lat', 'ActionGeo_Long', 'ActionGeo_FeatureID',
+    'ActionGeo_ADM1Code', 'ActionGeo_Lat', 'ActionGeo_Long', 'ActionGeo_FeatureID',
     'DATEADDED', 'SOURCEURL',
 ]
 
@@ -55,7 +53,7 @@ def apply_monitored_filter(df: pd.DataFrame) -> pd.DataFrame:
     return df[mask].copy()
 
 def fetch_daily(target_date: str, save: bool = True) -> pd.DataFrame:
-    """특정 날짜의 GDELT 이벤트를 다운로드하고 필터링하여 수집"""
+    """특정 날짜의 GDELT v1.0 이벤트를 다운로드하고 필터링하여 수집"""
     print(f"--- GDELT 데이터 수집 시작: {target_date} ---")
 
     save_path = DATA_DIR / f"{target_date}.parquet"
@@ -63,38 +61,34 @@ def fetch_daily(target_date: str, save: bool = True) -> pd.DataFrame:
         print(f"  [로컬 경로] {save_path.name} 파일이 이미 존재합니다.")
         return pd.read_parquet(save_path)
 
-    # 마스터 리스트 조회
-    resp = requests.get(GDELT_MASTER_URL, timeout=30)
-    resp.raise_for_status()
+    # GDELT v1.0: 일별 단일 파일 (YYYYMMDD.export.CSV.zip)
+    url = f"{GDELT_BASE_URL}{target_date}.export.CSV.zip"
+    print(f"  [다운로드] {url}")
 
-    # 타겟 날짜의 export 파일 URL 필터링
-    urls = [line.split()[2] for line in resp.text.strip().split('\n')
-            if '.export.CSV.zip' in line and target_date in line]
-
-    if not urls:
-        print(f"  [오류] {target_date}에 해당하는 GDELT 내보내기 파일이 없습니다.")
+    try:
+        r = requests.get(url, timeout=60)
+        r.raise_for_status()
+    except requests.exceptions.HTTPError:
+        print(f"  [오류] {target_date}에 해당하는 GDELT 파일이 없습니다.")
         return pd.DataFrame()
 
-    print(f"  [다운로드] {len(urls)}개 파일을 내려받는 중...")
-
     dfs = []
-    for url in urls:
-        try:
-            r = requests.get(url, timeout=60)
-            with zipfile.ZipFile(io.BytesIO(r.content)) as z:
-                with z.open(z.namelist()[0]) as f:
-                    batch = pd.read_csv(f, sep='\t', header=None, names=GDELT_COLUMNS, 
-                                        dtype=str, on_bad_lines='skip')
-                    
-                    # 수치형 데이터 변환
-                    for c in ['NumMentions', 'NumSources', 'NumArticles', 'ActionGeo_Type']:
-                        batch[c] = pd.to_numeric(batch[c], errors='coerce').fillna(0).astype(int)
-                    for c in ['AvgTone', 'GoldsteinScale', 'ActionGeo_Lat', 'ActionGeo_Long']:
-                        batch[c] = pd.to_numeric(batch[c], errors='coerce').fillna(0.0)
-                    
-                    dfs.append(batch)
-        except Exception as e:
-            print(f"  [오류] {url.split('/')[-1]} 다운로드 실패: {e}")
+    try:
+        with zipfile.ZipFile(io.BytesIO(r.content)) as z:
+            with z.open(z.namelist()[0]) as f:
+                batch = pd.read_csv(f, sep='\t', header=None, names=GDELT_COLUMNS, 
+                                    dtype=str, on_bad_lines='skip')
+                
+                # 수치형 데이터 변환
+                for c in ['NumMentions', 'NumSources', 'NumArticles', 'ActionGeo_Type']:
+                    batch[c] = pd.to_numeric(batch[c], errors='coerce').fillna(0).astype(int)
+                for c in ['AvgTone', 'GoldsteinScale', 'ActionGeo_Lat', 'ActionGeo_Long']:
+                    batch[c] = pd.to_numeric(batch[c], errors='coerce').fillna(0.0)
+                
+                dfs.append(batch)
+    except Exception as e:
+        print(f"  [오류] 파일 처리 실패: {e}")
+        return pd.DataFrame()
 
     if not dfs: return pd.DataFrame()
 
