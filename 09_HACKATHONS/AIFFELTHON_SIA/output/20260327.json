@@ -1,0 +1,235 @@
+{
+  "date": "20260327",
+  "generated_at": "2026-04-07T14:37:09.746127",
+  "total_cities": 349,
+  "alert_count": 15,
+  "alerts": [
+    {
+      "city": "Minab",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 1113.0,
+      "innovation_z": 107.02,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 52,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Larak Island",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 264.2,
+      "innovation_z": 77.61,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 1,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Yanbu",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 220.3,
+      "innovation_z": 60.97,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 3,
+      "llm_confidence": 0.1,
+      "llm_reason": "The city is not mentioned in titles or leads; events focus on Iran, Israel, and Yemen."
+    },
+    {
+      "city": "Dead Sea",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 170.2,
+      "innovation_z": 42.26,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 2,
+      "llm_confidence": 0.8,
+      "llm_reason": "The city is explicitly listed in the GPE extraction for reports on Iranian drone strikes targeting sensitive locations."
+    },
+    {
+      "city": "Ahvaz",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 104.3,
+      "innovation_z": 28.1,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 8,
+      "llm_confidence": 0.1,
+      "llm_reason": "Articles report on G7 meetings in France and general diplomatic discussions; no mention of the city."
+    },
+    {
+      "city": "Dezful",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 63.6,
+      "innovation_z": 18.93,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 2,
+      "llm_confidence": 0.1,
+      "llm_reason": "No mention of the city in the title, lead, or GPE list."
+    },
+    {
+      "city": "Kashmir",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 64.0,
+      "innovation_z": 15.15,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 3,
+      "llm_confidence": 1.0,
+      "llm_reason": "Direct mention of protests and assembly sessions occurring within the Jammu and Kashmir Legislative Assembly."
+    },
+    {
+      "city": "Shiraz",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 61.9,
+      "innovation_z": 14.26,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 7,
+      "llm_confidence": 0.9,
+      "llm_reason": "Art 2 explicitly mentions land mines being photographed outside Shiraz near a missile site."
+    },
+    {
+      "city": "Golestan",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 48.4,
+      "innovation_z": 14.1,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 2,
+      "llm_confidence": 0.1,
+      "llm_reason": "No mention of the city in the provided text; reports focus on general IRGC strikes and warnings."
+    },
+    {
+      "city": "Al Amal",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 36.5,
+      "innovation_z": 10.98,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 3,
+      "llm_confidence": 0.1,
+      "llm_reason": "Al Amal refers to a political organization (Islamic Action Society) in Bahrain involved in the dissent, not a city location."
+    },
+    {
+      "city": "El-Khiam",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 24.3,
+      "innovation_z": 7.3,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 3,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Yazd",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 21.2,
+      "innovation_z": 6.18,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 14,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Givati",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 24.1,
+      "innovation_z": 6.06,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 2,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Rumanah",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 30.5,
+      "innovation_z": 5.83,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 14,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Nablus",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 25.4,
+      "innovation_z": 5.63,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 7,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    }
+  ],
+  "summary": [
+    {
+      "city": "Tehran",
+      "risk_level": 0,
+      "conflict_index": 6830.3,
+      "z_score": -1858.1
+    },
+    {
+      "city": "Gaza",
+      "risk_level": 0,
+      "conflict_index": 2254.0,
+      "z_score": -9.19
+    },
+    {
+      "city": "Beirut",
+      "risk_level": 0,
+      "conflict_index": 2213.9,
+      "z_score": -75.78
+    },
+    {
+      "city": "Minab",
+      "risk_level": 2,
+      "conflict_index": 1113.0,
+      "z_score": 107.02
+    },
+    {
+      "city": "Jerusalem",
+      "risk_level": 0,
+      "conflict_index": 560.9,
+      "z_score": -39.34
+    },
+    {
+      "city": "Isfahan",
+      "risk_level": 0,
+      "conflict_index": 541.6,
+      "z_score": -104.8
+    },
+    {
+      "city": "Tel Aviv",
+      "risk_level": 0,
+      "conflict_index": 379.3,
+      "z_score": -1174.34
+    },
+    {
+      "city": "Larak Island",
+      "risk_level": 2,
+      "conflict_index": 264.2,
+      "z_score": 77.61
+    },
+    {
+      "city": "Yanbu",
+      "risk_level": 2,
+      "conflict_index": 220.3,
+      "z_score": 60.97
+    },
+    {
+      "city": "Kharg Island",
+      "risk_level": 0,
+      "conflict_index": 214.2,
+      "z_score": -297.88
+    }
+  ]
+}

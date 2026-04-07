@@ -11,7 +11,7 @@ import pandas as pd
 from pipeline.config import (
     tone_weight, CONFIRMED_CODES, MONITORED_COUNTRIES,
     KALMAN_Q_RATIO, KALMAN_R_RATIO, KALMAN_P0_RATIO, KALMAN_MIN_INIT_VAR,
-    MIN_HISTORY, get_risk_level,
+    MIN_HISTORY, get_risk_level, EVENT_WEIGHT_MAP
 )
 
 # ─── 1. 갈등 지수(I) 산출 로직 ──────────────────────────────
@@ -20,18 +20,19 @@ def compute_conflict_index(df: pd.DataFrame) -> pd.DataFrame:
     """
     GDELT 원본 이벤트 데이터를 도시별 일별 갈등 지수(I)로 변환.
     
-    공식: I = Sigma(NumMentions * NumSources * W(AvgTone))
+    공식: I = Sigma(NumMentions * log(1+NumSources) * W(AvgTone) * W(EventRootCode))
     """
     if df.empty:
         return pd.DataFrame(columns=['date', 'city', 'conflict_index',
                                      'events', 'mentions', 'avg_tone'])
 
-    # 모니터링 대상 국가, 분쟁 코드, 도시 단위 지오메트리(Type 4) 필터링
+    # 모니터링 대상 국가, 분쟁 코드, 도시 단위 지오메트리(Type 4), 최소 보도 기준 필터링
     mask = (
         (df['Actor1CountryCode'].isin(MONITORED_COUNTRIES) | 
          df['Actor2CountryCode'].isin(MONITORED_COUNTRIES)) &
-        df['EventCode'].astype(str).str.split('.').str[0].isin(CONFIRMED_CODES) &
-        (df['ActionGeo_Type'] == 4)
+        pd.to_numeric(df['EventCode'], errors='coerce').isin(CONFIRMED_CODES) &
+        (df['ActionGeo_Type'] == 4) &
+        (df['NumSources'] >= 2)
     )
     filtered = df[mask].copy()
 
@@ -39,13 +40,31 @@ def compute_conflict_index(df: pd.DataFrame) -> pd.DataFrame:
         return pd.DataFrame(columns=['date', 'city', 'conflict_index',
                                      'events', 'mentions', 'avg_tone'])
 
+    # GDELT 중복 파싱 제거 로직 (Actor별 조합으로 뻥튀기된 동일 기사 제거)
+    if 'Actor1Name' in filtered.columns and 'Actor2Name' in filtered.columns:
+        filtered['info_count'] = filtered[['Actor1Name', 'Actor2Name']].notna().sum(axis=1)
+        filtered = filtered.sort_values(by='info_count', ascending=False)
+        filtered = filtered.drop_duplicates(
+            subset=['SQLDATE', 'ActionGeo_FeatureID', 'EventCode', 'AvgTone', 'NumSources'], 
+            keep='first'
+        )
+
     # 날짜 형식 정리 및 가중치 적용
     filtered['date'] = filtered['SQLDATE'].astype(str).str[:8]
     filtered['weight'] = filtered['AvgTone'].apply(tone_weight)
+    
+    # EventRootCode 기반 행동 심각도 가중치
+    if 'EventRootCode' in filtered.columns:
+        event_weight = filtered['EventRootCode'].astype(int).map(EVENT_WEIGHT_MAP).fillna(0.7)
+    else:
+        # Fallback: EventCode의 앞 2자리 활용
+        event_weight = filtered['EventCode'].astype(str).str[:2].astype(int).map(EVENT_WEIGHT_MAP).fillna(0.7)
+        
     filtered['weighted_mention'] = (
         filtered['NumMentions'] 
         * np.log1p(filtered['NumSources'])  # log(1+NumSources)로 다매체 보도 가중
         * filtered['weight']
+        * event_weight
     )
 
     # 도시별/일별로 데이터 집계

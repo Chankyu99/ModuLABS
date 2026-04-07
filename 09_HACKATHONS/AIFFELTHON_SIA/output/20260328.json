@@ -1,0 +1,367 @@
+{
+  "date": "20260328",
+  "generated_at": "2026-04-07T14:43:21.928369",
+  "total_cities": 307,
+  "alert_count": 27,
+  "alerts": [
+    {
+      "city": "Beer Sheba",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 1756.8,
+      "innovation_z": 528.3,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 8,
+      "llm_confidence": 0.1,
+      "llm_reason": "Articles describe missile attacks on Israel generally; no specific mention of Beer Sheba."
+    },
+    {
+      "city": "Tehran",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 20173.1,
+      "innovation_z": 479.48,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 305,
+      "llm_confidence": 0.1,
+      "llm_reason": "Articles focus on events in Saudi Arabia or general Middle East shipping; Tehran is not the event location."
+    },
+    {
+      "city": "Eshtaol",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 1055.2,
+      "innovation_z": 317.42,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 23,
+      "llm_confidence": 0.1,
+      "llm_reason": "Articles discuss general missile attacks on Israel; no specific mention of Eshtaol."
+    },
+    {
+      "city": "Beersheba",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 726.1,
+      "innovation_z": 193.38,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 16,
+      "llm_confidence": 0.1,
+      "llm_reason": "Articles report on missile strikes in 'central Israel' without confirming Beersheba as the impact site."
+    },
+    {
+      "city": "Cairo",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 696.5,
+      "innovation_z": 174.24,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 7,
+      "llm_confidence": 0.1,
+      "llm_reason": "Articles focus on Saudi Arabia and general Middle East conflict; Cairo is not mentioned as an event site."
+    },
+    {
+      "city": "Beirut",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 3532.0,
+      "innovation_z": 148.88,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 74,
+      "llm_confidence": 0.2,
+      "llm_reason": "Beirut is mentioned as the location of the Health Ministry, but the event (airstrike) occurred in southern Lebanon."
+    },
+    {
+      "city": "Riyadh",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 500.8,
+      "innovation_z": 122.53,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 26,
+      "llm_confidence": 0.1,
+      "llm_reason": "Articles discuss missile attacks on Israel; Riyadh is not the event location."
+    },
+    {
+      "city": "Al-Manar",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 404.5,
+      "innovation_z": 121.68,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 5,
+      "llm_confidence": 0.0,
+      "llm_reason": "Al-Manar is an organization (media outlet), not a geographic location."
+    },
+    {
+      "city": "Jezzine",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 385.1,
+      "innovation_z": 115.79,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 29,
+      "llm_confidence": 0.1,
+      "llm_reason": "Articles report on strikes in 'southern Lebanon' but do not explicitly confirm Jezzine as the location."
+    },
+    {
+      "city": "Khondab",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 346.5,
+      "innovation_z": 103.96,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 9,
+      "llm_confidence": 0.1,
+      "llm_reason": "Articles discuss events in Saudi Arabia or provide insufficient data; Khondab is not mentioned."
+    },
+    {
+      "city": "As Iran",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 375.6,
+      "innovation_z": 41.11,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 17,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Arak",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 102.9,
+      "innovation_z": 30.66,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 1,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Gazan",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 93.4,
+      "innovation_z": 26.5,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 1,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Abu Dhabi",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 103.9,
+      "innovation_z": 24.88,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 14,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Larak",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 79.4,
+      "innovation_z": 23.71,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 3,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Yazd",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 72.8,
+      "innovation_z": 21.14,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 15,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Gaza",
+      "risk_level": 2,
+      "risk_label": "위험 (ORANGE)",
+      "conflict_index": 7405.6,
+      "innovation_z": 20.98,
+      "guide": "물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.",
+      "events": 189,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Sanaa",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 61.2,
+      "innovation_z": 17.92,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 13,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Akka",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 46.3,
+      "innovation_z": 13.62,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 10,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Erbil",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 53.2,
+      "innovation_z": 8.95,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 4,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Rasht",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 36.0,
+      "innovation_z": 8.47,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 2,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Gaza City",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 77.0,
+      "innovation_z": 8.43,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 5,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Al-Mayadeen",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 24.3,
+      "innovation_z": 7.3,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 6,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Al Manar",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 20.9,
+      "innovation_z": 6.28,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 8,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Manama",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 40.2,
+      "innovation_z": 5.89,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 2,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Jerusalem",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 2717.3,
+      "innovation_z": 5.6,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 95,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Dheisheh",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 18.0,
+      "innovation_z": 5.22,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 6,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    }
+  ],
+  "summary": [
+    {
+      "city": "Tehran",
+      "risk_level": 3,
+      "conflict_index": 20173.1,
+      "z_score": 479.48
+    },
+    {
+      "city": "Gaza",
+      "risk_level": 2,
+      "conflict_index": 7405.6,
+      "z_score": 20.98
+    },
+    {
+      "city": "Beirut",
+      "risk_level": 2,
+      "conflict_index": 3532.0,
+      "z_score": 148.88
+    },
+    {
+      "city": "Jerusalem",
+      "risk_level": 1,
+      "conflict_index": 2717.3,
+      "z_score": 5.6
+    },
+    {
+      "city": "Tel Aviv",
+      "risk_level": 0,
+      "conflict_index": 2232.3,
+      "z_score": -505.25
+    },
+    {
+      "city": "Beer Sheba",
+      "risk_level": 3,
+      "conflict_index": 1756.8,
+      "z_score": 528.3
+    },
+    {
+      "city": "Eshtaol",
+      "risk_level": 3,
+      "conflict_index": 1055.2,
+      "z_score": 317.42
+    },
+    {
+      "city": "Beersheba",
+      "risk_level": 3,
+      "conflict_index": 726.1,
+      "z_score": 193.38
+    },
+    {
+      "city": "Cairo",
+      "risk_level": 3,
+      "conflict_index": 696.5,
+      "z_score": 174.24
+    },
+    {
+      "city": "Riyadh",
+      "risk_level": 2,
+      "conflict_index": 500.8,
+      "z_score": 122.53
+    }
+  ]
+}

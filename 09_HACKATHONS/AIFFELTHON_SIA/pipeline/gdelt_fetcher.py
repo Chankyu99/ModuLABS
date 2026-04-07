@@ -131,4 +131,8 @@ def load_all_data(include_daily: bool = True) -> pd.DataFrame:
         if before > after:
             print(f"  [중복 제거] {before:,} -> {after:,} 건으로 압축 완료.")
 
+    # 4. 연산 최적화: 2026년 데이터만 필터링 (과거 13년치 제거)
+    if 'SQLDATE' in combined.columns:
+        combined = combined[pd.to_numeric(combined['SQLDATE'], errors='coerce') >= 20260000].copy()
+        
     return combined

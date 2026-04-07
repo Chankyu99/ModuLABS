@@ -16,9 +16,10 @@ from pathlib import Path
 
 import pandas as pd
 
-from pipeline.config import OUTPUT_DIR, RISK_LEVELS
+from pipeline.config import OUTPUT_DIR, RISK_LEVELS, LLM_CONFIDENCE_THRESHOLD
 from pipeline.conflict_index import compute_conflict_index, detect_anomalies
 from pipeline.gdelt_fetcher import load_all_data, fetch_daily
+from pipeline.llm_verifier import verify_top_cities, filter_blacklist
 
 
 def format_report(anomalies: pd.DataFrame, target_date: str) -> str:
@@ -47,10 +48,16 @@ def format_report(anomalies: pd.DataFrame, target_date: str) -> str:
         # 위험 등급이 높은 순서로 출력
         for _, row in alerts.sort_values('risk_level', ascending=False).iterrows():
             city_short = row['city'].split(',')[0][:15]
+            # LLM 신뢰도 표시
+            llm_conf = row.get('llm_confidence', -1)
+            if llm_conf >= 0:
+                llm_tag = f" [{llm_conf:.0%}]" if llm_conf >= LLM_CONFIDENCE_THRESHOLD else f" ⚠️[{llm_conf:.0%}]"
+            else:
+                llm_tag = ''
             lines.append(
                 f"  {row['risk_emoji']} {row['risk_label']:12s} | {city_short:15s} | "
                 f"{row['conflict_index']:>8.0f} | {row['innov_z']:>8.1f} | "
-                f"{row['events']:>5.0f} | {row['risk_guide']}"
+                f"{row['events']:>5.0f} | {row['risk_guide']}{llm_tag}"
             )
     else:
         lines.append(f"\n  ✅ 모든 도시 정상 (이상 징후 없음)")
@@ -91,7 +98,8 @@ def save_result(anomalies: pd.DataFrame, target_date: str):
                 'innovation_z': round(float(r['innov_z']), 2),
                 'guide': r['risk_guide'],
                 'events': int(r['events']),
-                'trigger': r.get('trigger', 'kalman'),
+                'llm_confidence': round(float(r.get('llm_confidence', -1)), 2),
+                'llm_reason': r.get('llm_reason', ''),
             } for _, r in alerts.iterrows()
         ],
         'summary': [
@@ -112,7 +120,7 @@ def save_result(anomalies: pd.DataFrame, target_date: str):
     return save_path
 
 
-def run_single_day(target_date: str, fetch: bool = False):
+def run_single_day(target_date: str, fetch: bool = False, use_llm: bool = True):
     """특정 날짜의 파이프라인 전체 실행"""
     print(f"\n--- 파이프라인 가동: {target_date} ---")
 
@@ -130,7 +138,20 @@ def run_single_day(target_date: str, fetch: bool = False):
     # 2. 칼만 필터 기반 이상 징후 탐지
     results = detect_anomalies(city_daily)
 
-    # 3. 리포트 생성 및 저장
+    # 3. LLM 게이트키퍼 검증
+    if use_llm:
+        import pandas as pd
+        url_path = Path(__file__).resolve().parent.parent / 'gdelt_url_final.parquet'
+        if url_path.exists():
+            url_df = pd.read_parquet(url_path, columns=['GLOBALEVENTID', 'SOURCEURL'])
+            results = verify_top_cities(results, raw, url_df, target_date)
+        else:
+            print("  [LLM] URL 매핑 파일 없음. 블랙리스트만 적용.")
+            results = filter_blacklist(results)
+    else:
+        results = filter_blacklist(results)
+
+    # 4. 리포트 생성 및 저장
     report = format_report(results, target_date)
     print(report)
     save_result(results, target_date)
@@ -178,13 +199,14 @@ def main():
     parser.add_argument('--date', type=str, default=None, help='대상 날짜 (YYYYMMDD)')
     parser.add_argument('--fetch', action='store_true', help='GDELT에서 데이터 직접 수집')
     parser.add_argument('--backtest', action='store_true', help='과거 데이터 백테스트 실행')
+    parser.add_argument('--no-llm', action='store_true', help='LLM 검증 비활성화')
     args = parser.parse_args()
 
     if args.backtest:
         run_backtest()
     else:
         target = args.date or datetime.now().strftime('%Y%m%d')
-        run_single_day(target, fetch=args.fetch)
+        run_single_day(target, fetch=args.fetch, use_llm=not args.no_llm)
 
 
 if __name__ == '__main__':
