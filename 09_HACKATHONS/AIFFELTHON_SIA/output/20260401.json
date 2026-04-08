@@ -1,8 +1,180 @@
 {
   "date": "20260401",
-  "generated_at": "2026-04-07T16:44:58.639885",
-  "total_cities": 0,
-  "alert_count": 0,
-  "alerts": [],
-  "summary": []
+  "generated_at": "2026-04-08T15:26:07.387692",
+  "total_cities": 33,
+  "alert_count": 10,
+  "alerts": [
+    {
+      "city": "Beersheba",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 3924.7,
+      "innovation_z": 585.98,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 21,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Dubai",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 18165.4,
+      "innovation_z": 312.68,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 17,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Tel Aviv",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 9907.8,
+      "innovation_z": 131.79,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 17,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Baghdad",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 6424.0,
+      "innovation_z": 131.67,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 34,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Beirut",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 5565.6,
+      "innovation_z": 17.91,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 37,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Baalbek",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 15.8,
+      "innovation_z": 9.91,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 1,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Kharg",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 5389.8,
+      "innovation_z": 7.29,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 8,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Fujairah",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 19805.0,
+      "innovation_z": 5.11,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 5,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Doha",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 79.7,
+      "innovation_z": 1.88,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 4,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Tehran",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 20152.1,
+      "innovation_z": 1.24,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 129,
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    }
+  ],
+  "summary": [
+    {
+      "city": "Tehran",
+      "risk_level": 1,
+      "conflict_index": 20152.1,
+      "z_score": 1.24
+    },
+    {
+      "city": "Fujairah",
+      "risk_level": 3,
+      "conflict_index": 19805.0,
+      "z_score": 5.11
+    },
+    {
+      "city": "Dubai",
+      "risk_level": 3,
+      "conflict_index": 18165.4,
+      "z_score": 312.68
+    },
+    {
+      "city": "Tel Aviv",
+      "risk_level": 3,
+      "conflict_index": 9907.8,
+      "z_score": 131.79
+    },
+    {
+      "city": "Baghdad",
+      "risk_level": 3,
+      "conflict_index": 6424.0,
+      "z_score": 131.67
+    },
+    {
+      "city": "Beirut",
+      "risk_level": 3,
+      "conflict_index": 5565.6,
+      "z_score": 17.91
+    },
+    {
+      "city": "Kharg",
+      "risk_level": 3,
+      "conflict_index": 5389.8,
+      "z_score": 7.29
+    },
+    {
+      "city": "Beersheba",
+      "risk_level": 3,
+      "conflict_index": 3924.7,
+      "z_score": 585.98
+    },
+    {
+      "city": "Gaza",
+      "risk_level": 0,
+      "conflict_index": 1842.0,
+      "z_score": -2.58
+    },
+    {
+      "city": "Kharg Island",
+      "risk_level": 0,
+      "conflict_index": 130.9,
+      "z_score": -1.34
+    }
+  ]
 }

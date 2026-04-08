@@ -47,7 +47,7 @@ def apply_monitored_filter(df: pd.DataFrame) -> pd.DataFrame:
     mask = (
         (df['Actor1CountryCode'].isin(MONITORED_COUNTRIES) |
          df['Actor2CountryCode'].isin(MONITORED_COUNTRIES)) &
-        df['EventCode'].astype(str).str.split('.').str[0].isin(CONFIRMED_CODES) &
+        pd.to_numeric(df['EventCode'], errors='coerce').isin(CONFIRMED_CODES) &
         (df['ActionGeo_Type'] == 4)
     )
     return df[mask].copy()
@@ -95,6 +95,8 @@ def fetch_daily(target_date: str, save: bool = True) -> pd.DataFrame:
     # 데이터 병합 및 필터링
     all_data = pd.concat(dfs, ignore_index=True)
     filtered = apply_monitored_filter(all_data)
+    # 히스토리 데이터와의 호환성을 위해 콤마 이후의 세부 지명 제거
+    filtered['ActionGeo_FullName'] = filtered['ActionGeo_FullName'].astype(str).apply(lambda x: x.split(',')[0])
     print(f"  [완료] 총 {len(filtered):,}건의 유효한 이벤트를 선별했습니다.")
 
     # 저장
