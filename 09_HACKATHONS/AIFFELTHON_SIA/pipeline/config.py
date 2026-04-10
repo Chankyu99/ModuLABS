@@ -9,17 +9,14 @@ SIA 갈등 모니터링 파이프라인 - 설정파일
 import numpy as np
 from pathlib import Path
 
-# ──────────────────────────────────────────────
 # 1. 프로젝트 경로 설정
-# ──────────────────────────────────────────────
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = PROJECT_ROOT / "data" / "daily"
 OUTPUT_DIR = PROJECT_ROOT / "output"
 PARQUET_PATH = PROJECT_ROOT / "gdelt_main_final.parquet"
 
-# ──────────────────────────────────────────────
 # 2. 데이터 필터링 조건
-# ──────────────────────────────────────────────
 
 # 물리적 충돌과 관련된 CAMEO 코드 (Root 15, 17, 18, 19, 20)
 CONFIRMED_CODES = [
@@ -35,9 +32,7 @@ MONITORED_COUNTRIES = [
     'ARE', 'SAU', 'QAT', 'KWT'          # 주요 인접국
 ]
 
-# ──────────────────────────────────────────────
 # 3. 갈등 지수(I) 산출 로직
-# ──────────────────────────────────────────────
 
 def tone_weight(avg_tone: float) -> float:
     """기사 어조(AvgTone)에 따른 심각도 가중치 반환"""
@@ -46,9 +41,7 @@ def tone_weight(avg_tone: float) -> float:
     if avg_tone < 0:   return 0.3  # 약한 부정
     return 0.1                     # 중립 또는 긍정 (단순 배경 소음)
 
-# ──────────────────────────────────────────────
 # 4. 칼만 필터(Kalman Filter) 파라미터
-# ──────────────────────────────────────────────
 KALMAN_Q_RATIO = 0.01   # 프로세스 노이즈 (변화에 대한 민감도)
 KALMAN_R_RATIO = 1.0    # 관측 노이즈 (데이터에 대한 신뢰도)
 KALMAN_P0_RATIO = 2.0   # 초기 불확실성 계수
@@ -62,14 +55,10 @@ EVENT_WEIGHT_MAP = {
     15: 0.7
 }
 
-# ──────────────────────────────────────────────
 # 5. 리스크 레벨 및 대응 가이드
-# ──────────────────────────────────────────────
 MIN_HISTORY = 30  # 칼만 필터 안정화를 위한 최소 관측 일수
 
-# ──────────────────────────────────────────────
 # 6. LLM 게이트키퍼 설정
-# ──────────────────────────────────────────────
 LLM_MODELS = [
     "gemini-3.1-pro-preview",       # 1순위: 정확도 우선
     "gemini-3-flash-preview",       # 2순위: 비용 절감
@@ -79,9 +68,7 @@ LLM_TOP_N = 10          # 검증 대상 상위 도시 수
 LLM_TOP_K_URLS = 5      # 도시당 초기 검증 기사 수
 LLM_CONFIDENCE_THRESHOLD = 0.3  # 이 이하면 신뢰도 낮음 표시
 
-# ──────────────────────────────────────────────
 # 7. 지오코딩 블랙리스트 (조직명/무기명/지명 오류) -- 테스트 과정에서 잡히는 단어들 실시간 추가
-# ──────────────────────────────────────────────
 CITY_BLACKLIST = {
     'Basij',          # 이란 혁명수비대 민병대 (조직명)
     'Shahed',         # 이란 자폭 드론 이름 (무기명)
@@ -92,6 +79,7 @@ CITY_BLACKLIST = {
     'As Iran', # 이건 뭐임?
     'Sepah', # 이란 혁명수비대(IRGC)를 지칭하는 페르시아어 단어
     'Palestinian Red Crescent', # 팔레스타인 적십자사
+    'Ministry Of Foreign Affairs' # 외교부
 }
 
 RISK_LEVELS = {
@@ -130,16 +118,14 @@ def get_risk_level(z_score: float) -> dict:
             return res
     return RISK_LEVELS[0]
 
-# ──────────────────────────────────────────────
 # 8. Level 2a: 위성 촬영 스케줄 설정
-# ──────────────────────────────────────────────
 # 위성 선택 5대 기준: 센서 비율 / 해상도 / 군집 여부 / 데이터 접근성 / 활성 상태
 
 SATELLITES = [
     {
         "name": "SpaceEye-T",  "norad_id": 63229,
         "type": "optical",     "swath_km": 12,    "resolution_m": 0.25,
-        "off_nadir_deg": None, "orbit": "SSO",    "altitude_km": 510,
+        "off_nadir_deg": 45,   "orbit": "SSO",    "altitude_km": 510,
         "priority": 1,
     },
     {
@@ -151,7 +137,7 @@ SATELLITES = [
     {
         "name": "SkySat-C12",  "norad_id": 43797,
         "type": "optical",     "swath_km": 5.9,   "resolution_m": 0.50,
-        "off_nadir_deg": None, "orbit": "SSO",    "altitude_km": 500,
+        "off_nadir_deg": 30,   "orbit": "SSO",    "altitude_km": 500,
         "priority": 3,
     },
     {
@@ -163,15 +149,15 @@ SATELLITES = [
     {
         "name": "ICEYE-X2",    "norad_id": 43800,
         "type": "sar",         "swath_km": 30,    "resolution_m": 1,
-        "off_nadir_deg": None, "orbit": "SSO",    "altitude_km": 570,
+        "off_nadir_deg": 35,   "orbit": "SSO",    "altitude_km": 570,
         "priority": 5,
     },
 ]
 
 # 기상 판별 설정
 CLOUD_THRESHOLD = 50        # 구름량 50% 초과 시 EO 촬영 부적합
-PREDICTION_HOURS = 48       # 48시간 내 통과 예측
-MIN_ELEVATION_DEG = 10.0    # 최소 앙각(도)
+PREDICTION_HOURS = 72       # 평균 2~3일 골든타임 확보를 위한 72시간 예측
+MIN_ELEVATION_DEG = 20.0    # 최소 앙각 (기존 10도 -> 20도 상향, 대기 왜곡/그림자 방지)
 
 # TLE 캐시
 TLE_CACHE_DIR = PROJECT_ROOT / "data" / "tle"

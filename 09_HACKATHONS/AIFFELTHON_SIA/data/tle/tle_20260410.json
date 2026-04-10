@@ -1,0 +1,72 @@
+{
+  "66820": {
+    "name": "KOMPSAT-7",
+    "line1": "1 66820U 25279A   26090.46738051  .00003776  00000+0  30280-3 0  9996",
+    "line2": "2 66820  97.6820  39.8015 0005051 239.4994 120.5731 15.00693278 17966",
+    "meta": {
+      "display_name": "KOMPSAT-7",
+      "type": "optical",
+      "swath_km": 15,
+      "resolution_m": 0.3,
+      "off_nadir_deg": 30,
+      "altitude_km": 570,
+      "priority": 2
+    }
+  },
+  "40697": {
+    "name": "SENTINEL-2A",
+    "line1": "1 40697U 15028A   26099.96298929  .00000088  00000+0  50175-4 0  9999",
+    "line2": "2 40697  98.5633 175.7961 0001353  92.6407 267.4931 14.30819036563975",
+    "meta": {
+      "display_name": "Sentinel-2A",
+      "type": "optical",
+      "swath_km": 290,
+      "resolution_m": 10,
+      "off_nadir_deg": null,
+      "altitude_km": 786,
+      "priority": 4
+    }
+  },
+  "63229": {
+    "name": "SPACEEYE-T1",
+    "line1": "1 63229U 25052V   26099.96110765  .00004712  00000+0  21000-3 0  9996",
+    "line2": "2 63229  97.4023 353.6049 0005991  45.7135 314.4592 15.21893468 59467",
+    "meta": {
+      "display_name": "SpaceEye-T",
+      "type": "optical",
+      "swath_km": 12,
+      "resolution_m": 0.25,
+      "off_nadir_deg": 45,
+      "altitude_km": 510,
+      "priority": 1
+    }
+  },
+  "43800": {
+    "name": "ICEYE-X2",
+    "line1": "1 43800U 18099AU  26099.95046506  .00005087  00000+0  26114-3 0  9999",
+    "line2": "2 43800  97.4432 155.0153 0010736 171.6222 188.5193 15.16907160402472",
+    "meta": {
+      "display_name": "ICEYE-X2",
+      "type": "sar",
+      "swath_km": 30,
+      "resolution_m": 1,
+      "off_nadir_deg": 35,
+      "altitude_km": 570,
+      "priority": 5
+    }
+  },
+  "43797": {
+    "name": "SKYSAT-C12",
+    "line1": "1 43797U 18099AR  26099.37035054  .00015321  00000+0  30694-3 0  9996",
+    "line2": "2 43797  96.9336 125.4631 0005594  64.7040 295.4790 15.46795815411210",
+    "meta": {
+      "display_name": "SkySat-C12",
+      "type": "optical",
+      "swath_km": 5.9,
+      "resolution_m": 0.5,
+      "off_nadir_deg": 30,
+      "altitude_km": 500,
+      "priority": 3
+    }
+  }
+}

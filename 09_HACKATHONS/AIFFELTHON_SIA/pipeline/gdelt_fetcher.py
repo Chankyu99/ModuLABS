@@ -9,6 +9,7 @@ import io
 import zipfile
 from datetime import datetime, timedelta
 from pathlib import Path
+from typing import Optional
 
 import pandas as pd
 import requests
@@ -20,6 +21,7 @@ from pipeline.config import (
 # GDELT 1.0 마스터 파일 리스트 URL
 GDELT_MASTER_URL = "http://data.gdeltproject.org/events/index.html"
 GDELT_BASE_URL = "http://data.gdeltproject.org/events/"
+HISTORY_START_DATE = 20260000
 
 # GDELT 1.0 이벤트 주요 컬럼 (58개)
 GDELT_COLUMNS = [
@@ -106,21 +108,80 @@ def fetch_daily(target_date: str, save: bool = True) -> pd.DataFrame:
 
     return filtered
 
-def load_all_data(include_daily: bool = True) -> pd.DataFrame:
-    """기존 대용량 Parquet 파일과 로컬 일별 파일들을 병합하여 로드"""
+
+def _history_cache_path() -> Path:
+    """2026년 전용 히스토리 캐시 경로."""
+    return PARQUET_PATH.with_name("gdelt_main_2026.parquet")
+
+
+def _load_history_2026() -> pd.DataFrame:
+    """2026년 히스토리 전용 캐시를 로드하거나 최초 1회 생성한다."""
+    cache_path = _history_cache_path()
+    if cache_path.exists():
+        print(f"  [히스토리 요약] {cache_path.name} 로드 중...")
+        return pd.read_parquet(cache_path)
+
+    if not PARQUET_PATH.exists():
+        return pd.DataFrame()
+
+    print(f"  [히스토리 요약] {PARQUET_PATH.name}에서 2026년 전용 캐시 생성 중...")
+    try:
+        history = pd.read_parquet(
+            PARQUET_PATH,
+            filters=[("SQLDATE", ">=", HISTORY_START_DATE)],
+        )
+    except Exception:
+        history = pd.read_parquet(PARQUET_PATH)
+        if "SQLDATE" in history.columns:
+            sql_dates = pd.to_numeric(history["SQLDATE"], errors="coerce")
+            history = history[sql_dates >= HISTORY_START_DATE].copy()
+
+    history.to_parquet(cache_path, index=False)
+    print(f"  [히스토리 요약] {cache_path.name} 캐시 저장 완료 ({len(history):,}건)")
+    return history
+
+def load_all_data(include_daily: bool = True, target_date: Optional[str] = None) -> pd.DataFrame:
+    """기존 대용량 Parquet 파일과 로컬 일별 파일들을 병합하여 로드한다.
+
+    Args:
+        include_daily: data/daily parquet 포함 여부
+        target_date: YYYYMMDD. 지정 시 해당 날짜 이하의 일별 parquet만 로드
+    """
     dfs = []
     
     # 1. 히스토리 데이터 로드
     if PARQUET_PATH.exists():
-        print(f"  [히스토리 요약] {PARQUET_PATH.name} 로드 중...")
-        dfs.append(pd.read_parquet(PARQUET_PATH))
+        history_2026 = _load_history_2026()
+        if not history_2026.empty:
+            dfs.append(history_2026)
 
     # 2. 일별 수집 데이터 로드
     if include_daily and DATA_DIR.exists():
-        daily_files = sorted(DATA_DIR.glob("*.parquet"))
+        all_daily_files = sorted(DATA_DIR.glob("*.parquet"))
+        daily_files = []
+        skipped_future_files = []
+
+        for path in all_daily_files:
+            try:
+                file_date = path.stem[:8]
+            except Exception:
+                continue
+
+            if not (len(file_date) == 8 and file_date.isdigit()):
+                continue
+
+            if target_date and file_date > target_date:
+                skipped_future_files.append(path.name)
+                continue
+
+            daily_files.append(path)
+
         if daily_files:
             print(f"  [일별 데이터] {len(daily_files)}개 파일을 병합 중...")
-            for f in daily_files: dfs.append(pd.read_parquet(f))
+            if skipped_future_files:
+                print(f"  [일별 데이터] 미래 기준 파일 {len(skipped_future_files)}개 제외")
+            for f in daily_files:
+                dfs.append(pd.read_parquet(f))
 
     if not dfs: return pd.DataFrame()
 
@@ -135,6 +196,9 @@ def load_all_data(include_daily: bool = True) -> pd.DataFrame:
 
     # 4. 연산 최적화: 2026년 데이터만 필터링 (과거 13년치 제거)
     if 'SQLDATE' in combined.columns:
-        combined = combined[pd.to_numeric(combined['SQLDATE'], errors='coerce') >= 20260000].copy()
+        combined = combined[pd.to_numeric(combined['SQLDATE'], errors='coerce') >= HISTORY_START_DATE].copy()
+        if target_date:
+            sql_dates = pd.to_numeric(combined['SQLDATE'], errors='coerce')
+            combined = combined[sql_dates <= int(target_date)].copy()
         
     return combined

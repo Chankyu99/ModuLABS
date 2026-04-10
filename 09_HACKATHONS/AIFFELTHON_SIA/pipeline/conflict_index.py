@@ -16,6 +16,15 @@ from pipeline.config import (
 
 # ─── 1. 갈등 지수(I) 산출 로직 ──────────────────────────────
 
+
+def _first_non_empty(series: pd.Series):
+    """시리즈에서 첫 번째 유효값을 반환한다."""
+    valid = series.dropna()
+    if valid.empty:
+        return np.nan
+    return valid.iloc[0]
+
+
 def compute_conflict_index(df: pd.DataFrame) -> pd.DataFrame:
     """
     GDELT 원본 이벤트 데이터를 도시별 일별 갈등 지수(I)로 변환.
@@ -24,7 +33,8 @@ def compute_conflict_index(df: pd.DataFrame) -> pd.DataFrame:
     """
     if df.empty:
         return pd.DataFrame(columns=['date', 'city', 'conflict_index',
-                                     'events', 'mentions', 'avg_tone'])
+                                     'events', 'mentions', 'avg_tone',
+                                     'lat', 'lon', 'country_code'])
 
     # 모니터링 대상 국가, 분쟁 코드, 도시 단위 지오메트리(Type 4), 최소 보도 기준 필터링
     mask = (
@@ -38,7 +48,8 @@ def compute_conflict_index(df: pd.DataFrame) -> pd.DataFrame:
 
     if filtered.empty:
         return pd.DataFrame(columns=['date', 'city', 'conflict_index',
-                                     'events', 'mentions', 'avg_tone'])
+                                     'events', 'mentions', 'avg_tone',
+                                     'lat', 'lon', 'country_code'])
 
     # GDELT 중복 파싱 제거 로직 (Actor별 조합으로 뻥튀기된 동일 기사 제거)
     if 'Actor1Name' in filtered.columns and 'Actor2Name' in filtered.columns:
@@ -51,6 +62,8 @@ def compute_conflict_index(df: pd.DataFrame) -> pd.DataFrame:
 
     # 날짜 형식 정리 및 가중치 적용
     filtered['date'] = filtered['SQLDATE'].astype(str).str[:8]
+    filtered['ActionGeo_Lat'] = pd.to_numeric(filtered['ActionGeo_Lat'], errors='coerce')
+    filtered['ActionGeo_Long'] = pd.to_numeric(filtered['ActionGeo_Long'], errors='coerce')
     filtered['weight'] = filtered['AvgTone'].apply(tone_weight)
     
     # EventRootCode 기반 행동 심각도 가중치
@@ -76,6 +89,9 @@ def compute_conflict_index(df: pd.DataFrame) -> pd.DataFrame:
             events=('EventCode', 'count'),
             mentions=('NumMentions', 'sum'),
             avg_tone=('AvgTone', 'mean'),
+            lat=('ActionGeo_Lat', 'median'),
+            lon=('ActionGeo_Long', 'median'),
+            country_code=('ActionGeo_CountryCode', _first_non_empty),
         )
         .reset_index()
         .rename(columns={'ActionGeo_FullName': 'city'})
@@ -97,6 +113,11 @@ def compute_conflict_index(df: pd.DataFrame) -> pd.DataFrame:
         grp_idx['events'] = grp_idx['events'].fillna(0).astype(int)
         grp_idx['mentions'] = grp_idx['mentions'].fillna(0).astype(int)
         grp_idx['avg_tone'] = grp_idx['avg_tone'].fillna(0.0)
+        grp_idx['lat'] = grp_idx['lat'].fillna(grp['lat'].dropna().median())
+        grp_idx['lon'] = grp_idx['lon'].fillna(grp['lon'].dropna().median())
+        country_values = grp['country_code'].dropna()
+        if not country_values.empty:
+            grp_idx['country_code'] = grp_idx['country_code'].fillna(country_values.iloc[0])
         grp_idx.index.name = 'date'
         filled_parts.append(grp_idx.reset_index())
 
@@ -195,4 +216,3 @@ def detect_anomalies(city_daily: pd.DataFrame,
         all_results = all_results[all_results['date'] == target_date]
 
     return all_results.sort_values(['date', 'innov_z'], ascending=[True, False])
-

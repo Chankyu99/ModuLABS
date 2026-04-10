@@ -42,7 +42,15 @@ def _fetch_cloud_forecast(lat: float, lon: float) -> dict | None:
             timeout=15,
         )
         resp.raise_for_status()
-        return resp.json()
+        data = resp.json()
+        
+        # O(1) 조회를 위해 HashMap(Dictionary) 사전 구축
+        if "hourly" in data:
+            times = data["hourly"]["time"]
+            clouds = data["hourly"]["cloud_cover"]
+            data["cloud_map"] = dict(zip(times, clouds))
+            
+        return data
     except requests.RequestException as e:
         print(f"  [WEATHER] ⚠️ Open-Meteo 요청 실패 ({lat_r}, {lon_r}): {e}")
         return None
@@ -64,42 +72,26 @@ def get_cloud_cover(lat: float, lon: float, pass_time_utc: str) -> dict:
     """
     data = _fetch_cloud_forecast(lat, lon)
 
-    if data is None or "hourly" not in data:
+    if data is None or "cloud_map" not in data:
         return {
             "cloud_cover_pct": -1,
             "cloud_status": "unknown",
             "shootable_eo": False,
         }
 
-    # 통과 시각에 가장 가까운 예보 시간 찾기
-    times = data["hourly"]["time"]  # "2026-04-09T00:00" 형식
-    clouds = data["hourly"]["cloud_cover"]
-
-    # pass_time을 "YYYY-MM-DDTHH:00" 형식으로 변환 (시간 단위로 매칭)
+    # pass_time을 "YYYY-MM-DDTHH:00" 형식으로 변환 (반올림을 통한 정각 매칭)
     pass_dt = datetime.fromisoformat(pass_time_utc.replace("Z", "+00:00"))
+    
+    # 30분 이상이면 다음 시간 정각으로 올림
+    if pass_dt.minute >= 30:
+        from datetime import timedelta
+        pass_dt += timedelta(hours=1)
+        
+    pass_dt = pass_dt.replace(minute=0, second=0, microsecond=0)
     target_hour = pass_dt.strftime("%Y-%m-%dT%H:00")
 
-    cloud_pct = None
-    for t, c in zip(times, clouds):
-        if t == target_hour:
-            cloud_pct = c
-            break
-
-    if cloud_pct is None:
-        # 정확한 시간 매치 실패 시, 가장 가까운 시간 찾기
-        min_diff = float("inf")
-        for t, c in zip(times, clouds):
-            try:
-                t_dt = datetime.fromisoformat(t).replace(tzinfo=timezone.utc)
-                diff = abs((pass_dt - t_dt).total_seconds())
-                if diff < min_diff:
-                    min_diff = diff
-                    cloud_pct = c
-            except ValueError:
-                continue
-
-    if cloud_pct is None:
-        cloud_pct = -1
+    # Hash 맵에서 O(1) 룩업
+    cloud_pct = data["cloud_map"].get(target_hour, -1)
 
     # 구름 상태 판정
     if cloud_pct < 0:

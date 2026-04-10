@@ -1,0 +1,230 @@
+{
+  "date": "20260409",
+  "generated_at": "2026-04-10T16:47:52.668916",
+  "total_cities": 24,
+  "alert_count": 10,
+  "alerts": [
+    {
+      "city": "Beirut",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 6378.4,
+      "innovation_z": 37.61,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 74,
+      "lat": 33.8719,
+      "lon": 35.5097,
+      "country_code": "LE",
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Manara",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 491.4,
+      "innovation_z": 11.29,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 3,
+      "lat": 33.1958,
+      "lon": 35.5431,
+      "country_code": "IS",
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Bekaa Valley",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 51.0,
+      "innovation_z": 9.25,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 3,
+      "lat": 33.8333,
+      "lon": 36.0,
+      "country_code": "LE",
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Damascus",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 119.9,
+      "innovation_z": 7.73,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 1,
+      "lat": 33.5,
+      "lon": 36.3,
+      "country_code": "SY",
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Gaza City",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 1108.8,
+      "innovation_z": 5.61,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 6,
+      "lat": 31.4167,
+      "lon": 34.3333,
+      "country_code": "IS",
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Gaza",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 10223.2,
+      "innovation_z": 5.09,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 85,
+      "lat": 31.4167,
+      "lon": 34.3333,
+      "country_code": "IS",
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Istanbul",
+      "risk_level": 3,
+      "risk_label": "위기 (RED)",
+      "conflict_index": 13.2,
+      "innovation_z": 3.14,
+      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
+      "events": 1,
+      "lat": 41.0186,
+      "lon": 28.9647,
+      "country_code": "TU",
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Ayyub",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 3.3,
+      "innovation_z": 1.83,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 1,
+      "lat": 37.8879,
+      "lon": 57.3904,
+      "country_code": "IR",
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Eilat",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 30.3,
+      "innovation_z": 1.73,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 2,
+      "lat": 29.558,
+      "lon": 34.9482,
+      "country_code": "IS",
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    },
+    {
+      "city": "Tehran",
+      "risk_level": 1,
+      "risk_label": "주의 (YELLOW)",
+      "conflict_index": 11430.9,
+      "innovation_z": 1.31,
+      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
+      "events": 81,
+      "lat": 35.75,
+      "lon": 51.5148,
+      "country_code": "IR",
+      "llm_confidence": -1.0,
+      "llm_reason": ""
+    }
+  ],
+  "summary": [
+    {
+      "city": "Tehran",
+      "risk_level": 1,
+      "conflict_index": 11430.9,
+      "z_score": 1.31,
+      "lat": 35.75,
+      "lon": 51.5148
+    },
+    {
+      "city": "Gaza",
+      "risk_level": 3,
+      "conflict_index": 10223.2,
+      "z_score": 5.09,
+      "lat": 31.4167,
+      "lon": 34.3333
+    },
+    {
+      "city": "Beirut",
+      "risk_level": 3,
+      "conflict_index": 6378.4,
+      "z_score": 37.61,
+      "lat": 33.8719,
+      "lon": 35.5097
+    },
+    {
+      "city": "Jerusalem",
+      "risk_level": 0,
+      "conflict_index": 1424.6,
+      "z_score": 0.24,
+      "lat": 31.7667,
+      "lon": 35.2333
+    },
+    {
+      "city": "Gaza City",
+      "risk_level": 3,
+      "conflict_index": 1108.8,
+      "z_score": 5.61,
+      "lat": 31.4167,
+      "lon": 34.3333
+    },
+    {
+      "city": "Tel Aviv",
+      "risk_level": 0,
+      "conflict_index": 911.6,
+      "z_score": -6.17,
+      "lat": 32.0667,
+      "lon": 34.7667
+    },
+    {
+      "city": "Manara",
+      "risk_level": 3,
+      "conflict_index": 491.4,
+      "z_score": 11.29,
+      "lat": 33.1958,
+      "lon": 35.5431
+    },
+    {
+      "city": "Damascus",
+      "risk_level": 3,
+      "conflict_index": 119.9,
+      "z_score": 7.73,
+      "lat": 33.5,
+      "lon": 36.3
+    },
+    {
+      "city": "Bekaa Valley",
+      "risk_level": 3,
+      "conflict_index": 51.0,
+      "z_score": 9.25,
+      "lat": 33.8333,
+      "lon": 36.0
+    },
+    {
+      "city": "Baghdad",
+      "risk_level": 0,
+      "conflict_index": 32.1,
+      "z_score": -4.02,
+      "lat": 33.3386,
+      "lon": 44.3939
+    }
+  ]
+}

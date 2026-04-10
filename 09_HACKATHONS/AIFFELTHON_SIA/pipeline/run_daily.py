@@ -98,6 +98,9 @@ def save_result(anomalies: pd.DataFrame, target_date: str):
                 'innovation_z': round(float(r['innov_z']), 2),
                 'guide': r['risk_guide'],
                 'events': int(r['events']),
+                'lat': round(float(r['lat']), 4) if pd.notna(r.get('lat')) else None,
+                'lon': round(float(r['lon']), 4) if pd.notna(r.get('lon')) else None,
+                'country_code': r.get('country_code', ''),
                 'llm_confidence': round(float(r.get('llm_confidence', -1)), 2),
                 'llm_reason': r.get('llm_reason', ''),
             } for _, r in alerts.iterrows()
@@ -108,6 +111,8 @@ def save_result(anomalies: pd.DataFrame, target_date: str):
                 'risk_level': int(r['risk_level']),
                 'conflict_index': round(float(r['conflict_index']), 1),
                 'z_score': round(float(r['innov_z']), 2),
+                'lat': round(float(r['lat']), 4) if pd.notna(r.get('lat')) else None,
+                'lon': round(float(r['lon']), 4) if pd.notna(r.get('lon')) else None,
             } for _, r in today.nlargest(10, 'conflict_index').iterrows()
         ]
     }
@@ -127,7 +132,7 @@ def run_single_day(target_date: str, fetch: bool = False, use_llm: bool = True):
     if fetch: fetch_daily(target_date)
 
     # 데이터 로드 (기존 대용량 Parquet + 수집된 일별 Parquet)
-    raw = load_all_data()
+    raw = load_all_data(target_date=target_date)
     if raw.empty:
         print("  [오류] 분석 가능한 데이터가 없습니다.")
         return
