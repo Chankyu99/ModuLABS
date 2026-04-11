@@ -1,5 +1,17 @@
 # ModuLABS_DATATON
 
+## 폴더 구조
+
+- `Code/`: 분석 노트북, 발표용 산출물 생성 스크립트, 리팩토링 모듈
+- `Data/`: Olist 원본 데이터셋
+- `Docs/`: 발표 PDF, 포트폴리오 문서 초안 및 최종본
+- `Assets/images/`: README 및 분석 설명에 사용하는 정적 이미지
+- `Assets/html_maps/`: 기존 실험용 HTML 지도 시각화
+- `Outputs/Presentation_Refined/`: 발표용 정제 산출물
+  - `figures/`: 발표 본문 이미지
+  - `tables/`: 발표 근거 테이블
+  - `appendix/`: 부록용 folium 지도
+
 ## 1월 19일 : 데이터 톺아보기 & 시각화 아이디어 제안
 
 일단 데이터를 대충 분석해본 결과 만족도 리뷰 1점의 53.3%가 배송 지연 및 미도착 문제에서 기인하였다. 이는 판매자가 통제하기 힘든 택배사 이슈가 가장 컸다는 것을 알 수 있다.
@@ -8,11 +20,11 @@
 
 먼저 색깔별로 도시 분포도를 시각화해 보았다. 마치 온도를 잴 때처럼, 붉은 곳일 수록 밀집도가 높은 것을 의미한다.
 
-![1](Img/try_visualization1.png)
+![1](Assets/images/try_visualization1.png)
 
 다음으로 판매자-구매자 좌표를 동시에 이용해 두 지점을 잇는 배송 경로를 표시해 보았다.
 
-![2](Img/try_visualization2.png)
+![2](Assets/images/try_visualization2.png)
 
 프로젝트를 진행하며 결론을 도출하는 과정에서 설명이 필요한 부분에 이러한 시각화 자료를 활용한다면 좋은 무기가 될 수 있을 것이다.
 
@@ -68,7 +80,7 @@ target = 'review_score'
 
 특성 중요도를 계산한 결과 특성 공학으로 생성된 **배송 예정일**과 **실제 배송일간의 편차(`arrival_diff`)**를 나타내는 피처가 눈에 띄게 중요한 지표로 분석되었고, 2순위로는 **상품의 설명 길이**로 상품에 대한 고객의 신뢰도가 중요하게 작용했음을 알 수 있었다.
 
-![3](Img/feature_importance.png)
+![3](Assets/images/feature_importance.png)
 
 - 1순위(배송편차) : 고객들은 얼마나 빠르게 도착하면 만족, 얼만큼만 늦게 도착해도 불만족을 표현하는가?
 - 2순위(상품 설명 길이) : 상품 설명을 얼만큼 쓰는게 좋은가?
@@ -77,13 +89,13 @@ target = 'review_score'
 
 생성된 특성들을 포함한 EDA 결과 RR(Roraima) 지역의 경우 평균 배송일은 약 46일 -> 그러나 안전 배송일(95%신뢰도)은 61일이었다.
 
-![4](Img/state_delivery_risk_guide.png)
+![4](Assets/images/state_delivery_risk_guide.png)
 
 이런 예시처럼 고객들이 이를 혼동해 배송 지연에 따른 불만족을 표시할 우려가 매우 높으니, 상품 설명 상세 페이지에 배송 과정에 대한 자세한 설명이 필요할 것으로 요구된다.
 
 2순위 지표인 상품 설명 길이 분석 결과, 약 500~700자 정도의 상품 설명 속에 배송이 보장되는 시간을 기입하는 것이 평균 리뷰점수가 제일 가치있었다. 
 
-![5](Img/optimal_description_length.png)
+![5](Assets/images/optimal_description_length.png)
 
 너무 길이가 길면 오히려 고객들이 배송 설명을 놓치기 쉬울 염려가 있으므로, 적당한 문구 길이를 조정하는 것이 중요했다.
 
@@ -166,21 +178,21 @@ target = 'review_score'
 
 지난번에 `folium`라이브러리를 사용해 히트맵을 시각화했던 것을 활용해서 어제 분석한 지표값을 지도상에 나타내 보았다.
 
-![6](Img/folium1.png)
+![6](Assets/images/folium1.png)
 
 우선 기회점수 지표로 1위인 리우데자네이루에 일부러 가중치를 부여해 도드라지게 하였고, 다른 도시와 기회 점수를 비교할 수 있었다.
 
-![7](Img/folium2.png)
+![7](Assets/images/folium2.png)
 
 그 다음은 배송 위험 지역군을 분류해 배송편차를 비교하고,
 
-![8](Img/folium3.png)
+![8](Assets/images/folium3.png)
 
 배송비가 높아 고비용 지역으로 분류되는 것도 확인할 수 있었다.
 
 세가지 지표를 동시에 나타내면 다음과 같다.
 
-![9](Img/folium4.png)
+![9](Assets/images/folium4.png)
 
 나의 지표로만 분석해본 결과, 기회점수로만 보았을 때는 대도시의 리우데자네이루가 베스트 결과로 뽑히지만, 북부 오지로의 진출을 고려할 경우 선택지가 여러개가 될 수 있음을 알 수 있었다.
 
@@ -200,8 +212,6 @@ target = 'review_score'
 자료 준비에 좀 더 많은 시간이 필요했다면 완성도가 높았을 텐데, 그러지 못해 아쉬움이 많았다. 
 
 오전에 이를 마치고, 오후에 구글 미트를 통해 발표를 진행했고, 마무리를 할 수 있었다.
-
-
 
 
 

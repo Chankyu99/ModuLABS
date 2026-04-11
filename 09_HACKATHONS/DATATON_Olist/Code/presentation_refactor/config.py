@@ -1,0 +1,20 @@
+from pathlib import Path
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+DATA_DIR = PROJECT_ROOT / "Data"
+OUTPUT_DIR = PROJECT_ROOT / "Outputs" / "Presentation_Refined"
+FIGURE_DIR = OUTPUT_DIR / "figures"
+TABLE_DIR = OUTPUT_DIR / "tables"
+
+PRIMARY = "#2563EB"
+SECONDARY = "#0F172A"
+ACCENT = "#F59E0B"
+DANGER = "#DC2626"
+SUCCESS = "#10B981"
+MUTED = "#64748B"
+LIGHT = "#E2E8F0"
+BACKGROUND = "#F8FAFC"
+
+MIN_STATE_ORDER_COUNT = 300
+MIN_DELAYED_ORDERS = 50
