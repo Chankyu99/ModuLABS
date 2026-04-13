@@ -1,0 +1,58 @@
+{
+  "43797": {
+    "name": "SKYSAT-C12",
+    "line1": "1 43797U 18099AR  26102.79893830  .00011549  00000+0  23113-3 0  9997",
+    "line2": "2 43797  96.9332 128.7464 0005219  55.5081 304.6662 15.46892815411740",
+    "meta": {
+      "display_name": "SkySat-C12",
+      "type": "optical",
+      "swath_km": 5.9,
+      "resolution_m": 0.5,
+      "off_nadir_deg": 30,
+      "altitude_km": 500,
+      "priority": 3
+    }
+  },
+  "63229": {
+    "name": "SPACEEYE-T1",
+    "line1": "1 63229U 25052V   26102.45957750  .00003495  00000+0  15647-3 0  9995",
+    "line2": "2 63229  97.4025 356.0632 0005813  39.1984 320.9672 15.21912794 59843",
+    "meta": {
+      "display_name": "SpaceEye-T",
+      "type": "optical",
+      "swath_km": 12,
+      "resolution_m": 0.25,
+      "off_nadir_deg": 45,
+      "altitude_km": 510,
+      "priority": 1
+    }
+  },
+  "40697": {
+    "name": "SENTINEL-2A",
+    "line1": "1 40697U 15028A   26102.83011832  .00000064  00000+0  41158-4 0  9991",
+    "line2": "2 40697  98.5633 178.6213 0001335  89.8875 270.2461 14.30819789564385",
+    "meta": {
+      "display_name": "Sentinel-2A",
+      "type": "optical",
+      "swath_km": 290,
+      "resolution_m": 10,
+      "off_nadir_deg": null,
+      "altitude_km": 786,
+      "priority": 4
+    }
+  },
+  "66820": {
+    "name": "KOMPSAT-7",
+    "line1": "1 66820U 25279A   26090.46738051  .00003776  00000+0  30280-3 0  9996",
+    "line2": "2 66820  97.6820  39.8015 0005051 239.4994 120.5731 15.00693278 17966",
+    "meta": {
+      "display_name": "KOMPSAT-7",
+      "type": "optical",
+      "swath_km": 15,
+      "resolution_m": 0.3,
+      "off_nadir_deg": 30,
+      "altitude_km": 570,
+      "priority": 2
+    }
+  }
+}

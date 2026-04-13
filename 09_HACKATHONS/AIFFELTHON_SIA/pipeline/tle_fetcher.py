@@ -12,6 +12,7 @@ from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from pipeline.config import SATELLITES, TLE_CACHE_DIR
+from pipeline.satellite_catalog import load_satellite_catalog
 
 
 # ──────────────────────────────────────────────
@@ -48,10 +49,11 @@ def fetch_tle(norad_id: int, session: requests.Session | None = None) -> tuple[i
         return norad_id, None
 
 
-def _cache_path(date_str: str) -> Path:
+def _cache_path(date_str: str, catalog_key: str = "default") -> Path:
     """날짜별 TLE 캐시 파일 경로."""
     TLE_CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    return TLE_CACHE_DIR / f"tle_{date_str}.json"
+    suffix = "" if catalog_key == "default" else f"_{catalog_key}"
+    return TLE_CACHE_DIR / f"tle_{date_str}{suffix}.json"
 
 
 def _normalize_reference_date(reference_date: str | None = None) -> str:
@@ -61,25 +63,34 @@ def _normalize_reference_date(reference_date: str | None = None) -> str:
     return datetime.utcnow().strftime("%Y%m%d")
 
 
-def list_cached_tle_dates() -> list[str]:
+def list_cached_tle_dates(catalog_key: str = "default") -> list[str]:
     """로컬에 저장된 TLE 캐시 날짜 목록을 반환한다."""
     TLE_CACHE_DIR.mkdir(parents=True, exist_ok=True)
     dates = []
-    for path in TLE_CACHE_DIR.glob("tle_*.json"):
-        date_str = path.stem.replace("tle_", "", 1)
+    suffix = "" if catalog_key == "default" else f"_{catalog_key}"
+    pattern = f"tle_*{suffix}.json"
+    for path in TLE_CACHE_DIR.glob(pattern):
+        stem = path.stem.replace("tle_", "", 1)
+        if suffix and stem.endswith(suffix):
+            stem = stem[: -len(suffix)]
+        date_str = stem
         if len(date_str) == 8 and date_str.isdigit():
             dates.append(date_str)
     return sorted(dates)
 
 
-def resolve_tle_cache_date(reference_date: str | None = None, mode: str = "operational") -> str | None:
+def resolve_tle_cache_date(
+    reference_date: str | None = None,
+    mode: str = "operational",
+    catalog_key: str = "default",
+) -> str | None:
     """요청 날짜와 모드에 맞는 TLE 캐시 기준 날짜를 결정한다."""
     requested_date = _normalize_reference_date(reference_date)
 
     if mode != "backtest":
         return requested_date
 
-    cached_dates = list_cached_tle_dates()
+    cached_dates = list_cached_tle_dates(catalog_key=catalog_key)
     if requested_date in cached_dates:
         return requested_date
 
@@ -95,6 +106,8 @@ def load_all_tle(
     reference_date: str | None = None,
     mode: str = "operational",
     return_info: bool = False,
+    satellites: list[dict] | None = None,
+    catalog_key: str = "default",
 ) -> dict | tuple[dict, dict]:
     """모든 위성의 TLE를 수집하고 캐시에 저장한다.
 
@@ -102,12 +115,14 @@ def load_all_tle(
         {norad_id: {"name": str, "line1": str, "line2": str, "meta": dict}, ...}
     """
     requested_date = _normalize_reference_date(reference_date)
-    resolved_date = resolve_tle_cache_date(requested_date, mode=mode)
+    satellite_defs = satellites or SATELLITES
+    resolved_date = resolve_tle_cache_date(requested_date, mode=mode, catalog_key=catalog_key)
     info = {
         "mode": mode,
         "requested_date": requested_date,
         "resolved_date": resolved_date,
         "source": "unknown",
+        "catalog_key": catalog_key,
     }
 
     if mode == "backtest":
@@ -122,7 +137,7 @@ def load_all_tle(
             info["source"] = "missing-historical-cache"
             return ({}, info) if return_info else {}
 
-        cache_file = _cache_path(resolved_date)
+        cache_file = _cache_path(resolved_date, catalog_key=catalog_key)
         source_label = "exact" if resolved_date == requested_date else "previous"
         print(
             f"  [TLE] 백테스트 캐시 로드: {cache_file.name} "
@@ -133,7 +148,7 @@ def load_all_tle(
         info["source"] = "historical-cache" if source_label == "exact" else "historical-cache-fallback"
         return (data, info) if return_info else data
 
-    cache_file = _cache_path(requested_date)
+    cache_file = _cache_path(requested_date, catalog_key=catalog_key)
 
     # 캐시가 있고 강제 갱신이 아니면 캐시 반환
     if cache_file.exists() and not force_refresh:
@@ -143,17 +158,17 @@ def load_all_tle(
         info["source"] = "cache"
         return (data, info) if return_info else data
 
-    print(f"  [TLE] CelesTrak에서 {len(SATELLITES)}개 위성의 TLE 수집 중... (병렬 처리)")
+    print(f"  [TLE] CelesTrak에서 {len(satellite_defs)}개 위성의 TLE 수집 중... (병렬 처리)")
     result = {}
 
     with requests.Session() as session:
         # 워커 개수는 위성 개수만큼, 단 최대 10개로 제한
-        max_workers = min(10, len(SATELLITES))
+        max_workers = min(10, len(satellite_defs))
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             # 퓨처 객체 매핑
             futures = {
                 executor.submit(fetch_tle, sat["norad_id"], session): sat
-                for sat in SATELLITES
+                for sat in satellite_defs
             }
             
             for future in as_completed(futures):
@@ -201,12 +216,15 @@ if __name__ == "__main__":
     parser.add_argument("--refresh", action="store_true", help="캐시 무시, 재수집")
     parser.add_argument("--date", type=str, help="캐시 기준 날짜 (YYYYMMDD)")
     parser.add_argument("--mode", choices=["operational", "backtest"], default="operational", help="TLE 사용 모드")
+    parser.add_argument("--scenario", default="default", help="위성 카탈로그 시나리오")
     args = parser.parse_args()
+
+    catalog = load_satellite_catalog(args.scenario)
 
     if args.satellite:
         # 특정 위성만 조회
         sat_info = next(
-            (s for s in SATELLITES if s["name"].lower() == args.satellite.lower()),
+            (s for s in catalog if s["name"].lower() == args.satellite.lower()),
             None,
         )
         if sat_info:
@@ -225,5 +243,7 @@ if __name__ == "__main__":
             force_refresh=args.refresh,
             reference_date=args.date,
             mode=args.mode,
+            satellites=catalog,
+            catalog_key=args.scenario,
         )
         print(f"\n총 {len(data)}개 위성 TLE 수집 완료.")
