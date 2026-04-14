@@ -23,6 +23,11 @@ from pipeline.config import CLOUD_THRESHOLD
 OPEN_METEO_URL = "https://api.open-meteo.com/v1/forecast"
 
 
+def _normalize_sensor_type(sensor: str | None) -> str:
+    """센서 타입 표기를 소문자 기준 공통 포맷으로 맞춘다."""
+    return str(sensor or "optical").strip().lower()
+
+
 @lru_cache(maxsize=64)
 def _fetch_cloud_forecast(lat: float, lon: float) -> dict | None:
     """Open-Meteo에서 시간별 구름량 예보를 가져온다. 좌표별 캐싱."""
@@ -139,7 +144,7 @@ def check_weather(pass_event: dict) -> dict:
     lat = pass_event["lat"]
     lon = pass_event["lon"]
     pass_time = pass_event["pass_time_utc"]
-    sensor = pass_event["sensor_type"]
+    sensor = _normalize_sensor_type(pass_event["sensor_type"])
 
     cloud = get_cloud_cover(lat, lon, pass_time)
     daylight = is_daylight(lat, lon, pass_time)
@@ -152,6 +157,7 @@ def check_weather(pass_event: dict) -> dict:
 
     result = pass_event.copy()
     result.update({
+        "sensor_type": sensor,
         "cloud_cover_pct": cloud["cloud_cover_pct"],
         "cloud_status": cloud["cloud_status"],
         "daylight": daylight,

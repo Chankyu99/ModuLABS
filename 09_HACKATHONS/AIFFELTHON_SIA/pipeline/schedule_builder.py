@@ -12,6 +12,7 @@ from pathlib import Path
 
 from pipeline.config import SATELLITES, ROI_CITIES, OUTPUT_DIR, PREDICTION_HOURS
 from pipeline.tle_fetcher import load_all_tle
+from pipeline.satellite_catalog import load_satellite_catalog
 from pipeline.pass_predictor import predict_passes, filter_shootable
 from pipeline.weather_checker import check_weather
 
@@ -26,6 +27,11 @@ PRIORITY_DISPLAY_ORDER = [
 ]
 
 
+def normalize_sensor_type(sensor: str | None) -> str:
+    """센서 타입 표기를 소문자 기준 공통 포맷으로 정규화한다."""
+    return str(sensor or "optical").strip().lower()
+
+
 def get_urgency_index(event: dict) -> float:
     """확장성을 염두에 두고 이벤트 객체에서 위험/긴급성에 대한 스코어를 추출한다."""
     return float(event.get("severity_score", event.get("innovation_z", 0.0)))
@@ -36,7 +42,7 @@ def classify_priority_band(event: dict) -> int:
     # 향후 확장성을 위해 risk_label 또는 risk_level 다형성 지원
     risk = event.get("risk_label", event.get("risk_level", "N/A"))
     z_score = get_urgency_index(event)
-    sensor = event.get("sensor_type", "optical")
+    sensor = normalize_sensor_type(event.get("sensor_type", "optical"))
     daylight = event.get("daylight", True)
     cloud = event.get("cloud_cover_pct", 50)
     elev = event.get("max_elevation_deg", 10)
@@ -78,7 +84,7 @@ def classify_priority_band(event: dict) -> int:
 
 def compute_quality_score(event: dict) -> float:
     """동일 등급 내에서 촬영 품질(구름, 앙각 등)에 따른 세부 순서를 조정합니다."""
-    sensor = event.get("sensor_type", "optical")
+    sensor = normalize_sensor_type(event.get("sensor_type", "optical"))
     elev = max(min(event.get("max_elevation_deg", 10), 90), 1)
 
     if sensor == "sar":
@@ -91,10 +97,38 @@ def compute_quality_score(event: dict) -> float:
     return round((1 - cloud / 100) * (elev / 90), 4)
 
 
+def compute_policy_preference(event: dict) -> float:
+    """운영 정책 기준의 추가 선호 점수를 계산한다.
+
+    목표:
+    - 광학 조건이 좋으면 SpaceEye-T를 최우선 광학 자산으로 밀어준다.
+    - 광학 조건이 나쁘면 SAR를 백업보다 우선하는 후보로 끌어올린다.
+    """
+    sensor = normalize_sensor_type(event.get("sensor_type", "optical"))
+    satellite = event.get("satellite", "")
+    daylight = bool(event.get("daylight", True))
+    cloud = max(min(event.get("cloud_cover_pct", 50), 100), 0)
+    elev = max(min(event.get("max_elevation_deg", 10), 90), 1)
+
+    eo_favorable = daylight and cloud <= 40 and elev >= 30
+    eo_impossible = (not daylight) or cloud > 50
+
+    if satellite == "SpaceEye-T" and sensor == "optical" and eo_favorable:
+        return 3.0
+    if sensor == "optical" and eo_favorable:
+        return 2.0
+    if sensor == "sar" and eo_impossible:
+        return 2.5
+    if sensor == "sar":
+        return 1.0
+    return 0.0
+
+
 def _recommendation_sort_key(event: dict) -> tuple:
     """정책 등급과 품질을 기준으로 추천 후보를 정렬한다."""
     return (
         -event.get("priority_band", 0),
+        -event.get("policy_preference", 0.0),
         -get_urgency_index(event),
         -event.get("quality_score", 0.0),
         event.get("pass_time_utc", ""),
@@ -132,30 +166,30 @@ def get_urgency_label(event: dict) -> str:
 
 def get_capture_condition_label(event: dict) -> str:
     """센서와 기상 조건을 종합해 촬영 여건 라벨을 만든다."""
-    sensor = event.get("sensor_type", "optical")
+    sensor = normalize_sensor_type(event.get("sensor_type", "optical"))
     elev = max(min(event.get("max_elevation_deg", 10), 90), 1)
     cloud = max(min(event.get("cloud_cover_pct", 50), 100), 0)
     daylight = bool(event.get("daylight", True))
 
     if sensor == "sar":
         if elev >= 75:
-            return "양호"
+            return "SAR 관측 양호"
         if elev >= 55:
-            return "보통"
-        return "제한적"
+            return "SAR 관측 보통"
+        return "SAR 관측 제한"
 
     if daylight and cloud <= 20 and elev >= 50:
-        return "매우 좋음"
+        return "EO 촬영 매우 좋음"
     if daylight and cloud <= 40 and elev >= 30:
-        return "좋음"
+        return "EO 촬영 좋음"
     if daylight and cloud <= 50:
-        return "보통"
-    return "제한적"
+        return "EO 촬영 보통"
+    return "EO 촬영 제한"
 
 
 def build_recommendation_reason(event: dict) -> str:
     """대시보드에 바로 노출 가능한 짧은 핵심 메시지를 생성한다."""
-    sensor = event.get("sensor_type", "optical")
+    sensor = normalize_sensor_type(event.get("sensor_type", "optical"))
     risk = event.get("risk_label", event.get("risk_level", "N/A"))
     urgency = get_urgency_label(event)
     condition = get_capture_condition_label(event)
@@ -178,9 +212,9 @@ def build_recommendation_reason(event: dict) -> str:
         return f"{risk} 지역의 일반 모니터링용 SAR 후보"
 
     if sensor == "optical":
-        if condition in ("매우 좋음", "좋음"):
+        if condition in ("EO 촬영 매우 좋음", "EO 촬영 좋음"):
             return f"{risk} 지역이며 광학 촬영 여건이 {condition}"
-        if condition == "보통":
+        if condition == "EO 촬영 보통":
             return f"{risk} 지역이며 광학 촬영 가능"
         return f"{risk} 지역이나 확보된 촬영 기회부터 활용"
 
@@ -190,6 +224,7 @@ def build_recommendation_reason(event: dict) -> str:
 def enrich_display_fields(event: dict) -> dict:
     """대시보드/콘솔용 사용자 친화적 표시 필드를 추가한다."""
     enriched = event.copy()
+    enriched["sensor_type"] = normalize_sensor_type(enriched.get("sensor_type"))
     enriched["action_priority_label"] = get_action_priority_label(enriched)
     enriched["urgency_label"] = get_urgency_label(enriched)
     enriched["capture_condition_label"] = get_capture_condition_label(enriched)
@@ -229,6 +264,41 @@ def build_city_best_recommendations(events: list[dict]) -> list[dict]:
     return city_best
 
 
+def build_sensor_condition_summary(events: list[dict]) -> dict:
+    """센서별 촬영 가능/제약 요약을 만든다."""
+    summary = {
+        "optical_total": 0,
+        "optical_shootable": 0,
+        "optical_blocked_night": 0,
+        "optical_blocked_cloud": 0,
+        "optical_blocked_unknown": 0,
+        "sar_total": 0,
+        "sar_shootable": 0,
+    }
+
+    for event in events:
+        sensor = normalize_sensor_type(event.get("sensor_type"))
+        if sensor == "sar":
+            summary["sar_total"] += 1
+            if event.get("shootable"):
+                summary["sar_shootable"] += 1
+            continue
+
+        summary["optical_total"] += 1
+        if event.get("shootable"):
+            summary["optical_shootable"] += 1
+            continue
+
+        if not event.get("daylight", True):
+            summary["optical_blocked_night"] += 1
+        elif event.get("cloud_cover_pct", -1) < 0:
+            summary["optical_blocked_unknown"] += 1
+        else:
+            summary["optical_blocked_cloud"] += 1
+
+    return summary
+
+
 def _parse_pass_time(pass_time_utc: str) -> datetime:
     """UTC 문자열을 timezone-aware datetime으로 변환한다."""
     return datetime.fromisoformat(pass_time_utc.replace("Z", "+00:00"))
@@ -256,17 +326,31 @@ def build_satellite_execution_plan(
     """
     selected_events = []
     skipped_conflicts = []
-    assigned_cities = set()
+    city_assignments: dict[str, list[dict]] = {}
     satellite_times: dict[str, list[datetime]] = {}
     gap_seconds = max(min_gap_minutes, 0) * 60
 
     for event in sorted(events, key=_recommendation_sort_key):
         city = event["city"]
         satellite = event["satellite"]
+        sensor = normalize_sensor_type(event.get("sensor_type"))
         pass_dt = _parse_pass_time(event["pass_time_utc"])
+        existing_city_events = city_assignments.setdefault(city, [])
+        risk = event.get("risk_label", event.get("risk_level", "N/A"))
+        city_limit = 2 if risk in {"RED", "ORANGE"} else 1
 
-        if city in assigned_cities:
+        if len(existing_city_events) >= city_limit:
             continue
+
+        # RED/ORANGE 도시의 두 번째 슬롯은 가능하면 다른 센서로 채워
+        # "primary + backup" 구성을 유도한다.
+        if existing_city_events:
+            existing_sensors = {
+                normalize_sensor_type(item.get("sensor_type"))
+                for item in existing_city_events
+            }
+            if sensor in existing_sensors:
+                continue
 
         existing_times = satellite_times.setdefault(satellite, [])
         has_conflict = any(abs((pass_dt - prev).total_seconds()) < gap_seconds for prev in existing_times)
@@ -283,7 +367,7 @@ def build_satellite_execution_plan(
 
         selected = event.copy()
         selected_events.append(selected)
-        assigned_cities.add(city)
+        existing_city_events.append(selected)
         existing_times.append(pass_dt)
 
     grouped: dict[str, list[dict]] = {}
@@ -316,7 +400,7 @@ def build_satellite_execution_plan(
     return {
         "min_capture_gap_minutes": min_gap_minutes,
         "scheduled_events": selected_events,
-        "scheduled_cities": len(assigned_cities),
+        "scheduled_cities": len(city_assignments),
         "satellites_used": len(execution_plan),
         "execution_plan": execution_plan,
         "skipped_conflicts": skipped_conflicts,
@@ -331,6 +415,7 @@ def build_schedule(
     tle_mode: str = "operational",
     tle_reference_date: str | None = None,
     prediction_start_utc: datetime | None = None,
+    satellite_scenario: str = "default",
 ) -> dict:
     """촬영 스케줄을 생성한다.
 
@@ -343,6 +428,7 @@ def build_schedule(
         tle_mode: operational | backtest
         tle_reference_date: TLE 캐시 기준 날짜(YYYYMMDD)
         prediction_start_utc: 궤도 예측 시작 시각(UTC)
+        satellite_scenario: 사용할 위성 카탈로그 시나리오
 
     Returns:
         스케줄 JSON 데이터 (dict)
@@ -353,6 +439,7 @@ def build_schedule(
         risk_cities = {}
 
     now_utc = datetime.now(timezone.utc)
+    satellites = load_satellite_catalog(satellite_scenario)
     if prediction_start_utc is None:
         prediction_start_utc = now_utc
     elif prediction_start_utc.tzinfo is None:
@@ -371,6 +458,8 @@ def build_schedule(
         reference_date=tle_reference_date,
         mode=tle_mode,
         return_info=True,
+        satellites=satellites,
+        catalog_key=satellite_scenario,
     )
 
     if not tle_data:
@@ -422,6 +511,7 @@ def build_schedule(
             
         checked["priority_band"] = classify_priority_band(checked)
         checked["quality_score"] = compute_quality_score(checked)
+        checked["policy_preference"] = compute_policy_preference(checked)
         checked = enrich_display_fields(checked)
         weather_checked.append(checked)
 
@@ -432,11 +522,13 @@ def build_schedule(
     final_shootable.sort(key=_recommendation_sort_key)
     city_best_recommendations = build_city_best_recommendations(final_shootable)
     satellite_execution = build_satellite_execution_plan(final_shootable)
+    sensor_condition_summary = build_sensor_condition_summary(weather_checked)
 
     # ── Step 5: 결과 조립 ──
     schedule = {
         "generated_utc": now_utc.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "mode": tle_mode,
+        "satellite_scenario": satellite_scenario,
         "tle_requested_date": tle_info.get("requested_date"),
         "tle_reference_date": tle_info.get("resolved_date"),
         "tle_source": tle_info.get("source"),
@@ -452,8 +544,10 @@ def build_schedule(
         "cities_with_shootable_passes": len(city_best_recommendations),
         "recommendations": final_shootable,
         "city_best_recommendations": city_best_recommendations,
+        "sensor_condition_summary": sensor_condition_summary,
         "satellite_execution_plan": satellite_execution["execution_plan"],
         "execution_min_gap_minutes": satellite_execution["min_capture_gap_minutes"],
+        "scheduled_events": len(satellite_execution["scheduled_events"]),
         "scheduled_cities": satellite_execution["scheduled_cities"],
         "satellites_used": satellite_execution["satellites_used"],
         "skipped_execution_conflicts": satellite_execution["skipped_conflicts"],
@@ -482,6 +576,7 @@ def print_schedule(schedule: dict) -> None:
     """스케줄 리포트를 터미널에 출력한다."""
     recs = schedule.get("city_best_recommendations") or schedule.get("recommendations", [])
     execution_plan = schedule.get("satellite_execution_plan", [])
+    sensor_summary = schedule.get("sensor_condition_summary", {})
 
     print("\n" + "═" * 85)
     print("  🛰️  SIA 위성 촬영 스케줄 리포트")
@@ -504,6 +599,20 @@ def print_schedule(schedule: dict) -> None:
           f"→ 촬영 가능 {schedule.get('shootable_passes', 0)}건 "
           f"→ 도시별 대표 {schedule.get('cities_with_shootable_passes', len(recs))}건 "
           f"→ 실행 계획 {schedule.get('scheduled_cities', 0)}건\n")
+    if sensor_summary:
+        print(
+            "  ℹ️ 센서별 판정: "
+            f"EO 후보 {sensor_summary.get('optical_total', 0)}건 중 촬영 가능 {sensor_summary.get('optical_shootable', 0)}건, "
+            f"SAR 후보 {sensor_summary.get('sar_total', 0)}건 중 촬영 가능 {sensor_summary.get('sar_shootable', 0)}건"
+        )
+        if sensor_summary.get("optical_total", 0) and sensor_summary.get("optical_shootable", 0) == 0:
+            print(
+                "  ℹ️ EO 미선정 사유: "
+                f"야간 {sensor_summary.get('optical_blocked_night', 0)}건, "
+                f"구름 과다 {sensor_summary.get('optical_blocked_cloud', 0)}건, "
+                f"기상 미상 {sensor_summary.get('optical_blocked_unknown', 0)}건"
+            )
+        print()
     if schedule.get("stale_passes_removed", 0):
         print(f"  ℹ️ 운영 기준 시각 이전 통과 {schedule['stale_passes_removed']}건은 자동 제외했습니다.\n")
 
@@ -519,14 +628,14 @@ def print_schedule(schedule: dict) -> None:
     for satellite_plan in execution_plan:
         print(f"  [{satellite_plan['satellite']}] {satellite_plan['scheduled_count']}건")
         print(f"  {'순번':>2s} | {'도시':15s} | {'대응 우선순위':12s} | "
-              f"{'촬영 시각(KST)':16s} | {'촬영 여건':8s} | {'긴급도':8s} | {'핵심 메시지'}")
-        print("  " + "─" * 111)
+              f"{'촬영 시각(KST)':16s} | {'핵심 메시지'}")
+        print("  " + "─" * 93)
         for item in satellite_plan["timeline"][:12]:
             print(
                 f"  {item['execution_order']:>2d} | {item['city']:15s} | "
                 f"{item.get('action_priority_label', '확인 필요'):12s} | "
-                f"{_format_display_time_kst(item['pass_time_utc']):16s} | {item.get('capture_condition_label', '보통'):8s} | "
-                f"{item.get('urgency_label', '확인 필요'):8s} | {item.get('recommendation_reason', '')}"
+                f"{_format_display_time_kst(item['pass_time_utc']):16s} | "
+                f"{item.get('recommendation_reason', '')}"
             )
         if len(satellite_plan["timeline"]) > 12:
             print(f"  ... 외 {len(satellite_plan['timeline']) - 12}건")

@@ -21,7 +21,7 @@ from pipeline.level2a import run_level2a_for_date
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--date", type=str, default="20260401", help="Level 1 결과를 읽어올 날짜 (YYYYMMDD)")
+    parser.add_argument("--date", type=str, default="20260411", help="Level 1 결과를 읽어올 날짜 (YYYYMMDD)")
     parser.add_argument("--hours", type=int, default=72, help="스케줄 예측 범위")
     parser.add_argument("--mode", choices=["operational", "backtest"], default="operational", help="실행 모드")
     parser.add_argument("--tle-date", type=str, help="백테스트용 TLE 기준 날짜 (YYYYMMDD)")

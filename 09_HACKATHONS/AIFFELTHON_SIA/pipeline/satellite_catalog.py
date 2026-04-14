@@ -32,7 +32,7 @@ def _load_eo_constellation(filename: str) -> list[dict]:
         satellites.append({
             "name": f"{constellation['constellation']}-{norad_id}",
             "norad_id": int(norad_id),
-            "type": constellation["sensor_type"],
+            "type": str(constellation["sensor_type"]).lower(),
             "swath_km": float(constellation["swath_km"]),
             "resolution_m": float(constellation["spatial_res_cm"]) / 100.0,
             "off_nadir_deg": constellation.get("off_nadir_deg"),
@@ -52,6 +52,24 @@ def load_satellite_catalog(scenario: str = "default") -> list[dict]:
     """실행 시나리오에 맞는 위성 목록을 반환한다."""
     if scenario == "default":
         return [sat.copy() for sat in DEFAULT_SATELLITES]
+
+    if scenario == "tri-mix":
+        satellites = []
+        satellites.extend(_load_eo_constellation("iceye.json"))
+        satellites.extend(_load_eo_constellation("planetscope.json"))
+        spaceeye = _default_spaceeye_entry()
+        spaceeye["priority"] = 1
+        spaceeye["source"] = "custom-default"
+        satellites.append(spaceeye)
+        return satellites
+
+    if scenario == "iceye-spaceeye":
+        satellites = _load_eo_constellation("iceye.json")
+        spaceeye = _default_spaceeye_entry()
+        spaceeye["priority"] = 1
+        spaceeye["source"] = "custom-default"
+        satellites.append(spaceeye)
+        return satellites
 
     if scenario == "planetscope-spaceeye":
         satellites = _load_eo_constellation("planetscope.json")
