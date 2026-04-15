@@ -1,0 +1,344 @@
+{
+  "generated_at": "2026-04-16T00:56:12.565014",
+  "ground_truth_paths": [
+    "/Users/chankyulee/Desktop/ModuLABS/09_HACKATHONS/AIFFELTHON_SIA/data/ground_truth/city_level_ground_truth_20260326_20260330.csv",
+    "/Users/chankyulee/Desktop/ModuLABS/09_HACKATHONS/AIFFELTHON_SIA/data/ground_truth/ground_truth_combined_0327_0401.csv"
+  ],
+  "labels": {
+    "count": 69,
+    "positives": 12,
+    "negatives": 57
+  },
+  "fp_error_types": {
+    "gdelt_geocoding_error": 27,
+    "country_level_only": 22,
+    "org_as_city": 5,
+    "region_name": 3
+  },
+  "matched": {
+    "count": 58,
+    "total": 69
+  },
+  "unmatched": {
+    "count": 11,
+    "rows": [
+      {
+        "date": "20260326",
+        "city": "Nahariya",
+        "label": 1,
+        "source_file": "city_level_ground_truth_20260326_20260330.csv",
+        "diagnosis": "city_not_found_in_raw",
+        "detail": {}
+      },
+      {
+        "date": "20260327",
+        "city": "Rumanah",
+        "label": 0,
+        "source_file": "ground_truth_combined_0327_0401.csv",
+        "diagnosis": "blocked_by_min_sources",
+        "detail": {
+          "raw_rows": 14,
+          "country_pass_rows": 14,
+          "confirmed_code_rows": 14,
+          "geo_type4_rows": 14,
+          "sources_ge_2_rows": 0,
+          "root_codes": [
+            19
+          ],
+          "event_codes": [
+            190
+          ]
+        }
+      },
+      {
+        "date": "20260328",
+        "city": "Dheisheh",
+        "label": 0,
+        "source_file": "ground_truth_combined_0327_0401.csv",
+        "diagnosis": "blocked_by_min_sources",
+        "detail": {
+          "raw_rows": 10,
+          "country_pass_rows": 10,
+          "confirmed_code_rows": 6,
+          "geo_type4_rows": 10,
+          "sources_ge_2_rows": 0,
+          "root_codes": [
+            3,
+            11,
+            19
+          ],
+          "event_codes": [
+            35,
+            112,
+            190,
+            193,
+            195
+          ]
+        }
+      },
+      {
+        "date": "20260328",
+        "city": "Duhok",
+        "label": 1,
+        "source_file": "city_level_ground_truth_20260326_20260330.csv",
+        "diagnosis": "blocked_by_confirmed_codes",
+        "detail": {
+          "raw_rows": 3,
+          "country_pass_rows": 3,
+          "confirmed_code_rows": 0,
+          "geo_type4_rows": 3,
+          "sources_ge_2_rows": 3,
+          "root_codes": [
+            1,
+            9
+          ],
+          "event_codes": [
+            10,
+            13,
+            90
+          ]
+        }
+      },
+      {
+        "date": "20260328",
+        "city": "Kirkuk",
+        "label": 1,
+        "source_file": "city_level_ground_truth_20260326_20260330.csv",
+        "diagnosis": "blocked_by_min_sources",
+        "detail": {
+          "raw_rows": 6,
+          "country_pass_rows": 6,
+          "confirmed_code_rows": 1,
+          "geo_type4_rows": 6,
+          "sources_ge_2_rows": 0,
+          "root_codes": [
+            1,
+            11,
+            19
+          ],
+          "event_codes": [
+            10,
+            112,
+            190,
+            1124
+          ]
+        }
+      },
+      {
+        "date": "20260329",
+        "city": "Gaza City",
+        "label": 1,
+        "source_file": "city_level_ground_truth_20260326_20260330.csv",
+        "diagnosis": "blocked_by_combined_filters",
+        "detail": {
+          "raw_rows": 14,
+          "country_pass_rows": 14,
+          "confirmed_code_rows": 5,
+          "geo_type4_rows": 14,
+          "sources_ge_2_rows": 3,
+          "root_codes": [
+            1,
+            2,
+            4,
+            7,
+            11,
+            12,
+            19
+          ],
+          "event_codes": [
+            11,
+            13,
+            20,
+            45,
+            75,
+            111,
+            124,
+            190,
+            193,
+            195
+          ]
+        }
+      },
+      {
+        "date": "20260329",
+        "city": "Lamerd",
+        "label": 1,
+        "source_file": "city_level_ground_truth_20260326_20260330.csv",
+        "diagnosis": "city_not_found_in_raw",
+        "detail": {}
+      },
+      {
+        "date": "20260330",
+        "city": "Haifa",
+        "label": 1,
+        "source_file": "city_level_ground_truth_20260326_20260330.csv",
+        "diagnosis": "city_not_found_in_raw",
+        "detail": {}
+      },
+      {
+        "date": "20260330",
+        "city": "Ramat Gan",
+        "label": 0,
+        "source_file": "ground_truth_combined_0327_0401.csv",
+        "diagnosis": "blocked_by_min_sources",
+        "detail": {
+          "raw_rows": 21,
+          "country_pass_rows": 21,
+          "confirmed_code_rows": 16,
+          "geo_type4_rows": 21,
+          "sources_ge_2_rows": 0,
+          "root_codes": [
+            1,
+            19
+          ],
+          "event_codes": [
+            10,
+            12,
+            190,
+            194
+          ]
+        }
+      },
+      {
+        "date": "20260330",
+        "city": "Shiraz",
+        "label": 0,
+        "source_file": "ground_truth_combined_0327_0401.csv",
+        "diagnosis": "blocked_by_min_sources",
+        "detail": {
+          "raw_rows": 13,
+          "country_pass_rows": 13,
+          "confirmed_code_rows": 7,
+          "geo_type4_rows": 13,
+          "sources_ge_2_rows": 0,
+          "root_codes": [
+            4,
+            11,
+            12,
+            17,
+            19
+          ],
+          "event_codes": [
+            42,
+            43,
+            112,
+            190,
+            194,
+            1124,
+            1246,
+            1712
+          ]
+        }
+      },
+      {
+        "date": "20260330",
+        "city": "Teheran",
+        "label": 0,
+        "source_file": "ground_truth_combined_0327_0401.csv",
+        "diagnosis": "blocked_by_min_sources",
+        "detail": {
+          "raw_rows": 29,
+          "country_pass_rows": 29,
+          "confirmed_code_rows": 8,
+          "geo_type4_rows": 29,
+          "sources_ge_2_rows": 0,
+          "root_codes": [
+            1,
+            2,
+            3,
+            4,
+            6,
+            8,
+            11,
+            12,
+            15,
+            16,
+            19
+          ],
+          "event_codes": [
+            10,
+            13,
+            26,
+            36,
+            40,
+            60,
+            80,
+            120,
+            125,
+            150,
+            164,
+            190,
+            1123
+          ]
+        }
+      }
+    ]
+  },
+  "feature_medians": {
+    "agg_events": {
+      "negative_median": 4.5,
+      "positive_median": 6.5,
+      "delta_pos_minus_neg": 2.0
+    },
+    "agg_mentions_sum": {
+      "negative_median": 108.0,
+      "positive_median": 97.5,
+      "delta_pos_minus_neg": -10.5
+    },
+    "agg_sources_sum": {
+      "negative_median": 28.0,
+      "positive_median": 67.5,
+      "delta_pos_minus_neg": 39.5
+    },
+    "agg_articles_sum": {
+      "negative_median": 108.0,
+      "positive_median": 97.5,
+      "delta_pos_minus_neg": -10.5
+    },
+    "agg_negative_tone_mean": {
+      "negative_median": 5.813362366113907,
+      "positive_median": 5.593471084322248,
+      "delta_pos_minus_neg": -0.21989128179165895
+    },
+    "agg_negative_goldstein_mean": {
+      "negative_median": 10.0,
+      "positive_median": 9.9375,
+      "delta_pos_minus_neg": -0.0625
+    },
+    "agg_root18_ratio": {
+      "negative_median": 0.0,
+      "positive_median": 0.0625,
+      "delta_pos_minus_neg": 0.0625
+    },
+    "agg_root19_ratio": {
+      "negative_median": 1.0,
+      "positive_median": 0.9375,
+      "delta_pos_minus_neg": -0.0625
+    },
+    "mi_raw": {
+      "negative_median": 4.021069912805941,
+      "positive_median": 4.319392316133061,
+      "delta_pos_minus_neg": 0.2983224033271199
+    },
+    "es_raw": {
+      "negative_median": 1.1545177444479562,
+      "positive_median": 1.4050703381470298,
+      "delta_pos_minus_neg": 0.25055259369907357
+    },
+    "ht_raw": {
+      "negative_median": 8.280973935127259,
+      "positive_median": 7.936370756427447,
+      "delta_pos_minus_neg": -0.3446031786998116
+    },
+    "conflict_index_arima": {
+      "negative_median": 1.3701158088733485,
+      "positive_median": 1.0418167689287516,
+      "delta_pos_minus_neg": -0.32829903994459686
+    },
+    "heur_conflict_index": {
+      "negative_median": 168.0417121666647,
+      "positive_median": 116.24747499701064,
+      "delta_pos_minus_neg": -51.79423716965405
+    }
+  }
+}

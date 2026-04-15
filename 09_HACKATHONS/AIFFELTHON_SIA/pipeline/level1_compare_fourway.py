@@ -26,6 +26,7 @@ import pandas as pd
 from pipeline.config import MIN_HISTORY, OUTPUT_DIR, get_risk_level
 from pipeline.conflict_index import compute_conflict_index, detect_anomalies as detect_anomalies_kalman
 from pipeline.gdelt_fetcher import load_all_data
+from pipeline.ground_truth_loader import load_ground_truth
 from pipeline.level1_arima import detect_anomalies_arima, evaluate_model_predictions
 from pipeline.level1_features import (
     ArimaFriendlyWeights,
@@ -45,7 +46,12 @@ DEFAULT_GT_PATH = (
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Level 1 4개 조합 비교")
-    parser.add_argument("--ground-truth", type=str, default=str(DEFAULT_GT_PATH))
+    parser.add_argument(
+        "--ground-truth",
+        type=str,
+        nargs="*",
+        default=[str(DEFAULT_GT_PATH)] if DEFAULT_GT_PATH.exists() else [],
+    )
     parser.add_argument("--min-history", type=int, default=MIN_HISTORY)
     parser.add_argument("--transform", choices=["log1p", "none"], default="log1p")
     parser.add_argument("--k-values", type=int, nargs="*", default=[1, 3, 5, 10])
@@ -143,12 +149,8 @@ def _save_result(payload: dict, output_name: str | None = None) -> Path:
 
 def main() -> None:
     args = parse_args()
-    gt_path = Path(args.ground_truth)
-    if not gt_path.exists():
-        raise FileNotFoundError(f"ground truth 파일이 없습니다: {gt_path}")
-
-    ground_truth_df = pd.read_csv(gt_path)
-    ground_truth_df["date"] = ground_truth_df["date"].astype(str)
+    gt_result = load_ground_truth(args.ground_truth)
+    ground_truth_df = gt_result.dataframe.copy()
     target_dates = _prepare_target_dates(ground_truth_df, args)
     if not target_dates:
         raise RuntimeError("비교할 target_dates가 비어 있습니다.")
@@ -157,12 +159,24 @@ def main() -> None:
     max_target_date = max(target_dates)
 
     print("\n=== Level 1 4개 조합 비교 실행 ===")
-    print(f"ground truth : {gt_path.name}")
+    print(f"ground truth files : {len(gt_result.file_summaries)}개")
+    for item in gt_result.file_summaries:
+        print(
+            f"  - {item['file']} | schema={item['schema']} | "
+            f"dates={item['dates']} | cities={item['cities']}"
+        )
+    if gt_result.date_mismatches:
+        print("  [주의] 파일명과 SQLDATE가 다른 ground truth 파일:")
+        for item in gt_result.date_mismatches:
+            print(
+                f"    - {item['file']}: filename={item['file_date']} / SQLDATE={item['sql_date']}"
+            )
     print(f"target dates : {target_dates}")
     print(f"min_history  : {args.min_history}")
     print(f"transform    : {args.transform}")
     print(f"k_values     : {args.k_values}")
     print(f"gt city only : {args.restrict_to_gt_cities}")
+    print(f"positive-only: {gt_result.is_positive_only}")
 
     raw = load_all_data(target_date=max_target_date)
     if raw.empty:
@@ -212,15 +226,41 @@ def main() -> None:
 
     k_values = tuple(args.k_values)
     evaluations = {
-        "A_Kalman": evaluate_model_predictions(a_k, "tasking_score", ground_truth_df, k_values=k_values),
-        "A_ARIMA": evaluate_model_predictions(a_r, "tasking_score", ground_truth_df, k_values=k_values),
-        "B_Kalman": evaluate_model_predictions(b_k, "tasking_score", ground_truth_df, k_values=k_values),
-        "B_ARIMA": evaluate_model_predictions(b_r, "tasking_score", ground_truth_df, k_values=k_values),
+        "A_Kalman": evaluate_model_predictions(
+            a_k,
+            "tasking_score",
+            ground_truth_df,
+            k_values=k_values,
+            allow_fallback_all_cities=gt_result.is_positive_only,
+        ),
+        "A_ARIMA": evaluate_model_predictions(
+            a_r,
+            "tasking_score",
+            ground_truth_df,
+            k_values=k_values,
+            allow_fallback_all_cities=gt_result.is_positive_only,
+        ),
+        "B_Kalman": evaluate_model_predictions(
+            b_k,
+            "tasking_score",
+            ground_truth_df,
+            k_values=k_values,
+            allow_fallback_all_cities=gt_result.is_positive_only,
+        ),
+        "B_ARIMA": evaluate_model_predictions(
+            b_r,
+            "tasking_score",
+            ground_truth_df,
+            k_values=k_values,
+            allow_fallback_all_cities=gt_result.is_positive_only,
+        ),
     }
 
     payload = {
         "generated_at": datetime.now().isoformat(),
-        "ground_truth_path": str(gt_path),
+        "ground_truth_paths": [str(path) for path in args.ground_truth],
+        "ground_truth_positive_only": gt_result.is_positive_only,
+        "ground_truth_date_mismatches": gt_result.date_mismatches,
         "target_dates": target_dates,
         "config": {
             "min_history": args.min_history,

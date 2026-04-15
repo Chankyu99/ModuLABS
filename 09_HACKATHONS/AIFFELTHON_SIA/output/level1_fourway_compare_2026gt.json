@@ -1,0 +1,1618 @@
+{
+  "generated_at": "2026-04-16T01:05:48.256013",
+  "ground_truth_paths": [
+    "/Users/chankyulee/Desktop/ModuLABS/09_HACKATHONS/AIFFELTHON_SIA/data/ground_truth/20260228.csv",
+    "/Users/chankyulee/Desktop/ModuLABS/09_HACKATHONS/AIFFELTHON_SIA/data/ground_truth/20260302.csv",
+    "/Users/chankyulee/Desktop/ModuLABS/09_HACKATHONS/AIFFELTHON_SIA/data/ground_truth/20260317.csv",
+    "/Users/chankyulee/Desktop/ModuLABS/09_HACKATHONS/AIFFELTHON_SIA/data/ground_truth/20260322.csv",
+    "/Users/chankyulee/Desktop/ModuLABS/09_HACKATHONS/AIFFELTHON_SIA/data/ground_truth/20260326.csv",
+    "/Users/chankyulee/Desktop/ModuLABS/09_HACKATHONS/AIFFELTHON_SIA/data/ground_truth/20260328.csv"
+  ],
+  "ground_truth_positive_only": true,
+  "ground_truth_date_mismatches": [
+    {
+      "file": "20260302.csv",
+      "file_date": "20260302",
+      "sql_date": "20260322"
+    }
+  ],
+  "target_dates": [
+    "20260228",
+    "20260317",
+    "20260322",
+    "20260326",
+    "20260328"
+  ],
+  "config": {
+    "min_history": 30,
+    "transform": "log1p",
+    "k_values": [
+      1,
+      3,
+      5,
+      10
+    ]
+  },
+  "dataset": {
+    "raw_rows": 771942,
+    "heuristic_city_daily_rows": 9154,
+    "heuristic_cities": 695,
+    "eda_city_day_rows": 9154,
+    "eda_city_index_rows": 9154,
+    "eda_cities": 695
+  },
+  "evaluations": {
+    "A_Kalman": {
+      "dates_evaluated": 5,
+      "avg_mrr": 0.23909774436090223,
+      "avg_rank_of_first_hit": 7.4,
+      "precision_at_k": {
+        "p@1": 0.0,
+        "p@3": 0.13333333333333333,
+        "p@5": 0.08,
+        "p@10": 0.12
+      },
+      "recall_at_k": {
+        "r@1": 0.0,
+        "r@3": 0.04,
+        "r@5": 0.04,
+        "r@10": 0.12
+      },
+      "per_date": [
+        {
+          "date": "20260228",
+          "truth_count": 10,
+          "truth_cities": [
+            "abu dhabi",
+            "dubai",
+            "jurf al-nasr",
+            "kuwait",
+            "lamerd",
+            "manama",
+            "minab",
+            "tabriz",
+            "tehran",
+            "tel aviv"
+          ],
+          "prediction_count": 96,
+          "first_hit_rank": 2,
+          "top_10_predictions": [
+            "Ramat Gan",
+            "Tel Aviv",
+            "Natanz",
+            "Shahed",
+            "Kermanshah",
+            "Tehran",
+            "Dubai",
+            "Pahlavi",
+            "Doha",
+            "Mashhad"
+          ],
+          "top_1": [
+            "Ramat Gan"
+          ],
+          "hits@1": 0,
+          "matched_truth@1": [],
+          "p@1": 0.0,
+          "r@1": 0.0,
+          "top_3": [
+            "Ramat Gan",
+            "Tel Aviv",
+            "Natanz"
+          ],
+          "hits@3": 1,
+          "matched_truth@3": [
+            "tel aviv"
+          ],
+          "p@3": 0.3333333333333333,
+          "r@3": 0.1,
+          "top_5": [
+            "Ramat Gan",
+            "Tel Aviv",
+            "Natanz",
+            "Shahed",
+            "Kermanshah"
+          ],
+          "hits@5": 1,
+          "matched_truth@5": [
+            "tel aviv"
+          ],
+          "p@5": 0.2,
+          "r@5": 0.1,
+          "top_10": [
+            "Ramat Gan",
+            "Tel Aviv",
+            "Natanz",
+            "Shahed",
+            "Kermanshah",
+            "Tehran",
+            "Dubai",
+            "Pahlavi",
+            "Doha",
+            "Mashhad"
+          ],
+          "hits@10": 3,
+          "matched_truth@10": [
+            "dubai",
+            "tehran",
+            "tel aviv"
+          ],
+          "p@10": 0.3,
+          "r@10": 0.3
+        },
+        {
+          "date": "20260317",
+          "truth_count": 10,
+          "truth_cities": [
+            "baghdad",
+            "bani yas",
+            "erbil",
+            "fujairah",
+            "kirkuk",
+            "ramat gan",
+            "shiraz",
+            "tabriz",
+            "tehran",
+            "yazd"
+          ],
+          "prediction_count": 72,
+          "first_hit_rank": 3,
+          "top_10_predictions": [
+            "Tel Aviv",
+            "Gazan",
+            "Baghdad",
+            "Herzliya",
+            "Chabahar",
+            "Basij",
+            "Dubai",
+            "Anbar",
+            "Mizan",
+            "Doha"
+          ],
+          "top_1": [
+            "Tel Aviv"
+          ],
+          "hits@1": 0,
+          "matched_truth@1": [],
+          "p@1": 0.0,
+          "r@1": 0.0,
+          "top_3": [
+            "Tel Aviv",
+            "Gazan",
+            "Baghdad"
+          ],
+          "hits@3": 1,
+          "matched_truth@3": [
+            "baghdad"
+          ],
+          "p@3": 0.3333333333333333,
+          "r@3": 0.1,
+          "top_5": [
+            "Tel Aviv",
+            "Gazan",
+            "Baghdad",
+            "Herzliya",
+            "Chabahar"
+          ],
+          "hits@5": 1,
+          "matched_truth@5": [
+            "baghdad"
+          ],
+          "p@5": 0.2,
+          "r@5": 0.1,
+          "top_10": [
+            "Tel Aviv",
+            "Gazan",
+            "Baghdad",
+            "Herzliya",
+            "Chabahar",
+            "Basij",
+            "Dubai",
+            "Anbar",
+            "Mizan",
+            "Doha"
+          ],
+          "hits@10": 1,
+          "matched_truth@10": [
+            "baghdad"
+          ],
+          "p@10": 0.1,
+          "r@10": 0.1
+        },
+        {
+          "date": "20260322",
+          "truth_count": 10,
+          "truth_cities": [
+            "abu dhabi",
+            "baghdad",
+            "esfahan",
+            "jurf al sakhr",
+            "lar",
+            "manama",
+            "qasmiyeh",
+            "tehran",
+            "tel aviv",
+            "yazd"
+          ],
+          "prediction_count": 58,
+          "first_hit_rank": 19,
+          "top_10_predictions": [
+            "Natanz",
+            "Jordan Valley",
+            "Beersheba",
+            "Dimona",
+            "Bekaa Valley",
+            "As Iran",
+            "Mizan",
+            "Isfahan",
+            "Ramallah",
+            "Ben Gurion"
+          ],
+          "top_1": [
+            "Natanz"
+          ],
+          "hits@1": 0,
+          "matched_truth@1": [],
+          "p@1": 0.0,
+          "r@1": 0.0,
+          "top_3": [
+            "Natanz",
+            "Jordan Valley",
+            "Beersheba"
+          ],
+          "hits@3": 0,
+          "matched_truth@3": [],
+          "p@3": 0.0,
+          "r@3": 0.0,
+          "top_5": [
+            "Natanz",
+            "Jordan Valley",
+            "Beersheba",
+            "Dimona",
+            "Bekaa Valley"
+          ],
+          "hits@5": 0,
+          "matched_truth@5": [],
+          "p@5": 0.0,
+          "r@5": 0.0,
+          "top_10": [
+            "Natanz",
+            "Jordan Valley",
+            "Beersheba",
+            "Dimona",
+            "Bekaa Valley",
+            "As Iran",
+            "Mizan",
+            "Isfahan",
+            "Ramallah",
+            "Ben Gurion"
+          ],
+          "hits@10": 0,
+          "matched_truth@10": [],
+          "p@10": 0.0,
+          "r@10": 0.0
+        },
+        {
+          "date": "20260326",
+          "truth_count": 10,
+          "truth_cities": [
+            "abu dhabi",
+            "amerli",
+            "esfahan",
+            "hamedan",
+            "kuwait city",
+            "mashhad",
+            "nahariya",
+            "qantara",
+            "tehran",
+            "tel aviv"
+          ],
+          "prediction_count": 46,
+          "first_hit_rank": 6,
+          "top_10_predictions": [
+            "Bandar Abbas",
+            "Isfahan",
+            "Qazvin",
+            "Qiam",
+            "Chabahar",
+            "Tel Aviv",
+            "Shiraz",
+            "Kharg Island",
+            "Dimona",
+            "Qalibaf"
+          ],
+          "top_1": [
+            "Bandar Abbas"
+          ],
+          "hits@1": 0,
+          "matched_truth@1": [],
+          "p@1": 0.0,
+          "r@1": 0.0,
+          "top_3": [
+            "Bandar Abbas",
+            "Isfahan",
+            "Qazvin"
+          ],
+          "hits@3": 0,
+          "matched_truth@3": [],
+          "p@3": 0.0,
+          "r@3": 0.0,
+          "top_5": [
+            "Bandar Abbas",
+            "Isfahan",
+            "Qazvin",
+            "Qiam",
+            "Chabahar"
+          ],
+          "hits@5": 0,
+          "matched_truth@5": [],
+          "p@5": 0.0,
+          "r@5": 0.0,
+          "top_10": [
+            "Bandar Abbas",
+            "Isfahan",
+            "Qazvin",
+            "Qiam",
+            "Chabahar",
+            "Tel Aviv",
+            "Shiraz",
+            "Kharg Island",
+            "Dimona",
+            "Qalibaf"
+          ],
+          "hits@10": 1,
+          "matched_truth@10": [
+            "tel aviv"
+          ],
+          "p@10": 0.1,
+          "r@10": 0.1
+        },
+        {
+          "date": "20260328",
+          "truth_count": 10,
+          "truth_cities": [
+            "abu dhabi",
+            "arak",
+            "askar",
+            "bushehr",
+            "kashan",
+            "kirkuk",
+            "kuwait city",
+            "salalah",
+            "tehran",
+            "yazd"
+          ],
+          "prediction_count": 29,
+          "first_hit_rank": 7,
+          "top_10_predictions": [
+            "Beersheba",
+            "Gazan",
+            "As Iran",
+            "Riyadh",
+            "Cairo",
+            "Rasht",
+            "Yazd",
+            "Dimona",
+            "Sanaa",
+            "Beirut"
+          ],
+          "top_1": [
+            "Beersheba"
+          ],
+          "hits@1": 0,
+          "matched_truth@1": [],
+          "p@1": 0.0,
+          "r@1": 0.0,
+          "top_3": [
+            "Beersheba",
+            "Gazan",
+            "As Iran"
+          ],
+          "hits@3": 0,
+          "matched_truth@3": [],
+          "p@3": 0.0,
+          "r@3": 0.0,
+          "top_5": [
+            "Beersheba",
+            "Gazan",
+            "As Iran",
+            "Riyadh",
+            "Cairo"
+          ],
+          "hits@5": 0,
+          "matched_truth@5": [],
+          "p@5": 0.0,
+          "r@5": 0.0,
+          "top_10": [
+            "Beersheba",
+            "Gazan",
+            "As Iran",
+            "Riyadh",
+            "Cairo",
+            "Rasht",
+            "Yazd",
+            "Dimona",
+            "Sanaa",
+            "Beirut"
+          ],
+          "hits@10": 1,
+          "matched_truth@10": [
+            "yazd"
+          ],
+          "p@10": 0.1,
+          "r@10": 0.1
+        }
+      ]
+    },
+    "A_ARIMA": {
+      "dates_evaluated": 5,
+      "avg_mrr": 0.10412698412698411,
+      "avg_rank_of_first_hit": 10.6,
+      "precision_at_k": {
+        "p@1": 0.0,
+        "p@3": 0.0,
+        "p@5": 0.0,
+        "p@10": 0.08
+      },
+      "recall_at_k": {
+        "r@1": 0.0,
+        "r@3": 0.0,
+        "r@5": 0.0,
+        "r@10": 0.08
+      },
+      "per_date": [
+        {
+          "date": "20260228",
+          "truth_count": 10,
+          "truth_cities": [
+            "abu dhabi",
+            "dubai",
+            "jurf al-nasr",
+            "kuwait",
+            "lamerd",
+            "manama",
+            "minab",
+            "tabriz",
+            "tehran",
+            "tel aviv"
+          ],
+          "prediction_count": 96,
+          "first_hit_rank": 7,
+          "top_10_predictions": [
+            "Ramat Gan",
+            "Kermanshah",
+            "Natanz",
+            "Pahlavi",
+            "Mashhad",
+            "Doha",
+            "Dubai",
+            "New Delhi",
+            "Shahed",
+            "Moscow"
+          ],
+          "top_1": [
+            "Ramat Gan"
+          ],
+          "hits@1": 0,
+          "matched_truth@1": [],
+          "p@1": 0.0,
+          "r@1": 0.0,
+          "top_3": [
+            "Ramat Gan",
+            "Kermanshah",
+            "Natanz"
+          ],
+          "hits@3": 0,
+          "matched_truth@3": [],
+          "p@3": 0.0,
+          "r@3": 0.0,
+          "top_5": [
+            "Ramat Gan",
+            "Kermanshah",
+            "Natanz",
+            "Pahlavi",
+            "Mashhad"
+          ],
+          "hits@5": 0,
+          "matched_truth@5": [],
+          "p@5": 0.0,
+          "r@5": 0.0,
+          "top_10": [
+            "Ramat Gan",
+            "Kermanshah",
+            "Natanz",
+            "Pahlavi",
+            "Mashhad",
+            "Doha",
+            "Dubai",
+            "New Delhi",
+            "Shahed",
+            "Moscow"
+          ],
+          "hits@10": 1,
+          "matched_truth@10": [
+            "dubai"
+          ],
+          "p@10": 0.1,
+          "r@10": 0.1
+        },
+        {
+          "date": "20260317",
+          "truth_count": 10,
+          "truth_cities": [
+            "baghdad",
+            "bani yas",
+            "erbil",
+            "fujairah",
+            "kirkuk",
+            "ramat gan",
+            "shiraz",
+            "tabriz",
+            "tehran",
+            "yazd"
+          ],
+          "prediction_count": 72,
+          "first_hit_rank": 9,
+          "top_10_predictions": [
+            "Chabahar",
+            "Basij",
+            "Dubai",
+            "Gazan",
+            "Herzliya",
+            "Mizan",
+            "Doha",
+            "Anbar",
+            "Baghdad",
+            "Gulf Of Oman"
+          ],
+          "top_1": [
+            "Chabahar"
+          ],
+          "hits@1": 0,
+          "matched_truth@1": [],
+          "p@1": 0.0,
+          "r@1": 0.0,
+          "top_3": [
+            "Chabahar",
+            "Basij",
+            "Dubai"
+          ],
+          "hits@3": 0,
+          "matched_truth@3": [],
+          "p@3": 0.0,
+          "r@3": 0.0,
+          "top_5": [
+            "Chabahar",
+            "Basij",
+            "Dubai",
+            "Gazan",
+            "Herzliya"
+          ],
+          "hits@5": 0,
+          "matched_truth@5": [],
+          "p@5": 0.0,
+          "r@5": 0.0,
+          "top_10": [
+            "Chabahar",
+            "Basij",
+            "Dubai",
+            "Gazan",
+            "Herzliya",
+            "Mizan",
+            "Doha",
+            "Anbar",
+            "Baghdad",
+            "Gulf Of Oman"
+          ],
+          "hits@10": 1,
+          "matched_truth@10": [
+            "baghdad"
+          ],
+          "p@10": 0.1,
+          "r@10": 0.1
+        },
+        {
+          "date": "20260322",
+          "truth_count": 10,
+          "truth_cities": [
+            "abu dhabi",
+            "baghdad",
+            "esfahan",
+            "jurf al sakhr",
+            "lar",
+            "manama",
+            "qasmiyeh",
+            "tehran",
+            "tel aviv",
+            "yazd"
+          ],
+          "prediction_count": 58,
+          "first_hit_rank": 18,
+          "top_10_predictions": [
+            "Jordan Valley",
+            "Dimona",
+            "Beersheba",
+            "Natanz",
+            "As Iran",
+            "Bekaa Valley",
+            "Mizan",
+            "Ramallah",
+            "Ben Gurion",
+            "Dubai"
+          ],
+          "top_1": [
+            "Jordan Valley"
+          ],
+          "hits@1": 0,
+          "matched_truth@1": [],
+          "p@1": 0.0,
+          "r@1": 0.0,
+          "top_3": [
+            "Jordan Valley",
+            "Dimona",
+            "Beersheba"
+          ],
+          "hits@3": 0,
+          "matched_truth@3": [],
+          "p@3": 0.0,
+          "r@3": 0.0,
+          "top_5": [
+            "Jordan Valley",
+            "Dimona",
+            "Beersheba",
+            "Natanz",
+            "As Iran"
+          ],
+          "hits@5": 0,
+          "matched_truth@5": [],
+          "p@5": 0.0,
+          "r@5": 0.0,
+          "top_10": [
+            "Jordan Valley",
+            "Dimona",
+            "Beersheba",
+            "Natanz",
+            "As Iran",
+            "Bekaa Valley",
+            "Mizan",
+            "Ramallah",
+            "Ben Gurion",
+            "Dubai"
+          ],
+          "hits@10": 0,
+          "matched_truth@10": [],
+          "p@10": 0.0,
+          "r@10": 0.0
+        },
+        {
+          "date": "20260326",
+          "truth_count": 10,
+          "truth_cities": [
+            "abu dhabi",
+            "amerli",
+            "esfahan",
+            "hamedan",
+            "kuwait city",
+            "mashhad",
+            "nahariya",
+            "qantara",
+            "tehran",
+            "tel aviv"
+          ],
+          "prediction_count": 46,
+          "first_hit_rank": 10,
+          "top_10_predictions": [
+            "Bandar Abbas",
+            "Qazvin",
+            "Isfahan",
+            "Chabahar",
+            "Shiraz",
+            "Qiam",
+            "Dimona",
+            "Kharg Island",
+            "Qalibaf",
+            "Tel Aviv"
+          ],
+          "top_1": [
+            "Bandar Abbas"
+          ],
+          "hits@1": 0,
+          "matched_truth@1": [],
+          "p@1": 0.0,
+          "r@1": 0.0,
+          "top_3": [
+            "Bandar Abbas",
+            "Qazvin",
+            "Isfahan"
+          ],
+          "hits@3": 0,
+          "matched_truth@3": [],
+          "p@3": 0.0,
+          "r@3": 0.0,
+          "top_5": [
+            "Bandar Abbas",
+            "Qazvin",
+            "Isfahan",
+            "Chabahar",
+            "Shiraz"
+          ],
+          "hits@5": 0,
+          "matched_truth@5": [],
+          "p@5": 0.0,
+          "r@5": 0.0,
+          "top_10": [
+            "Bandar Abbas",
+            "Qazvin",
+            "Isfahan",
+            "Chabahar",
+            "Shiraz",
+            "Qiam",
+            "Dimona",
+            "Kharg Island",
+            "Qalibaf",
+            "Tel Aviv"
+          ],
+          "hits@10": 1,
+          "matched_truth@10": [
+            "tel aviv"
+          ],
+          "p@10": 0.1,
+          "r@10": 0.1
+        },
+        {
+          "date": "20260328",
+          "truth_count": 10,
+          "truth_cities": [
+            "abu dhabi",
+            "arak",
+            "askar",
+            "bushehr",
+            "kashan",
+            "kirkuk",
+            "kuwait city",
+            "salalah",
+            "tehran",
+            "yazd"
+          ],
+          "prediction_count": 29,
+          "first_hit_rank": 9,
+          "top_10_predictions": [
+            "Beersheba",
+            "As Iran",
+            "Gazan",
+            "Riyadh",
+            "Rasht",
+            "Dimona",
+            "Sanaa",
+            "Cairo",
+            "Yazd",
+            "Bandar Abbas"
+          ],
+          "top_1": [
+            "Beersheba"
+          ],
+          "hits@1": 0,
+          "matched_truth@1": [],
+          "p@1": 0.0,
+          "r@1": 0.0,
+          "top_3": [
+            "Beersheba",
+            "As Iran",
+            "Gazan"
+          ],
+          "hits@3": 0,
+          "matched_truth@3": [],
+          "p@3": 0.0,
+          "r@3": 0.0,
+          "top_5": [
+            "Beersheba",
+            "As Iran",
+            "Gazan",
+            "Riyadh",
+            "Rasht"
+          ],
+          "hits@5": 0,
+          "matched_truth@5": [],
+          "p@5": 0.0,
+          "r@5": 0.0,
+          "top_10": [
+            "Beersheba",
+            "As Iran",
+            "Gazan",
+            "Riyadh",
+            "Rasht",
+            "Dimona",
+            "Sanaa",
+            "Cairo",
+            "Yazd",
+            "Bandar Abbas"
+          ],
+          "hits@10": 1,
+          "matched_truth@10": [
+            "yazd"
+          ],
+          "p@10": 0.1,
+          "r@10": 0.1
+        }
+      ]
+    },
+    "B_Kalman": {
+      "dates_evaluated": 5,
+      "avg_mrr": 0.09353535353535353,
+      "avg_rank_of_first_hit": 14.4,
+      "precision_at_k": {
+        "p@1": 0.0,
+        "p@3": 0.0,
+        "p@5": 0.04,
+        "p@10": 0.04
+      },
+      "recall_at_k": {
+        "r@1": 0.0,
+        "r@3": 0.0,
+        "r@5": 0.02,
+        "r@10": 0.04
+      },
+      "per_date": [
+        {
+          "date": "20260228",
+          "truth_count": 10,
+          "truth_cities": [
+            "abu dhabi",
+            "dubai",
+            "jurf al-nasr",
+            "kuwait",
+            "lamerd",
+            "manama",
+            "minab",
+            "tabriz",
+            "tehran",
+            "tel aviv"
+          ],
+          "prediction_count": 96,
+          "first_hit_rank": 18,
+          "top_10_predictions": [
+            "Kermanshah",
+            "Pahlavi",
+            "Ramat Gan",
+            "Caracas",
+            "Sweida",
+            "Moscow",
+            "New Delhi",
+            "Yazd",
+            "Anbar",
+            "Baalbek"
+          ],
+          "top_1": [
+            "Kermanshah"
+          ],
+          "hits@1": 0,
+          "matched_truth@1": [],
+          "p@1": 0.0,
+          "r@1": 0.0,
+          "top_3": [
+            "Kermanshah",
+            "Pahlavi",
+            "Ramat Gan"
+          ],
+          "hits@3": 0,
+          "matched_truth@3": [],
+          "p@3": 0.0,
+          "r@3": 0.0,
+          "top_5": [
+            "Kermanshah",
+            "Pahlavi",
+            "Ramat Gan",
+            "Caracas",
+            "Sweida"
+          ],
+          "hits@5": 0,
+          "matched_truth@5": [],
+          "p@5": 0.0,
+          "r@5": 0.0,
+          "top_10": [
+            "Kermanshah",
+            "Pahlavi",
+            "Ramat Gan",
+            "Caracas",
+            "Sweida",
+            "Moscow",
+            "New Delhi",
+            "Yazd",
+            "Anbar",
+            "Baalbek"
+          ],
+          "hits@10": 0,
+          "matched_truth@10": [],
+          "p@10": 0.0,
+          "r@10": 0.0
+        },
+        {
+          "date": "20260317",
+          "truth_count": 10,
+          "truth_cities": [
+            "baghdad",
+            "bani yas",
+            "erbil",
+            "fujairah",
+            "kirkuk",
+            "ramat gan",
+            "shiraz",
+            "tabriz",
+            "tehran",
+            "yazd"
+          ],
+          "prediction_count": 72,
+          "first_hit_rank": 9,
+          "top_10_predictions": [
+            "Chabahar",
+            "Anbar",
+            "Herzliya",
+            "Gazan",
+            "Istanbul",
+            "Mizan",
+            "Metula",
+            "Hezbollah",
+            "Shiraz",
+            "As Iran"
+          ],
+          "top_1": [
+            "Chabahar"
+          ],
+          "hits@1": 0,
+          "matched_truth@1": [],
+          "p@1": 0.0,
+          "r@1": 0.0,
+          "top_3": [
+            "Chabahar",
+            "Anbar",
+            "Herzliya"
+          ],
+          "hits@3": 0,
+          "matched_truth@3": [],
+          "p@3": 0.0,
+          "r@3": 0.0,
+          "top_5": [
+            "Chabahar",
+            "Anbar",
+            "Herzliya",
+            "Gazan",
+            "Istanbul"
+          ],
+          "hits@5": 0,
+          "matched_truth@5": [],
+          "p@5": 0.0,
+          "r@5": 0.0,
+          "top_10": [
+            "Chabahar",
+            "Anbar",
+            "Herzliya",
+            "Gazan",
+            "Istanbul",
+            "Mizan",
+            "Metula",
+            "Hezbollah",
+            "Shiraz",
+            "As Iran"
+          ],
+          "hits@10": 1,
+          "matched_truth@10": [
+            "shiraz"
+          ],
+          "p@10": 0.1,
+          "r@10": 0.1
+        },
+        {
+          "date": "20260322",
+          "truth_count": 10,
+          "truth_cities": [
+            "abu dhabi",
+            "baghdad",
+            "esfahan",
+            "jurf al sakhr",
+            "lar",
+            "manama",
+            "qasmiyeh",
+            "tehran",
+            "tel aviv",
+            "yazd"
+          ],
+          "prediction_count": 58,
+          "first_hit_rank": 22,
+          "top_10_predictions": [
+            "Beersheba",
+            "Jordan Valley",
+            "Bekaa Valley",
+            "Istanbul",
+            "As Iran",
+            "Dimona",
+            "Mizan",
+            "Ramallah",
+            "Khorramshahr",
+            "Natanz"
+          ],
+          "top_1": [
+            "Beersheba"
+          ],
+          "hits@1": 0,
+          "matched_truth@1": [],
+          "p@1": 0.0,
+          "r@1": 0.0,
+          "top_3": [
+            "Beersheba",
+            "Jordan Valley",
+            "Bekaa Valley"
+          ],
+          "hits@3": 0,
+          "matched_truth@3": [],
+          "p@3": 0.0,
+          "r@3": 0.0,
+          "top_5": [
+            "Beersheba",
+            "Jordan Valley",
+            "Bekaa Valley",
+            "Istanbul",
+            "As Iran"
+          ],
+          "hits@5": 0,
+          "matched_truth@5": [],
+          "p@5": 0.0,
+          "r@5": 0.0,
+          "top_10": [
+            "Beersheba",
+            "Jordan Valley",
+            "Bekaa Valley",
+            "Istanbul",
+            "As Iran",
+            "Dimona",
+            "Mizan",
+            "Ramallah",
+            "Khorramshahr",
+            "Natanz"
+          ],
+          "hits@10": 0,
+          "matched_truth@10": [],
+          "p@10": 0.0,
+          "r@10": 0.0
+        },
+        {
+          "date": "20260326",
+          "truth_count": 10,
+          "truth_cities": [
+            "abu dhabi",
+            "amerli",
+            "esfahan",
+            "hamedan",
+            "kuwait city",
+            "mashhad",
+            "nahariya",
+            "qantara",
+            "tehran",
+            "tel aviv"
+          ],
+          "prediction_count": 46,
+          "first_hit_rank": 18,
+          "top_10_predictions": [
+            "Qazvin",
+            "Chabahar",
+            "Bandar Abbas",
+            "Qiam",
+            "Shiraz",
+            "Jbeil",
+            "Qalibaf",
+            "Anbar",
+            "Bekaa Valley",
+            "Jordan Valley"
+          ],
+          "top_1": [
+            "Qazvin"
+          ],
+          "hits@1": 0,
+          "matched_truth@1": [],
+          "p@1": 0.0,
+          "r@1": 0.0,
+          "top_3": [
+            "Qazvin",
+            "Chabahar",
+            "Bandar Abbas"
+          ],
+          "hits@3": 0,
+          "matched_truth@3": [],
+          "p@3": 0.0,
+          "r@3": 0.0,
+          "top_5": [
+            "Qazvin",
+            "Chabahar",
+            "Bandar Abbas",
+            "Qiam",
+            "Shiraz"
+          ],
+          "hits@5": 0,
+          "matched_truth@5": [],
+          "p@5": 0.0,
+          "r@5": 0.0,
+          "top_10": [
+            "Qazvin",
+            "Chabahar",
+            "Bandar Abbas",
+            "Qiam",
+            "Shiraz",
+            "Jbeil",
+            "Qalibaf",
+            "Anbar",
+            "Bekaa Valley",
+            "Jordan Valley"
+          ],
+          "hits@10": 0,
+          "matched_truth@10": [],
+          "p@10": 0.0,
+          "r@10": 0.0
+        },
+        {
+          "date": "20260328",
+          "truth_count": 10,
+          "truth_cities": [
+            "abu dhabi",
+            "arak",
+            "askar",
+            "bushehr",
+            "kashan",
+            "kirkuk",
+            "kuwait city",
+            "salalah",
+            "tehran",
+            "yazd"
+          ],
+          "prediction_count": 29,
+          "first_hit_rank": 5,
+          "top_10_predictions": [
+            "Beersheba",
+            "Gazan",
+            "Rasht",
+            "Kermanshah",
+            "Yazd",
+            "Sanaa",
+            "Ashdod",
+            "As Iran",
+            "Metula",
+            "Bandar Abbas"
+          ],
+          "top_1": [
+            "Beersheba"
+          ],
+          "hits@1": 0,
+          "matched_truth@1": [],
+          "p@1": 0.0,
+          "r@1": 0.0,
+          "top_3": [
+            "Beersheba",
+            "Gazan",
+            "Rasht"
+          ],
+          "hits@3": 0,
+          "matched_truth@3": [],
+          "p@3": 0.0,
+          "r@3": 0.0,
+          "top_5": [
+            "Beersheba",
+            "Gazan",
+            "Rasht",
+            "Kermanshah",
+            "Yazd"
+          ],
+          "hits@5": 1,
+          "matched_truth@5": [
+            "yazd"
+          ],
+          "p@5": 0.2,
+          "r@5": 0.1,
+          "top_10": [
+            "Beersheba",
+            "Gazan",
+            "Rasht",
+            "Kermanshah",
+            "Yazd",
+            "Sanaa",
+            "Ashdod",
+            "As Iran",
+            "Metula",
+            "Bandar Abbas"
+          ],
+          "hits@10": 1,
+          "matched_truth@10": [
+            "yazd"
+          ],
+          "p@10": 0.1,
+          "r@10": 0.1
+        }
+      ]
+    },
+    "B_ARIMA": {
+      "dates_evaluated": 5,
+      "avg_mrr": 0.08366946778711484,
+      "avg_rank_of_first_hit": 14.2,
+      "precision_at_k": {
+        "p@1": 0.0,
+        "p@3": 0.0,
+        "p@5": 0.0,
+        "p@10": 0.04
+      },
+      "recall_at_k": {
+        "r@1": 0.0,
+        "r@3": 0.0,
+        "r@5": 0.0,
+        "r@10": 0.04
+      },
+      "per_date": [
+        {
+          "date": "20260228",
+          "truth_count": 10,
+          "truth_cities": [
+            "abu dhabi",
+            "dubai",
+            "jurf al-nasr",
+            "kuwait",
+            "lamerd",
+            "manama",
+            "minab",
+            "tabriz",
+            "tehran",
+            "tel aviv"
+          ],
+          "prediction_count": 96,
+          "first_hit_rank": 18,
+          "top_10_predictions": [
+            "Kermanshah",
+            "Ramat Gan",
+            "Pahlavi",
+            "New Delhi",
+            "Moscow",
+            "Caracas",
+            "Sweida",
+            "Yazd",
+            "Mizan",
+            "Bekaa Valley"
+          ],
+          "top_1": [
+            "Kermanshah"
+          ],
+          "hits@1": 0,
+          "matched_truth@1": [],
+          "p@1": 0.0,
+          "r@1": 0.0,
+          "top_3": [
+            "Kermanshah",
+            "Ramat Gan",
+            "Pahlavi"
+          ],
+          "hits@3": 0,
+          "matched_truth@3": [],
+          "p@3": 0.0,
+          "r@3": 0.0,
+          "top_5": [
+            "Kermanshah",
+            "Ramat Gan",
+            "Pahlavi",
+            "New Delhi",
+            "Moscow"
+          ],
+          "hits@5": 0,
+          "matched_truth@5": [],
+          "p@5": 0.0,
+          "r@5": 0.0,
+          "top_10": [
+            "Kermanshah",
+            "Ramat Gan",
+            "Pahlavi",
+            "New Delhi",
+            "Moscow",
+            "Caracas",
+            "Sweida",
+            "Yazd",
+            "Mizan",
+            "Bekaa Valley"
+          ],
+          "hits@10": 0,
+          "matched_truth@10": [],
+          "p@10": 0.0,
+          "r@10": 0.0
+        },
+        {
+          "date": "20260317",
+          "truth_count": 10,
+          "truth_cities": [
+            "baghdad",
+            "bani yas",
+            "erbil",
+            "fujairah",
+            "kirkuk",
+            "ramat gan",
+            "shiraz",
+            "tabriz",
+            "tehran",
+            "yazd"
+          ],
+          "prediction_count": 72,
+          "first_hit_rank": 9,
+          "top_10_predictions": [
+            "Herzliya",
+            "Mizan",
+            "Chabahar",
+            "Anbar",
+            "Gazan",
+            "Hezbollah",
+            "Metula",
+            "Istanbul",
+            "Shiraz",
+            "As Iran"
+          ],
+          "top_1": [
+            "Herzliya"
+          ],
+          "hits@1": 0,
+          "matched_truth@1": [],
+          "p@1": 0.0,
+          "r@1": 0.0,
+          "top_3": [
+            "Herzliya",
+            "Mizan",
+            "Chabahar"
+          ],
+          "hits@3": 0,
+          "matched_truth@3": [],
+          "p@3": 0.0,
+          "r@3": 0.0,
+          "top_5": [
+            "Herzliya",
+            "Mizan",
+            "Chabahar",
+            "Anbar",
+            "Gazan"
+          ],
+          "hits@5": 0,
+          "matched_truth@5": [],
+          "p@5": 0.0,
+          "r@5": 0.0,
+          "top_10": [
+            "Herzliya",
+            "Mizan",
+            "Chabahar",
+            "Anbar",
+            "Gazan",
+            "Hezbollah",
+            "Metula",
+            "Istanbul",
+            "Shiraz",
+            "As Iran"
+          ],
+          "hits@10": 1,
+          "matched_truth@10": [
+            "shiraz"
+          ],
+          "p@10": 0.1,
+          "r@10": 0.1
+        },
+        {
+          "date": "20260322",
+          "truth_count": 10,
+          "truth_cities": [
+            "abu dhabi",
+            "baghdad",
+            "esfahan",
+            "jurf al sakhr",
+            "lar",
+            "manama",
+            "qasmiyeh",
+            "tehran",
+            "tel aviv",
+            "yazd"
+          ],
+          "prediction_count": 58,
+          "first_hit_rank": 20,
+          "top_10_predictions": [
+            "Jordan Valley",
+            "Beersheba",
+            "Mizan",
+            "Bekaa Valley",
+            "As Iran",
+            "Istanbul",
+            "Dimona",
+            "Ramallah",
+            "Khorramshahr",
+            "Gaza"
+          ],
+          "top_1": [
+            "Jordan Valley"
+          ],
+          "hits@1": 0,
+          "matched_truth@1": [],
+          "p@1": 0.0,
+          "r@1": 0.0,
+          "top_3": [
+            "Jordan Valley",
+            "Beersheba",
+            "Mizan"
+          ],
+          "hits@3": 0,
+          "matched_truth@3": [],
+          "p@3": 0.0,
+          "r@3": 0.0,
+          "top_5": [
+            "Jordan Valley",
+            "Beersheba",
+            "Mizan",
+            "Bekaa Valley",
+            "As Iran"
+          ],
+          "hits@5": 0,
+          "matched_truth@5": [],
+          "p@5": 0.0,
+          "r@5": 0.0,
+          "top_10": [
+            "Jordan Valley",
+            "Beersheba",
+            "Mizan",
+            "Bekaa Valley",
+            "As Iran",
+            "Istanbul",
+            "Dimona",
+            "Ramallah",
+            "Khorramshahr",
+            "Gaza"
+          ],
+          "hits@10": 0,
+          "matched_truth@10": [],
+          "p@10": 0.0,
+          "r@10": 0.0
+        },
+        {
+          "date": "20260326",
+          "truth_count": 10,
+          "truth_cities": [
+            "abu dhabi",
+            "amerli",
+            "esfahan",
+            "hamedan",
+            "kuwait city",
+            "mashhad",
+            "nahariya",
+            "qantara",
+            "tehran",
+            "tel aviv"
+          ],
+          "prediction_count": 46,
+          "first_hit_rank": 17,
+          "top_10_predictions": [
+            "Bandar Abbas",
+            "Qazvin",
+            "Chabahar",
+            "Shiraz",
+            "Qiam",
+            "Qalibaf",
+            "Bekaa Valley",
+            "Anbar",
+            "Jbeil",
+            "Jordan Valley"
+          ],
+          "top_1": [
+            "Bandar Abbas"
+          ],
+          "hits@1": 0,
+          "matched_truth@1": [],
+          "p@1": 0.0,
+          "r@1": 0.0,
+          "top_3": [
+            "Bandar Abbas",
+            "Qazvin",
+            "Chabahar"
+          ],
+          "hits@3": 0,
+          "matched_truth@3": [],
+          "p@3": 0.0,
+          "r@3": 0.0,
+          "top_5": [
+            "Bandar Abbas",
+            "Qazvin",
+            "Chabahar",
+            "Shiraz",
+            "Qiam"
+          ],
+          "hits@5": 0,
+          "matched_truth@5": [],
+          "p@5": 0.0,
+          "r@5": 0.0,
+          "top_10": [
+            "Bandar Abbas",
+            "Qazvin",
+            "Chabahar",
+            "Shiraz",
+            "Qiam",
+            "Qalibaf",
+            "Bekaa Valley",
+            "Anbar",
+            "Jbeil",
+            "Jordan Valley"
+          ],
+          "hits@10": 0,
+          "matched_truth@10": [],
+          "p@10": 0.0,
+          "r@10": 0.0
+        },
+        {
+          "date": "20260328",
+          "truth_count": 10,
+          "truth_cities": [
+            "abu dhabi",
+            "arak",
+            "askar",
+            "bushehr",
+            "kashan",
+            "kirkuk",
+            "kuwait city",
+            "salalah",
+            "tehran",
+            "yazd"
+          ],
+          "prediction_count": 29,
+          "first_hit_rank": 7,
+          "top_10_predictions": [
+            "Kermanshah",
+            "Beersheba",
+            "Sanaa",
+            "Gazan",
+            "Rasht",
+            "Bandar Abbas",
+            "Yazd",
+            "As Iran",
+            "Ashdod",
+            "Metula"
+          ],
+          "top_1": [
+            "Kermanshah"
+          ],
+          "hits@1": 0,
+          "matched_truth@1": [],
+          "p@1": 0.0,
+          "r@1": 0.0,
+          "top_3": [
+            "Kermanshah",
+            "Beersheba",
+            "Sanaa"
+          ],
+          "hits@3": 0,
+          "matched_truth@3": [],
+          "p@3": 0.0,
+          "r@3": 0.0,
+          "top_5": [
+            "Kermanshah",
+            "Beersheba",
+            "Sanaa",
+            "Gazan",
+            "Rasht"
+          ],
+          "hits@5": 0,
+          "matched_truth@5": [],
+          "p@5": 0.0,
+          "r@5": 0.0,
+          "top_10": [
+            "Kermanshah",
+            "Beersheba",
+            "Sanaa",
+            "Gazan",
+            "Rasht",
+            "Bandar Abbas",
+            "Yazd",
+            "As Iran",
+            "Ashdod",
+            "Metula"
+          ],
+          "hits@10": 1,
+          "matched_truth@10": [
+            "yazd"
+          ],
+          "p@10": 0.1,
+          "r@10": 0.1
+        }
+      ]
+    }
+  }
+}

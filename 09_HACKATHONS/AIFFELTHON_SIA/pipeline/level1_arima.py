@@ -331,6 +331,7 @@ def compare_kalman_vs_arima(
     transform: str = "log1p",
     candidate_orders: Iterable[tuple[int, int, int]] = DEFAULT_ARIMA_ORDERS,
     k_values: tuple[int, ...] = (1, 3, 5, 10),
+    allow_fallback_all_cities: bool = False,
 ) -> dict:
     """동일한 갈등 지수 시계열에 대해 Kalman vs ARIMA 결과를 비교."""
     kalman_results = detect_anomalies_kalman(city_daily)
@@ -352,12 +353,14 @@ def compare_kalman_vs_arima(
         score_col="innov_z",
         ground_truth_df=ground_truth_df,
         k_values=k_values,
+        allow_fallback_all_cities=allow_fallback_all_cities,
     )
     arima_eval = evaluate_model_predictions(
         arima_results,
         score_col="arima_z",
         ground_truth_df=ground_truth_df,
         k_values=k_values,
+        allow_fallback_all_cities=allow_fallback_all_cities,
     )
 
     return {
@@ -366,6 +369,7 @@ def compare_kalman_vs_arima(
             "transform": transform,
             "candidate_orders": [list(order) for order in candidate_orders],
             "k_values": list(k_values),
+            "allow_fallback_all_cities": allow_fallback_all_cities,
         },
         "kalman": {
             "score_col": "innov_z",

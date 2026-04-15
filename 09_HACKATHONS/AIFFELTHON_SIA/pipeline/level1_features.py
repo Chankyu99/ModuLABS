@@ -17,6 +17,7 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 
+from pipeline.city_utils import normalize_city_name
 from pipeline.config import (
     CONFIRMED_CODES,
     MIN_HISTORY,
@@ -77,7 +78,7 @@ def _robust_zscore_by_city(df: pd.DataFrame, column: str, out_col: str) -> pd.Da
 
 def build_city_day_features(
     df: pd.DataFrame,
-    min_sources: int = 2,
+    min_sources: int = 1,
 ) -> pd.DataFrame:
     """GDELT 이벤트를 도시-일 단위 feature 테이블로 변환한다."""
     if df.empty:
@@ -121,7 +122,7 @@ def build_city_day_features(
         )
 
     filtered["date"] = filtered["SQLDATE"].astype(str).str[:8]
-    filtered["city"] = filtered["ActionGeo_FullName"].astype(str).str.split(",").str[0].str.strip()
+    filtered["city"] = filtered["ActionGeo_FullName"].astype(str).map(normalize_city_name)
     filtered["country_code"] = filtered["ActionGeo_CountryCode"].fillna("")
     filtered["negative_tone"] = np.maximum(0.0, -pd.to_numeric(filtered["AvgTone"], errors="coerce").fillna(0.0))
     filtered["negative_goldstein"] = np.maximum(

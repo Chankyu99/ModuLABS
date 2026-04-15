@@ -8,8 +8,9 @@ SIA 갈등 지수 산출 및 이상 징후 탐지 엔진 (칼만 필터 기반)
 
 import numpy as np
 import pandas as pd
+from pipeline.city_utils import normalize_city_name
 from pipeline.config import (
-    tone_weight, CONFIRMED_CODES, MONITORED_COUNTRIES,
+    tone_weight, source_count_weight, CONFIRMED_CODES, MONITORED_COUNTRIES,
     KALMAN_Q_RATIO, KALMAN_R_RATIO, KALMAN_P0_RATIO, KALMAN_MIN_INIT_VAR,
     MIN_HISTORY, get_risk_level, EVENT_WEIGHT_MAP
 )
@@ -26,13 +27,14 @@ def compute_conflict_index(df: pd.DataFrame) -> pd.DataFrame:
         return pd.DataFrame(columns=['date', 'city', 'country_code', 'lat', 'lon',
                                      'conflict_index', 'events', 'mentions', 'avg_tone'])
 
-    # 모니터링 대상 국가, 분쟁 코드, 도시 단위 지오메트리(Type 4), 최소 보도 기준 필터링
+    # 모니터링 대상 국가, 분쟁 코드, 도시 단위 지오메트리(Type 4) 필터링
+    # NumSources는 hard cutoff 대신 soft penalty로 반영한다.
     mask = (
         (df['Actor1CountryCode'].isin(MONITORED_COUNTRIES) | 
          df['Actor2CountryCode'].isin(MONITORED_COUNTRIES)) &
         pd.to_numeric(df['EventCode'], errors='coerce').isin(CONFIRMED_CODES) &
         (df['ActionGeo_Type'] == 4) &
-        (df['NumSources'] >= 2)
+        (df['NumSources'] >= 1)
     )
     filtered = df[mask].copy()
 
@@ -51,7 +53,9 @@ def compute_conflict_index(df: pd.DataFrame) -> pd.DataFrame:
 
     # 날짜 형식 정리 및 가중치 적용
     filtered['date'] = filtered['SQLDATE'].astype(str).str[:8]
+    filtered['city'] = filtered['ActionGeo_FullName'].astype(str).map(normalize_city_name)
     filtered['weight'] = filtered['AvgTone'].apply(tone_weight)
+    filtered['source_weight'] = pd.to_numeric(filtered['NumSources'], errors='coerce').fillna(0.0).apply(source_count_weight)
     
     # EventRootCode 기반 행동 심각도 가중치
     if 'EventRootCode' in filtered.columns:
@@ -63,6 +67,7 @@ def compute_conflict_index(df: pd.DataFrame) -> pd.DataFrame:
     filtered['weighted_mention'] = (
         filtered['NumMentions'] 
         * np.log1p(filtered['NumSources'])  # log(1+NumSources)로 다매체 보도 가중
+        * filtered['source_weight']         # single-source는 남기되 penalty 부여
         * filtered['weight']
         * event_weight
     )
@@ -70,7 +75,7 @@ def compute_conflict_index(df: pd.DataFrame) -> pd.DataFrame:
     # 도시별/일별로 데이터 집계
     agg = (
         filtered
-        .groupby(['date', 'ActionGeo_FullName'])
+        .groupby(['date', 'city'])
         .agg(
             country_code=('ActionGeo_CountryCode', 'first'),
             lat=('ActionGeo_Lat', 'median'),
@@ -81,7 +86,6 @@ def compute_conflict_index(df: pd.DataFrame) -> pd.DataFrame:
             avg_tone=('AvgTone', 'mean'),
         )
         .reset_index()
-        .rename(columns={'ActionGeo_FullName': 'city'})
     )
 
     # 빈 날짜를 I=0으로 채워 연속 일자 시계열 보장

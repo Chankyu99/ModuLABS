@@ -18,6 +18,7 @@ import pandas as pd
 from pipeline.config import OUTPUT_DIR
 from pipeline.conflict_index import compute_conflict_index
 from pipeline.gdelt_fetcher import load_all_data
+from pipeline.ground_truth_loader import load_ground_truth
 from pipeline.level1_arima import compare_kalman_vs_arima
 
 
@@ -34,7 +35,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--ground-truth",
         type=str,
-        default=str(DEFAULT_GT_PATH),
+        nargs="*",
+        default=[str(DEFAULT_GT_PATH)] if DEFAULT_GT_PATH.exists() else [],
         help="ground truth CSV 경로",
     )
     parser.add_argument(
@@ -98,21 +100,29 @@ def _save_result(payload: dict, output_name: str | None = None) -> Path:
 def main() -> None:
     args = parse_args()
 
-    gt_path = Path(args.ground_truth)
-    if not gt_path.exists():
-        raise FileNotFoundError(f"ground truth 파일이 없습니다: {gt_path}")
-
-    ground_truth_df = pd.read_csv(gt_path)
-    ground_truth_df["date"] = ground_truth_df["date"].astype(str)
+    gt_result = load_ground_truth(args.ground_truth)
+    ground_truth_df = gt_result.dataframe.copy()
     target_dates = sorted(ground_truth_df["date"].unique().tolist())
     max_target_date = max(target_dates)
 
     print("\n=== Level 1 모델 비교 실행 ===")
-    print(f"ground truth : {gt_path.name}")
+    print(f"ground truth files : {len(gt_result.file_summaries)}개")
+    for item in gt_result.file_summaries:
+        print(
+            f"  - {item['file']} | schema={item['schema']} | "
+            f"dates={item['dates']} | cities={item['cities']}"
+        )
+    if gt_result.date_mismatches:
+        print("  [주의] 파일명과 SQLDATE가 다른 ground truth 파일:")
+        for item in gt_result.date_mismatches:
+            print(
+                f"    - {item['file']}: filename={item['file_date']} / SQLDATE={item['sql_date']}"
+            )
     print(f"target dates : {target_dates[0]} ~ {target_dates[-1]} ({len(target_dates)}일)")
     print(f"min_history  : {args.min_history}")
     print(f"transform    : {args.transform}")
     print(f"k_values     : {args.k_values}")
+    print(f"positive-only: {gt_result.is_positive_only}")
 
     raw = load_all_data(target_date=max_target_date)
     if raw.empty:
@@ -129,11 +139,14 @@ def main() -> None:
         min_history=args.min_history,
         transform=args.transform,
         k_values=tuple(args.k_values),
+        allow_fallback_all_cities=gt_result.is_positive_only,
     )
 
     payload = {
         "generated_at": datetime.now().isoformat(),
-        "ground_truth_path": str(gt_path),
+        "ground_truth_paths": [str(path) for path in args.ground_truth],
+        "ground_truth_positive_only": gt_result.is_positive_only,
+        "ground_truth_date_mismatches": gt_result.date_mismatches,
         "target_dates": target_dates,
         "city_daily_rows": int(len(city_daily)),
         "comparison": comparison,

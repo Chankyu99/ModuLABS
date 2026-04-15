@@ -41,9 +41,22 @@ def tone_weight(avg_tone: float) -> float:
     if avg_tone < 0:   return 0.3  # 약한 부정
     return 0.1                     # 중립 또는 긍정 (단순 배경 소음)
 
+
+def source_count_weight(num_sources: float) -> float:
+    """단일 매체 보도는 남기되 soft penalty를 준다."""
+    if num_sources <= 0:
+        return 0.0
+    if num_sources < 2:
+        return 0.60
+    if num_sources < 3:
+        return 0.85
+    return 1.0
+
 # 4. 칼만 필터(Kalman Filter) 파라미터
-KALMAN_Q_RATIO = 0.01   # 프로세스 노이즈 (변화에 대한 민감도)
-KALMAN_R_RATIO = 1.0    # 관측 노이즈 (데이터에 대한 신뢰도)
+# Spatial GT 기준으로는 평시보다 변화 폭을 더 빠르게 따라가도록 Q를 키우고,
+# 관측을 조금 더 신뢰하는 쪽이 성능이 안정적이었다.
+KALMAN_Q_RATIO = 0.10   # 프로세스 노이즈 (변화에 대한 민감도)
+KALMAN_R_RATIO = 0.25   # 관측 노이즈 (데이터에 대한 신뢰도)
 KALMAN_P0_RATIO = 2.0   # 초기 불확실성 계수
 KALMAN_MIN_INIT_VAR = 1.0  # 초기 분산 하한선 (0 채우기 시 노이즈 증폭 방지)
 
