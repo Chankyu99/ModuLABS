@@ -15,7 +15,7 @@ import pandas as pd
 import requests
 
 from pipeline.config import (
-    DATA_DIR, PARQUET_PATH, CONFIRMED_CODES, MONITORED_COUNTRIES,
+    ACTION_GEO_ALLOWED_COUNTRIES, DATA_DIR, PARQUET_PATH, CONFIRMED_CODES, MONITORED_COUNTRIES,
 )
 
 # GDELT 1.0 마스터 파일 리스트 URL
@@ -50,7 +50,8 @@ def apply_monitored_filter(df: pd.DataFrame) -> pd.DataFrame:
         (df['Actor1CountryCode'].isin(MONITORED_COUNTRIES) |
          df['Actor2CountryCode'].isin(MONITORED_COUNTRIES)) &
         pd.to_numeric(df['EventCode'], errors='coerce').isin(CONFIRMED_CODES) &
-        (df['ActionGeo_Type'] == 4)
+        (df['ActionGeo_Type'] == 4) &
+        (df['ActionGeo_CountryCode'].isin(ACTION_GEO_ALLOWED_COUNTRIES))
     )
     return df[mask].copy()
 

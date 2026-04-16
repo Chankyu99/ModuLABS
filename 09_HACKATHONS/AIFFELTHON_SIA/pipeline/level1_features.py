@@ -17,8 +17,9 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 
-from pipeline.city_utils import normalize_city_name
+from pipeline.city_utils import canonicalize_city_by_feature_id, normalize_city_name
 from pipeline.config import (
+    ACTION_GEO_ALLOWED_COUNTRIES,
     CONFIRMED_CODES,
     MIN_HISTORY,
     MONITORED_COUNTRIES,
@@ -106,6 +107,7 @@ def build_city_day_features(
          | filtered["Actor2CountryCode"].isin(MONITORED_COUNTRIES))
         & pd.to_numeric(filtered["EventCode"], errors="coerce").isin(CONFIRMED_CODES)
         & (filtered["ActionGeo_Type"] == 4)
+        & (filtered["ActionGeo_CountryCode"].isin(ACTION_GEO_ALLOWED_COUNTRIES))
         & (filtered["NumSources"] >= min_sources)
     )
     filtered = filtered.loc[mask].copy()
@@ -123,6 +125,7 @@ def build_city_day_features(
 
     filtered["date"] = filtered["SQLDATE"].astype(str).str[:8]
     filtered["city"] = filtered["ActionGeo_FullName"].astype(str).map(normalize_city_name)
+    filtered["city"] = canonicalize_city_by_feature_id(filtered["city"], filtered["ActionGeo_FeatureID"])
     filtered["country_code"] = filtered["ActionGeo_CountryCode"].fillna("")
     filtered["negative_tone"] = np.maximum(0.0, -pd.to_numeric(filtered["AvgTone"], errors="coerce").fillna(0.0))
     filtered["negative_goldstein"] = np.maximum(

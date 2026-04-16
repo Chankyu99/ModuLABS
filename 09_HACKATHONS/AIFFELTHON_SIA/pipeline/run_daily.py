@@ -19,8 +19,14 @@ import pandas as pd
 from pipeline.config import (
     OUTPUT_DIR,
     RISK_LEVELS,
-    LLM_CONFIDENCE_THRESHOLD,
+    LLM_ALLOW_STRATEGIC_SINGLE_SUPPORT,
+    LLM_ALLOW_ROI_PRIOR_SINGLE_SUPPORT,
     CITY_BLACKLIST,
+    LLM_MIN_EXACT_SUPPORT,
+    LLM_ALLOW_SINGLE_ARTICLE_EXACT,
+    REPORT_MAX_ALERTS,
+    REPORT_MIN_CONFLICT_INDEX,
+    REPORT_MIN_INNOV_Z,
 )
 from pipeline.conflict_index import compute_conflict_index, detect_anomalies
 from pipeline.gdelt_fetcher import load_all_data, fetch_daily
@@ -51,31 +57,93 @@ def format_report(anomalies: pd.DataFrame, target_date: str) -> str:
         lines.append(f"\n  📊 해당 날짜에 모니터링 대상 이벤트가 없습니다.")
         return '\n'.join(lines)
 
-    alerts = today[today['is_anomaly'] == True]
+    alerts = today[today['is_anomaly'] == True].copy()
     normals = today[today['is_anomaly'] == False]
 
-    if not alerts.empty:
-        lines.append(f"\n  🚨 이상 징후 포착 ({len(alerts)}개 도시)")
-        lines.append(f"  {'─'*85}")
-        lines.append(f"  {'위험 등급':15s} | {'도시 명칭':15s} | {'갈등(I)':>6s} | {'오차(Z)':>6s} | {'이벤트':>3s} | {'대응 가이드'}")
-        lines.append(f"  {'-'*15}-+-{'-'*15}-+-{'-'*8}-+-{'-'*8}-+-{'-'*5}-+-{'-'*30}")
+    def safe_text(value, default: str = "") -> str:
+        if pd.isna(value):
+            return default
+        text = str(value).strip()
+        if not text or text.lower() == "nan":
+            return default
+        return text
 
-        # 위험 등급이 높은 순서로 출력
-        for _, row in alerts.sort_values('risk_level', ascending=False).iterrows():
+    def build_core_message(row: pd.Series) -> str:
+        summary = safe_text(row.get('llm_event_summary', ''))
+        imagery = safe_text(row.get('llm_imagery_need', ''))
+        if summary and imagery:
+            return f"{summary} {imagery}"
+        if summary:
+            return summary
+        if imagery:
+            return imagery
+        return safe_text(row.get('risk_guide', ''), "사건 핵심 요약을 추가 검토해야 합니다.")
+
+    default_actionability = 'suppress' if 'llm_actionability' in alerts.columns else 'actionable'
+    alerts['llm_actionability'] = alerts.get(
+        'llm_actionability',
+        pd.Series(default_actionability, index=alerts.index),
+    ).fillna(default_actionability).astype(str)
+
+    score_mask = (
+        (pd.to_numeric(alerts['conflict_index'], errors='coerce').fillna(0.0) >= REPORT_MIN_CONFLICT_INDEX)
+        & (pd.to_numeric(alerts['innov_z'], errors='coerce').fillna(0.0) >= REPORT_MIN_INNOV_Z)
+    )
+    actionable_alerts = (
+        alerts.loc[score_mask & alerts['llm_actionability'].eq('actionable')]
+        .sort_values(['innov_z', 'conflict_index'], ascending=[False, False])
+        .head(REPORT_MAX_ALERTS)
+        .copy()
+    )
+    suppressed_count = int((score_mask & ~alerts['llm_actionability'].eq('actionable')).sum())
+
+    lines.append(
+        f"\n  🎯 정밀 촬영 후보 조건: 갈등지수 >= {REPORT_MIN_CONFLICT_INDEX:.0f}, "
+        f"Z-score >= {REPORT_MIN_INNOV_Z:.1f}, "
+        f"기사별 exact-city 근거 {LLM_MIN_EXACT_SUPPORT}건 이상"
+    )
+    if LLM_ALLOW_SINGLE_ARTICLE_EXACT:
+        lines.append("     기사 1건만 확보된 경우에는 exact-city 근거 1건도 통과 허용")
+    lines.append("     전략 표적(공항/기지/항만/핵·에너지·산업시설)은 exact/nearby 1건 + 표적 명시로 예외 통과 가능")
+
+    if not actionable_alerts.empty:
+        lines.append(f"\n  🚨 정밀 촬영 후보 ({len(actionable_alerts)}개 도시)")
+        lines.append(f"  {'─'*85}")
+        lines.append(f"  {'도시 명칭':15s} | {'갈등(I)':>8s} | {'오차(Z)':>8s} | {'이벤트':>5s} | {'검증'}")
+        lines.append(f"  {'-'*15}-+-{'-'*10}-+-{'-'*10}-+-{'-'*7}-+-{'-'*20}")
+
+        for _, row in actionable_alerts.iterrows():
             city_short = row['city'].split(',')[0][:15]
-            # LLM 신뢰도 표시
             llm_conf = row.get('llm_confidence', -1)
-            if llm_conf >= 0:
-                llm_tag = f" [{llm_conf:.0%}]" if llm_conf >= LLM_CONFIDENCE_THRESHOLD else f" ⚠️[{llm_conf:.0%}]"
+            resolved_city = safe_text(row.get('llm_resolved_city', ''))
+            validation_type = safe_text(row.get('llm_validation_type', ''), 'validated')
+            exact_support = int(row.get('llm_exact_support', 0) or 0)
+            nearby_support = int(row.get('llm_nearby_support', 0) or 0)
+            strategic_support = int(row.get('llm_strategic_support', 0) or 0)
+            roi_prior_support = int(row.get('llm_roi_prior_support', 0) or 0)
+            article_count = int(row.get('llm_article_count', 0) or 0)
+            target_category = safe_text(row.get('llm_target_category', ''))
+            if not pd.isna(llm_conf) and float(llm_conf) >= 0:
+                if resolved_city and resolved_city != str(row['city']).strip():
+                    llm_tag = f" [{validation_type}:{resolved_city}|exact={exact_support}/{article_count}|strategic={strategic_support}|roi={roi_prior_support}]"
+                else:
+                    llm_tag = f" [{validation_type}|exact={exact_support}/{article_count}|nearby={nearby_support}|strategic={strategic_support}|roi={roi_prior_support}]"
             else:
-                llm_tag = ''
+                llm_tag = '-'
             lines.append(
-                f"  {row['risk_emoji']} {row['risk_label']:12s} | {city_short:15s} | "
+                f"  {city_short:15s} | "
                 f"{row['conflict_index']:>8.0f} | {row['innov_z']:>8.1f} | "
-                f"{row['events']:>5.0f} | {row['risk_guide']}{llm_tag}"
+                f"{row['events']:>5.0f} | {llm_tag}"
             )
+            if target_category:
+                lines.append(f"     표적: {target_category}")
+            lines.append(f"     핵심: {build_core_message(row)}")
     else:
-        lines.append(f"\n  ✅ 모든 도시 정상 (이상 징후 없음)")
+        lines.append(f"\n  ✅ 정밀 촬영 후보 없음 (현재 조건 기준)")
+
+    # 이 아래 부분은 출력 결과에 없어도 될 것 같음 -> 추후 삭제 필요
+    if suppressed_count > 0:
+        lines.append(f"\n  ℹ️ LLM이 근거 부족/모호성으로 숨긴 후보: {suppressed_count}개")
 
     if not normals.empty:
         lines.append(f"\n  📊 정기 관측 정보 ({len(normals)}개 도시)")
@@ -96,14 +164,53 @@ def save_result(anomalies: pd.DataFrame, target_date: str):
     """분석 결과를 JSON 형식으로 저장 (대시보드 또는 시스템 연동 목적)"""
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    today = anomalies[anomalies['date'] == target_date]
-    alerts = today[today['is_anomaly'] == True]
+    today = anomalies[anomalies['date'] == target_date].copy()
+    alerts = today[today['is_anomaly'] == True].copy()
+
+    def safe_json_text(value, default: str = "") -> str:
+        if pd.isna(value):
+            return default
+        text = str(value)
+        return "" if text.lower() == "nan" else text
+
+    default_actionability = 'suppress' if 'llm_actionability' in alerts.columns else 'actionable'
+    alerts['llm_actionability'] = alerts.get(
+        'llm_actionability',
+        pd.Series(default_actionability, index=alerts.index),
+    ).fillna(default_actionability).astype(str)
+
+    score_mask = (
+        (pd.to_numeric(alerts['conflict_index'], errors='coerce').fillna(0.0) >= REPORT_MIN_CONFLICT_INDEX)
+        & (pd.to_numeric(alerts['innov_z'], errors='coerce').fillna(0.0) >= REPORT_MIN_INNOV_Z)
+    )
+    actionable_alerts = (
+        alerts.loc[score_mask & alerts['llm_actionability'].eq('actionable')]
+        .sort_values(['innov_z', 'conflict_index'], ascending=[False, False])
+        .head(REPORT_MAX_ALERTS)
+        .copy()
+    )
+    suppressed_alerts = (
+        alerts.loc[score_mask & ~alerts['llm_actionability'].eq('actionable')]
+        .sort_values(['innov_z', 'conflict_index'], ascending=[False, False])
+        .copy()
+    )
 
     result = {
         'date': target_date,
         'generated_at': datetime.now().isoformat(),
         'total_cities': len(today),
-        'alert_count': len(alerts),
+        'raw_alert_count': len(alerts),
+        'alert_count': len(actionable_alerts),
+        'suppressed_count': len(suppressed_alerts),
+        'output_policy': {
+            'max_alerts': REPORT_MAX_ALERTS,
+            'min_conflict_index': REPORT_MIN_CONFLICT_INDEX,
+            'min_innovation_z': REPORT_MIN_INNOV_Z,
+            'min_exact_support': LLM_MIN_EXACT_SUPPORT,
+            'allow_single_article_exact': LLM_ALLOW_SINGLE_ARTICLE_EXACT,
+            'allow_strategic_single_support': LLM_ALLOW_STRATEGIC_SINGLE_SUPPORT,
+            'allow_roi_prior_single_support': LLM_ALLOW_ROI_PRIOR_SINGLE_SUPPORT,
+        },
         'alerts': [
             {
                 'city': r['city'],
@@ -117,8 +224,23 @@ def save_result(anomalies: pd.DataFrame, target_date: str):
                 'lon': None if pd.isna(r.get('lon')) else round(float(r.get('lon')), 4),
                 'country_code': r.get('country_code', ''),
                 'llm_confidence': round(float(r.get('llm_confidence', -1)), 2),
-                'llm_reason': r.get('llm_reason', ''),
-            } for _, r in alerts.iterrows()
+                'llm_reason': safe_json_text(r.get('llm_reason', '')),
+                'llm_validation_type': safe_json_text(r.get('llm_validation_type', '')),
+                'llm_resolved_city': safe_json_text(r.get('llm_resolved_city', '')),
+                'llm_event_summary': safe_json_text(r.get('llm_event_summary', '')),
+                'llm_imagery_need': safe_json_text(r.get('llm_imagery_need', '')),
+                'llm_actionability': safe_json_text(r.get('llm_actionability', '')),
+                'llm_article_count': int(r.get('llm_article_count', 0) or 0),
+                'llm_exact_support': int(r.get('llm_exact_support', 0) or 0),
+                'llm_nearby_support': int(r.get('llm_nearby_support', 0) or 0),
+                'llm_invalid_support': int(r.get('llm_invalid_support', 0) or 0),
+                'llm_unclear_count': int(r.get('llm_unclear_count', 0) or 0),
+                'llm_strategic_support': int(r.get('llm_strategic_support', 0) or 0),
+                'llm_roi_prior_support': int(r.get('llm_roi_prior_support', 0) or 0),
+                'llm_evidence_span': safe_json_text(r.get('llm_evidence_span', '')),
+                'llm_target_category': safe_json_text(r.get('llm_target_category', '')),
+                'llm_keep': bool(r.get('llm_keep', True)),
+            } for _, r in actionable_alerts.iterrows()
         ],
         'summary': [
             {
@@ -126,6 +248,10 @@ def save_result(anomalies: pd.DataFrame, target_date: str):
                 'risk_level': int(r['risk_level']),
                 'conflict_index': round(float(r['conflict_index']), 1),
                 'z_score': round(float(r['innov_z']), 2),
+                'llm_validation_type': safe_json_text(r.get('llm_validation_type', '')),
+                'llm_resolved_city': safe_json_text(r.get('llm_resolved_city', '')),
+                'llm_event_summary': safe_json_text(r.get('llm_event_summary', '')),
+                'llm_imagery_need': safe_json_text(r.get('llm_imagery_need', '')),
             } for _, r in today.nlargest(10, 'conflict_index').iterrows()
         ]
     }

@@ -23,7 +23,7 @@ import numpy as np
 import pandas as pd
 
 from pipeline.conflict_index import compute_conflict_index
-from pipeline.config import CONFIRMED_CODES, MONITORED_COUNTRIES, OUTPUT_DIR
+from pipeline.config import ACTION_GEO_ALLOWED_COUNTRIES, CONFIRMED_CODES, MONITORED_COUNTRIES, OUTPUT_DIR
 from pipeline.gdelt_fetcher import load_all_data
 from pipeline.level1_features import (
     build_city_day_features,
@@ -113,7 +113,8 @@ def _current_pipeline_mask(df: pd.DataFrame) -> pd.Series:
         (df["Actor1CountryCode"].isin(MONITORED_COUNTRIES) | df["Actor2CountryCode"].isin(MONITORED_COUNTRIES))
         & pd.to_numeric(df["EventCode"], errors="coerce").isin(CONFIRMED_CODES)
         & (pd.to_numeric(df["ActionGeo_Type"], errors="coerce") == 4)
-        & (pd.to_numeric(df["NumSources"], errors="coerce") >= 2)
+        & (df["ActionGeo_CountryCode"].isin(ACTION_GEO_ALLOWED_COUNTRIES))
+        & (pd.to_numeric(df["NumSources"], errors="coerce") >= 1)
     )
 
 

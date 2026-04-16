@@ -8,9 +8,9 @@ SIA 갈등 지수 산출 및 이상 징후 탐지 엔진 (칼만 필터 기반)
 
 import numpy as np
 import pandas as pd
-from pipeline.city_utils import normalize_city_name
+from pipeline.city_utils import canonicalize_city_by_feature_id, normalize_city_name
 from pipeline.config import (
-    tone_weight, source_count_weight, CONFIRMED_CODES, MONITORED_COUNTRIES,
+    tone_weight, source_count_weight, ACTION_GEO_ALLOWED_COUNTRIES, CONFIRMED_CODES, MONITORED_COUNTRIES,
     KALMAN_Q_RATIO, KALMAN_R_RATIO, KALMAN_P0_RATIO, KALMAN_MIN_INIT_VAR,
     MIN_HISTORY, get_risk_level, EVENT_WEIGHT_MAP
 )
@@ -34,6 +34,7 @@ def compute_conflict_index(df: pd.DataFrame) -> pd.DataFrame:
          df['Actor2CountryCode'].isin(MONITORED_COUNTRIES)) &
         pd.to_numeric(df['EventCode'], errors='coerce').isin(CONFIRMED_CODES) &
         (df['ActionGeo_Type'] == 4) &
+        (df['ActionGeo_CountryCode'].isin(ACTION_GEO_ALLOWED_COUNTRIES)) &
         (df['NumSources'] >= 1)
     )
     filtered = df[mask].copy()
@@ -54,6 +55,7 @@ def compute_conflict_index(df: pd.DataFrame) -> pd.DataFrame:
     # 날짜 형식 정리 및 가중치 적용
     filtered['date'] = filtered['SQLDATE'].astype(str).str[:8]
     filtered['city'] = filtered['ActionGeo_FullName'].astype(str).map(normalize_city_name)
+    filtered['city'] = canonicalize_city_by_feature_id(filtered['city'], filtered['ActionGeo_FeatureID'])
     filtered['weight'] = filtered['AvgTone'].apply(tone_weight)
     filtered['source_weight'] = pd.to_numeric(filtered['NumSources'], errors='coerce').fillna(0.0).apply(source_count_weight)
     

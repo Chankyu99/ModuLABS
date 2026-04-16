@@ -32,6 +32,27 @@ MONITORED_COUNTRIES = [
     'ARE', 'SAU', 'QAT', 'KWT'          # 주요 인접국
 ]
 
+# ActionGeo_* 컬럼은 Actor 국가 코드와 다른 위치 코드 체계를 쓴다.
+# 전장/타격 가능 권역만 허용해 unrelated third-country city 유입을 줄인다.
+ACTION_GEO_ALLOWED_COUNTRIES = [
+    'IR',  # Iran
+    'IS',  # Israel
+    'IZ',  # Iraq
+    'LE',  # Lebanon
+    'SY',  # Syria
+    'YM',  # Yemen
+    'AE',  # UAE
+    'SA',  # Saudi Arabia
+    'QA',  # Qatar
+    'KU',  # Kuwait
+    'BA',  # Bahrain
+    'MU',  # Oman
+    'JO',  # Jordan
+    'WE',  # West Bank
+    'EG',  # Egypt / Sinai 접근권
+    'GR',  # Akrotiri/Cyprus 계열이 이 코드로 들어오는 사례 대응
+]
+
 # 3. 갈등 지수(I) 산출 로직
 
 def tone_weight(avg_tone: float) -> float:
@@ -73,13 +94,48 @@ MIN_HISTORY = 30  # 칼만 필터 안정화를 위한 최소 관측 일수
 
 # 6. LLM 게이트키퍼 설정
 LLM_MODELS = [
-    "gemini-3.1-pro-preview",       # 1순위: 정확도 우선
-    "gemini-3-flash-preview",       # 2순위: 비용 절감
-    "gemini-3.1-flash-lite-preview" # 3순위: 최저 비용
+    "gemini-2.5-flash-preview",     # 속도+정확도 균형 (thinking 없이 빠른 응답)
 ]
-LLM_TOP_N = 10          # 검증 대상 상위 도시 수
+LLM_TOP_N = 20          # 정밀 출력 후보(10~15개)를 충분히 커버하기 위한 상위 도시 수
 LLM_TOP_K_URLS = 5      # 도시당 초기 검증 기사 수
 LLM_CONFIDENCE_THRESHOLD = 0.3  # 이 이하면 신뢰도 낮음 표시
+LLM_PREFETCH_URLS = 8   # 후보당 먼저 가져와 볼 기사 수
+LLM_MIN_EXACT_SUPPORT = 2  # actionable 판정을 위한 최소 exact-city 기사 수
+LLM_ALLOW_SINGLE_ARTICLE_EXACT = True  # 기사 1건만 확보된 경우 exact-city면 통과 허용
+LLM_ALLOW_STRATEGIC_SINGLE_SUPPORT = True  # 전략 표적은 exact/nearby 1건 + 명시적 표적 언급이면 통과 허용
+LLM_ALLOW_ROI_PRIOR_SINGLE_SUPPORT = True  # ROI prior 도시는 exact/nearby 1건으로 통과 허용
+LLM_STRATEGIC_KEYWORDS = [
+    "airport",
+    "air base",
+    "airbase",
+    "military base",
+    "naval base",
+    "missile",
+    "nuclear",
+    "reactor",
+    "heavy water",
+    "refinery",
+    "gas facility",
+    "terminal",
+    "port",
+    "shipyard",
+    "bridge",
+    "steel",
+    "factory",
+    "plant",
+    "industrial",
+    "radar",
+    "air defense",
+    "command center",
+    "headquarters",
+    "drone",
+    "shipyard",
+]
+
+# Precision 우선 출력 정책
+REPORT_MAX_ALERTS = 15
+REPORT_MIN_CONFLICT_INDEX = 120.0
+REPORT_MIN_INNOV_Z = 3.0
 
 # 7. 지오코딩 블랙리스트 (조직명/무기명/지명 오류) -- 테스트 과정에서 잡히는 단어들 실시간 추가
 CITY_BLACKLIST = {
