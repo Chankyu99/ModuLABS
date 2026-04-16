@@ -1,1 +1,3 @@
 02_DataPreprocessing/Data/csv/fraud.csv
+05_TimeSeries/Data/sub_upbit_eth_min_feature_labels.pkl
+05_TimeSeries/Data/sub_upbit_eth_min_tick.csv
