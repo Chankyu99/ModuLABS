@@ -1,0 +1,4 @@
+config_name,model,target_alert_rate,threshold,cooldown_min
+baseline_zscore,zscore,0.013191802543520289,3.4429741674635634,0
+balanced_selected,zscore,0.0075,3.959979412992318,0
+conservative_selected,zscore,0.005,4.371867104994919,20

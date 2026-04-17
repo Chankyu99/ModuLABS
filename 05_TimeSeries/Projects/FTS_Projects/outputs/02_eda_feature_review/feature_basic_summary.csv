@@ -1,0 +1,7 @@
+metric,value
+row_count,908845
+column_count,29
+start_time,2018-01-01 00:43:00
+end_time,2019-11-03 10:03:00
+feature_count_without_label,28
+label_count,3

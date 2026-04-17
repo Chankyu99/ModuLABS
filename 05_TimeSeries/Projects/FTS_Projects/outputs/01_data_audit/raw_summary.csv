@@ -1,0 +1,12 @@
+metric,value
+row_count,1000000
+column_count,12
+start_time,2017-09-25 03:00:00
+end_time,2019-11-03 10:33:00
+duplicate_time_count,0
+expected_minute_count,1107814
+observed_minute_count,1000000
+missing_minute_count,107814
+missing_minute_ratio,0.09732139149712858
+pct_gap_gt_1min,0.055867
+max_gap_min,4924.0
