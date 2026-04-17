@@ -1,210 +1,150 @@
 {
   "date": "20260411",
-  "generated_at": "2026-04-15T14:49:44.994973",
-  "total_cities": 40,
-  "alert_count": 10,
+  "generated_at": "2026-04-17T16:53:02.452903",
+  "total_cities": 106,
+  "raw_alert_count": 24,
+  "alert_count": 1,
+  "suppressed_count": 1,
+  "output_policy": {
+    "max_alerts": 15,
+    "min_conflict_index": 120.0,
+    "min_innovation_z": 3.0,
+    "min_exact_support": 2,
+    "allow_single_article_exact": true,
+    "allow_strategic_single_support": true,
+    "allow_roi_prior_single_support": true
+  },
   "alerts": [
     {
       "city": "Ashdod",
       "risk_level": 3,
       "risk_label": "위기 (RED)",
-      "conflict_index": 157.2,
-      "innovation_z": 149.31,
+      "conflict_index": 193.7,
+      "innovation_z": 282.55,
       "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
-      "events": 4,
+      "events": 12,
       "lat": 31.7444,
       "lon": 34.6809,
       "country_code": "IS",
       "llm_confidence": -1.0,
-      "llm_reason": ""
-    },
-    {
-      "city": "Seoul",
-      "risk_level": 3,
-      "risk_label": "위기 (RED)",
-      "conflict_index": 126.4,
-      "innovation_z": 120.24,
-      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
-      "events": 2,
-      "lat": 37.5664,
-      "lon": 127.0,
-      "country_code": "KS",
-      "llm_confidence": -1.0,
-      "llm_reason": ""
-    },
-    {
-      "city": "Islamabad",
-      "risk_level": 3,
-      "risk_label": "위기 (RED)",
-      "conflict_index": 740.6,
-      "innovation_z": 42.83,
-      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
-      "events": 19,
-      "lat": 33.7,
-      "lon": 73.1667,
-      "country_code": "PK",
-      "llm_confidence": -1.0,
-      "llm_reason": ""
-    },
-    {
-      "city": "Ziba",
-      "risk_level": 3,
-      "risk_label": "위기 (RED)",
-      "conflict_index": 11.0,
-      "innovation_z": 10.45,
-      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
-      "events": 1,
-      "lat": 28.9038,
-      "lon": 57.8896,
-      "country_code": "IR",
-      "llm_confidence": -1.0,
-      "llm_reason": ""
-    },
-    {
-      "city": "Moscow",
-      "risk_level": 3,
-      "risk_label": "위기 (RED)",
-      "conflict_index": 66.5,
-      "innovation_z": 6.0,
-      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
-      "events": 3,
-      "lat": 55.7522,
-      "lon": 37.6156,
-      "country_code": "RS",
-      "llm_confidence": -1.0,
-      "llm_reason": ""
-    },
-    {
-      "city": "Jnah",
-      "risk_level": 3,
-      "risk_label": "위기 (RED)",
-      "conflict_index": 41.4,
-      "innovation_z": 5.28,
-      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
-      "events": 1,
-      "lat": 33.8664,
-      "lon": 35.4886,
-      "country_code": "LE",
-      "llm_confidence": -1.0,
-      "llm_reason": ""
-    },
-    {
-      "city": "Beirut",
-      "risk_level": 3,
-      "risk_label": "위기 (RED)",
-      "conflict_index": 2502.6,
-      "innovation_z": 5.11,
-      "guide": "대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.",
-      "events": 48,
-      "lat": 33.8719,
-      "lon": 35.5097,
-      "country_code": "LE",
-      "llm_confidence": -1.0,
-      "llm_reason": ""
-    },
-    {
-      "city": "Istanbul",
-      "risk_level": 1,
-      "risk_label": "주의 (YELLOW)",
-      "conflict_index": 8.8,
-      "innovation_z": 1.81,
-      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
-      "events": 1,
-      "lat": 41.0186,
-      "lon": 28.9647,
-      "country_code": "TU",
-      "llm_confidence": -1.0,
-      "llm_reason": ""
-    },
-    {
-      "city": "Madrid",
-      "risk_level": 1,
-      "risk_label": "주의 (YELLOW)",
-      "conflict_index": 48.7,
-      "innovation_z": 1.63,
-      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
-      "events": 1,
-      "lat": 40.4,
-      "lon": -3.6833,
-      "country_code": "SP",
-      "llm_confidence": -1.0,
-      "llm_reason": ""
-    },
-    {
-      "city": "Al Udeid",
-      "risk_level": 1,
-      "risk_label": "주의 (YELLOW)",
-      "conflict_index": 1.3,
-      "innovation_z": 1.06,
-      "guide": "긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.",
-      "events": 1,
-      "lat": 24.6167,
-      "lon": 51.4,
-      "country_code": "AE",
-      "llm_confidence": -1.0,
-      "llm_reason": ""
+      "llm_reason": "헤즈볼라가 아슈도드 해군 기지를 미사일로 공격했습니다.",
+      "llm_validation_type": "SUCCESS",
+      "llm_resolved_city": "",
+      "llm_event_summary": "헤즈볼라가 아슈도드 해군 기지를 미사일로 공격했습니다.",
+      "llm_imagery_need": "",
+      "llm_actionability": "actionable",
+      "llm_article_count": 2,
+      "llm_exact_support": 2,
+      "llm_nearby_support": 0,
+      "llm_invalid_support": 0,
+      "llm_unclear_count": 0,
+      "llm_strategic_support": 0,
+      "llm_roi_prior_support": 0,
+      "llm_evidence_span": "",
+      "llm_target_category": "",
+      "llm_keep": true
     }
   ],
   "summary": [
     {
       "city": "Beirut",
       "risk_level": 3,
-      "conflict_index": 2502.6,
-      "z_score": 5.11
+      "conflict_index": 2376.9,
+      "z_score": 8.76,
+      "llm_validation_type": "DROPPED",
+      "llm_resolved_city": "",
+      "llm_event_summary": "",
+      "llm_imagery_need": ""
     },
     {
       "city": "Tehran",
       "risk_level": 0,
-      "conflict_index": 2128.4,
-      "z_score": -1.8
+      "conflict_index": 2224.6,
+      "z_score": -0.34,
+      "llm_validation_type": "",
+      "llm_resolved_city": "",
+      "llm_event_summary": "",
+      "llm_imagery_need": ""
     },
     {
       "city": "Gaza",
       "risk_level": 0,
-      "conflict_index": 1734.3,
-      "z_score": -0.85
-    },
-    {
-      "city": "Islamabad",
-      "risk_level": 3,
-      "conflict_index": 740.6,
-      "z_score": 42.83
+      "conflict_index": 1792.1,
+      "z_score": -0.74,
+      "llm_validation_type": "",
+      "llm_resolved_city": "",
+      "llm_event_summary": "",
+      "llm_imagery_need": ""
     },
     {
       "city": "Jerusalem",
       "risk_level": 0,
-      "conflict_index": 312.2,
-      "z_score": -1.45
+      "conflict_index": 330.8,
+      "z_score": -0.11,
+      "llm_validation_type": "",
+      "llm_resolved_city": "",
+      "llm_event_summary": "",
+      "llm_imagery_need": ""
     },
     {
       "city": "Tel Aviv",
       "risk_level": 0,
-      "conflict_index": 222.8,
-      "z_score": -19.78
+      "conflict_index": 233.6,
+      "z_score": -0.05,
+      "llm_validation_type": "",
+      "llm_resolved_city": "",
+      "llm_event_summary": "",
+      "llm_imagery_need": ""
     },
     {
       "city": "Ashdod",
       "risk_level": 3,
-      "conflict_index": 157.2,
-      "z_score": 149.31
+      "conflict_index": 193.7,
+      "z_score": 282.55,
+      "llm_validation_type": "SUCCESS",
+      "llm_resolved_city": "",
+      "llm_event_summary": "헤즈볼라가 아슈도드 해군 기지를 미사일로 공격했습니다.",
+      "llm_imagery_need": ""
     },
     {
-      "city": "Seoul",
+      "city": "Deir Jarir",
       "risk_level": 3,
-      "conflict_index": 126.4,
-      "z_score": 120.24
+      "conflict_index": 114.1,
+      "z_score": 167.13,
+      "llm_validation_type": "SUCCESS",
+      "llm_resolved_city": "",
+      "llm_event_summary": "이스라엘 정착민들이 데이르 자리르 마을을 습격하여 팔레스타인 남성을 총격 살해했습니다.",
+      "llm_imagery_need": ""
     },
     {
-      "city": "Moscow",
+      "city": "Hormuz",
       "risk_level": 3,
       "conflict_index": 66.5,
-      "z_score": 6.0
+      "z_score": 81.19,
+      "llm_validation_type": "AMBIGUOUS",
+      "llm_resolved_city": "",
+      "llm_event_summary": "이란이 호르무즈 해협에서 선박을 가두고 통행을 거부하며 해협을 인질로 잡고 있습니다.",
+      "llm_imagery_need": ""
     },
     {
-      "city": "Madrid",
-      "risk_level": 1,
-      "conflict_index": 48.7,
-      "z_score": 1.63
+      "city": "Jnah",
+      "risk_level": 3,
+      "conflict_index": 41.4,
+      "z_score": 8.01,
+      "llm_validation_type": "SUCCESS",
+      "llm_resolved_city": "",
+      "llm_event_summary": "이스라엘이 Jnah에 공격을 감행했습니다.",
+      "llm_imagery_need": ""
+    },
+    {
+      "city": "Minab",
+      "risk_level": 0,
+      "conflict_index": 32.6,
+      "z_score": 0.01,
+      "llm_validation_type": "",
+      "llm_resolved_city": "",
+      "llm_event_summary": "",
+      "llm_imagery_need": ""
     }
   ]
 }
