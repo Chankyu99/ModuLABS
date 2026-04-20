@@ -16,6 +16,7 @@ from pathlib import Path
 
 import pandas as pd
 
+from pipeline.city_utils import normalize_city_key
 from pipeline.config import (
     OUTPUT_DIR,
     RISK_LEVELS,
@@ -41,6 +42,83 @@ def filter_blacklist(results: pd.DataFrame) -> pd.DataFrame:
     city_lower = results['city'].fillna('').astype(str).str.lower()
     keep_mask = ~city_lower.isin(blocked)
     return results.loc[keep_mask].copy()
+
+
+def attach_report_urls(
+    results: pd.DataFrame,
+    raw_df: pd.DataFrame,
+    url_df: pd.DataFrame | None = None,
+) -> pd.DataFrame:
+    """도시/날짜별 대표 기사 URL을 결과에 붙여 리포트 출력에 활용한다."""
+    if results.empty:
+        enriched = results.copy()
+        if 'report_source_url' not in enriched.columns:
+            enriched['report_source_url'] = pd.Series(dtype='object')
+        return enriched
+
+    enriched = results.copy()
+    if 'report_source_url' not in enriched.columns:
+        enriched['report_source_url'] = ''
+    enriched['report_source_url'] = enriched['report_source_url'].fillna('').astype(str)
+
+    if raw_df.empty or 'SQLDATE' not in raw_df.columns or 'ActionGeo_FullName' not in raw_df.columns:
+        return enriched
+
+    raw = raw_df.copy()
+    raw['date'] = raw['SQLDATE'].astype(str).str[:8]
+    raw['city_key'] = raw['ActionGeo_FullName'].astype(str).map(normalize_city_key)
+
+    if 'SOURCEURL' not in raw.columns:
+        raw['SOURCEURL'] = None
+
+    if url_df is not None and not url_df.empty and 'GLOBALEVENTID' in raw.columns:
+        mapping = url_df.copy()
+        mapping['GLOBALEVENTID'] = mapping['GLOBALEVENTID'].astype(str)
+        raw['GLOBALEVENTID'] = raw['GLOBALEVENTID'].astype(str)
+        raw = raw.merge(
+            mapping[['GLOBALEVENTID', 'SOURCEURL']].rename(columns={'SOURCEURL': 'MAPPED_SOURCEURL'}),
+            on='GLOBALEVENTID',
+            how='left',
+        )
+        raw['SOURCEURL'] = raw['SOURCEURL'].fillna(raw['MAPPED_SOURCEURL'])
+        raw = raw.drop(columns=['MAPPED_SOURCEURL'])
+
+    for col in ['NumSources', 'NumMentions', 'NumArticles']:
+        if col in raw.columns:
+            raw[col] = pd.to_numeric(raw[col], errors='coerce').fillna(0.0)
+        else:
+            raw[col] = 0.0
+
+    raw['candidate_weight'] = raw['NumSources'] * 4 + raw['NumMentions'] + raw['NumArticles']
+    raw['SOURCEURL'] = raw['SOURCEURL'].fillna('').astype(str).str.strip()
+
+    candidates = raw.loc[
+        raw['SOURCEURL'].str.startswith(('http://', 'https://'))
+        & raw['city_key'].ne('')
+    ].copy()
+    if candidates.empty:
+        return enriched
+
+    top_urls = (
+        candidates
+        .sort_values(
+            ['date', 'city_key', 'candidate_weight', 'NumSources', 'NumMentions', 'NumArticles'],
+            ascending=[True, True, False, False, False, False],
+        )
+        .drop_duplicates(subset=['date', 'city_key'], keep='first')
+        [['date', 'city_key', 'SOURCEURL']]
+        .rename(columns={'SOURCEURL': 'report_source_url_selected'})
+    )
+
+    enriched['city_key'] = enriched['city'].astype(str).map(normalize_city_key)
+    enriched = enriched.merge(top_urls, on=['date', 'city_key'], how='left')
+    selected_urls = enriched['report_source_url_selected'].fillna('').astype(str)
+    enriched['report_source_url'] = enriched['report_source_url'].where(
+        enriched['report_source_url'].str.strip().ne(''),
+        selected_urls,
+    )
+
+    return enriched.drop(columns=['city_key', 'report_source_url_selected'])
 
 
 def format_report(anomalies: pd.DataFrame, target_date: str) -> str:
@@ -112,6 +190,7 @@ def format_report(anomalies: pd.DataFrame, target_date: str) -> str:
         for _, row in actionable_alerts.iterrows():
             city_short = row['city'].split(',')[0][:15]
             llm_conf = row.get('llm_confidence', -1)
+            report_url = safe_text(row.get('report_source_url', ''))
             resolved_city = safe_text(row.get('llm_resolved_city', ''))
             validation_type = safe_text(row.get('llm_validation_type', ''), 'validated')
             exact_support = int(row.get('llm_exact_support', 0) or 0)
@@ -135,6 +214,8 @@ def format_report(anomalies: pd.DataFrame, target_date: str) -> str:
             if target_category:
                 lines.append(f"     표적: {target_category}")
             lines.append(f"     핵심: {build_core_message(row)}")
+            if report_url:
+                lines.append(f"     URL: {report_url}")
     else:
         lines.append(f"\n  ✅ 정밀 촬영 후보 없음 (현재 조건 기준)")
 
@@ -168,10 +249,13 @@ def format_report(anomalies: pd.DataFrame, target_date: str) -> str:
             for _, row in top_normals.iterrows():
                 city_name = str(row['city']).split(',')[0]
                 summary = str(row.get('llm_baseline_summary', '요약 정보 없음'))
+                report_url = safe_text(row.get('report_source_url', ''))
                 lines.append(
                     f"\n     📍 {city_name:15s} | 지수={row['conflict_index']:>6.0f} | 표준오차={row['innov_z']:>5.1f}"
                 )
                 lines.append(f"     📌 전황: {summary}")
+                if report_url:
+                    lines.append(f"     🔗 기사: {report_url}")
 
     lines.append(f"\n{'═'*85}\n")
     return '\n'.join(lines)
@@ -240,6 +324,7 @@ def save_result(anomalies: pd.DataFrame, target_date: str):
                 'lat': None if pd.isna(r.get('lat')) else round(float(r.get('lat')), 4),
                 'lon': None if pd.isna(r.get('lon')) else round(float(r.get('lon')), 4),
                 'country_code': r.get('country_code', ''),
+                'source_url': safe_json_text(r.get('report_source_url', '')),
                 'llm_confidence': round(float(r.get('llm_confidence', -1)), 2),
                 'llm_reason': safe_json_text(r.get('llm_reason', '')),
                 'llm_validation_type': safe_json_text(r.get('llm_validation_type', '')),
@@ -265,6 +350,7 @@ def save_result(anomalies: pd.DataFrame, target_date: str):
                 'risk_level': int(r['risk_level']),
                 'conflict_index': round(float(r['conflict_index']), 1),
                 'z_score': round(float(r['innov_z']), 2),
+                'source_url': safe_json_text(r.get('report_source_url', '')),
                 'llm_validation_type': safe_json_text(r.get('llm_validation_type', '')),
                 'llm_resolved_city': safe_json_text(r.get('llm_resolved_city', '')),
                 'llm_event_summary': safe_json_text(r.get('llm_event_summary', '')),
@@ -298,6 +384,7 @@ def run_single_day(target_date: str, fetch: bool = False, use_llm: bool = False)
     
     # 2. 칼만 필터 기반 이상 징후 탐지
     results = detect_anomalies(city_daily)
+    url_df = None
 
     # 3. LLM 게이트키퍼 검증
     if use_llm:
@@ -326,7 +413,8 @@ def run_single_day(target_date: str, fetch: bool = False, use_llm: bool = False)
             else:
                 print("  [LLM] URL 매핑 파일 없음. 블랙리스트만 적용.")
                 results = filter_blacklist(results)
-    
+
+    results = attach_report_urls(results, raw, url_df)
     report = format_report(results, target_date)
     print(report)
     save_result(results, target_date)
