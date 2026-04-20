@@ -10,7 +10,8 @@ SIA 갈등 모니터링 파이프라인 - 일별 실행 및 백테스트 엔진
 
 import argparse
 import json
-import sys
+import math
+# import sys  # unused
 from datetime import datetime
 from pathlib import Path
 
@@ -19,7 +20,7 @@ import pandas as pd
 from pipeline.city_utils import normalize_city_key
 from pipeline.config import (
     OUTPUT_DIR,
-    RISK_LEVELS,
+    # RISK_LEVELS,  # unused
     LLM_ALLOW_STRATEGIC_SINGLE_SUPPORT,
     LLM_ALLOW_ROI_PRIOR_SINGLE_SUPPORT,
     CITY_BLACKLIST,
@@ -136,7 +137,7 @@ def format_report(anomalies: pd.DataFrame, target_date: str) -> str:
         return '\n'.join(lines)
 
     alerts = today[today['is_anomaly'] == True].copy()
-    normals = today[today['is_anomaly'] == False]
+    # normals = today[today['is_anomaly'] == False]  # unused: Track 2 block is currently disabled
 
     def safe_text(value, default: str = "") -> str:
         if pd.isna(value):
@@ -167,27 +168,26 @@ def format_report(anomalies: pd.DataFrame, target_date: str) -> str:
         (pd.to_numeric(alerts['conflict_index'], errors='coerce').fillna(0.0) >= REPORT_MIN_CONFLICT_INDEX)
         & (pd.to_numeric(alerts['innov_z'], errors='coerce').fillna(0.0) >= REPORT_MIN_INNOV_Z)
     )
-    actionable_alerts = (
-        alerts.loc[score_mask & alerts['llm_actionability'].eq('actionable')]
-        .sort_values(['innov_z', 'conflict_index'], ascending=[False, False])
-        .head(REPORT_MAX_ALERTS)
-        .copy()
+    _cands = alerts.loc[score_mask & alerts['llm_actionability'].eq('actionable')].copy()
+    _cands['composite_score'] = (
+        pd.to_numeric(_cands['conflict_index'], errors='coerce').fillna(0.0)
+        * _cands['innov_z'].apply(lambda z: math.log1p(max(float(z), 0)))
     )
+    actionable_alerts = _cands.sort_values('composite_score', ascending=False).head(REPORT_MAX_ALERTS).copy()
     suppressed_count = int((score_mask & ~alerts['llm_actionability'].eq('actionable')).sum())
 
-    lines.append(f"\n  🎯 [정밀 촬영 후보 선정 기준]")
-    lines.append(f"     1. 데이터 급증: 갈등 지수가 {REPORT_MIN_CONFLICT_INDEX:.0f} 이상이며, 평소 대비 보도량이 폭증(Z-score {REPORT_MIN_INNOV_Z:.1f} 이상)한 지역")
-    lines.append(f"     2. AI 교차 검증: 실제 물리적 타격이나 군사적 피해가 발생했다고 AI가 2건 이상의 기사로 팩트체크한 지역")
-    if LLM_ALLOW_SINGLE_ARTICLE_EXACT:
-        lines.append(f"        (※ 단, 초기 속보이거나 핵심 전략 표적(공항/항만/핵·군사시설)인 경우 1건의 확실한 보도만 있어도 긴급 승격)")
+    lines.append(f"\n  🎯 [촬영이 필요한 도시 후보 선정 기준]")
+    lines.append(f"    - 갈등 지수가 {REPORT_MIN_CONFLICT_INDEX:.0f} 이상이며, 평소 대비 보도량이 폭증(Z-score {REPORT_MIN_INNOV_Z:.1f} 이상)한 지역")
+    lines.append(f"    - 실제 물리적 타격이나 군사적 피해가 발생했다고 AI가 2건 이상의 기사로 팩트체크한 지역")
+    lines.append(f"    - 갈등 지수 * log(1 + Z-score) 합성 점수 기준 내림차순 — 상위일수록 즉각 대응 필요")
 
     if not actionable_alerts.empty:
-        lines.append(f"\n  🚨 정밀 촬영 후보 ({len(actionable_alerts)}개 도시)")
-        lines.append(f"  {'─'*85}")
-        lines.append(f"  {'도시 명칭':15s} | {'갈등(I)':>8s} | {'오차(Z)':>8s} | {'이벤트':>5s} | {'검증'}")
-        lines.append(f"  {'-'*15}-+-{'-'*10}-+-{'-'*10}-+-{'-'*7}-+-{'-'*20}")
+        lines.append(f"\n  🚨 촬영이 필요한 도시 후보 ({len(actionable_alerts)}개 도시)")
+        lines.append(f"  {'─'*92}")
+        lines.append(f"  {'순위':>4s} | {'도시 명칭':15s} | {'갈등(I)':>8s} | {'오차(Z)':>8s} | {'이벤트':>5s} | {'검증'}")
+        lines.append(f"  {'-'*4}-+-{'-'*15}-+-{'-'*10}-+-{'-'*10}-+-{'-'*7}-+-{'-'*20}")
 
-        for _, row in actionable_alerts.iterrows():
+        for rank, (_, row) in enumerate(actionable_alerts.iterrows(), 1):
             city_short = row['city'].split(',')[0][:15]
             llm_conf = row.get('llm_confidence', -1)
             report_url = safe_text(row.get('report_source_url', ''))
@@ -207,55 +207,54 @@ def format_report(anomalies: pd.DataFrame, target_date: str) -> str:
             else:
                 llm_tag = '-'
             lines.append(
-                f"  {city_short:15s} | "
+                f"  {rank:>4d} | {city_short:15s} | "
                 f"{row['conflict_index']:>8.0f} | {row['innov_z']:>8.1f} | "
                 f"{row['events']:>5.0f} | {llm_tag}"
             )
             if target_category:
-                lines.append(f"     표적: {target_category}")
-            lines.append(f"     핵심: {build_core_message(row)}")
+                lines.append(f"          표적: {target_category}")
+            lines.append(f"          핵심: {build_core_message(row)}")
             if report_url:
-                lines.append(f"     URL: {report_url}")
+                lines.append(f"          URL: {report_url}")
     else:
-        lines.append(f"\n  ✅ 정밀 촬영 후보 없음 (현재 조건 기준)")
+        lines.append(f"\n  ✅ 촬영이 필요한 도시 후보 없음 (현재 조건 기준)")
 
-    # 이 아래 부분은 출력 결과에 없어도 될 것 같음 -> 추후 삭제 필요
     if suppressed_count > 0:
-        lines.append(f"\n ⚙️ LLM이 근거 부족/모호성으로 숨긴 후보: {suppressed_count}개")
-    
+        lines.append(f"\n 👤 분석관의 판단이 필요한 도시 후보 : {suppressed_count}개")
+
         suppressed_alerts = alerts.loc[score_mask & ~alerts['llm_actionability'].eq('actionable')].sort_values('innov_z', ascending=False)
         for _, row in suppressed_alerts.iterrows():
             city_name = str(row['city']).split(',')[0][:15]
             z_score = float(row['innov_z'])
-            reason = str(row.get('llm_reason', '사유 없음')).replace('\n', ' ')[:60] # 사유가 길면 60자에서 자름
+            reason = str(row.get('llm_reason', '사유 없음')).replace('\n', ' ')[:60]
             val_type = str(row.get('llm_validation_type', ''))
-                
+
             lines.append(f"     - {city_name:15s} | Z={z_score:>5.1f} | [{val_type}] {reason}...")
 
 
-    if not normals.empty:
-        lines.append(f"\n  📊 [TRACK 2] 정기 전략 관측 및 전황 브리핑 (상시 집중 모니터링)")
-        lines.append(f"  {'─'*85}")
-        lines.append(f"  전쟁 양상 파악을 위해 꾸준한 위성 자원 할당이 필요한 핵심 거점입니다.")
-        lines.append(f"  (선정 기준: 갈등 지수 5,000 이상 핵심 전략지)")
+    # if not normals.empty:
+    #     lines.append(f"\n  📊 [TRACK 2] 정기 전략 관측 및 전황 브리핑 (상시 집중 모니터링)")
+    #     lines.append(f"  {'─'*85}")
+    #     lines.append(f"  전쟁 양상 파악을 위해 꾸준한 위성 자원 할당이 필요한 핵심 거점입니다.")
+    #     lines.append(f"  (선정 기준: 갈등 지수 5,000 이상 핵심 전략지)")
         
-        # Track 2 조건 (Z-score는 낮지만, 볼륨이 5000 이상인 곳)
-        track2_mask = normals['conflict_index'] >= 5000
-        top_normals = normals[track2_mask].sort_values('conflict_index', ascending=False).head(5)
-        
-        if top_normals.empty:
-             lines.append(f"\n     ✅ 현재 기준을 충족하는 대형 정기 관측 도시가 없습니다.")
-        else:
-            for _, row in top_normals.iterrows():
-                city_name = str(row['city']).split(',')[0]
-                summary = str(row.get('llm_baseline_summary', '요약 정보 없음'))
-                report_url = safe_text(row.get('report_source_url', ''))
-                lines.append(
-                    f"\n     📍 {city_name:15s} | 지수={row['conflict_index']:>6.0f} | 표준오차={row['innov_z']:>5.1f}"
-                )
-                lines.append(f"     📌 전황: {summary}")
-                if report_url:
-                    lines.append(f"     🔗 기사: {report_url}")
+    #     # Track 2 조건 (Z-score는 낮지만, 볼륨이 5000 이상인 곳)
+    #     track2_mask = normals['conflict_index'] >= 5000
+    #     top_normals = normals[track2_mask].sort_values('conflict_index', ascending=False).head(5)
+
+    #     if top_normals.empty:
+    #         lines.append(f"\n     ✅ 현재 기준을 충족하는 대형 정기 관측 도시가 없습니다.")
+    #     else:
+    #         for _, row in top_normals.iterrows():
+    #             city_name = str(row['city']).split(',')[0]
+    #             summary = str(row.get('llm_baseline_summary', '요약 정보 없음'))
+    #             report_url = safe_text(row.get('report_source_url', ''))
+    #             lines.append(
+    #                 f"\n     📍 {city_name:15s} | 지수={row['conflict_index']:>6.0f} | 표준오차={row['innov_z']:>5.1f}"
+    #             )
+    #             lines.append(f"     📌 전황: {summary}")
+    #             if report_url:
+    #                 lines.append(f"     🔗 기사: {report_url}")
 
     lines.append(f"\n{'═'*85}\n")
     return '\n'.join(lines)
@@ -284,15 +283,18 @@ def save_result(anomalies: pd.DataFrame, target_date: str):
         (pd.to_numeric(alerts['conflict_index'], errors='coerce').fillna(0.0) >= REPORT_MIN_CONFLICT_INDEX)
         & (pd.to_numeric(alerts['innov_z'], errors='coerce').fillna(0.0) >= REPORT_MIN_INNOV_Z)
     )
-    actionable_alerts = (
-        alerts.loc[score_mask & alerts['llm_actionability'].eq('actionable')]
-        .sort_values(['innov_z', 'conflict_index'], ascending=[False, False])
-        .head(REPORT_MAX_ALERTS)
-        .copy()
-    )
+    def _composite(df: pd.DataFrame) -> pd.Series:
+        ci = pd.to_numeric(df['conflict_index'], errors='coerce').fillna(0.0)
+        z  = pd.to_numeric(df['innov_z'], errors='coerce').fillna(0.0)
+        return ci * z.apply(lambda v: math.log1p(max(v, 0)))
+
+    _act = alerts.loc[score_mask & alerts['llm_actionability'].eq('actionable')].copy()
+    _act['composite_score'] = _composite(_act)
+    actionable_alerts = _act.sort_values('composite_score', ascending=False).head(REPORT_MAX_ALERTS).copy()
+
     suppressed_alerts = (
         alerts.loc[score_mask & ~alerts['llm_actionability'].eq('actionable')]
-        .sort_values(['innov_z', 'conflict_index'], ascending=[False, False])
+        .sort_values(['conflict_index', 'innov_z'], ascending=[False, False])
         .copy()
     )
 
@@ -314,11 +316,13 @@ def save_result(anomalies: pd.DataFrame, target_date: str):
         },
         'alerts': [
             {
+                'priority': rank,
                 'city': r['city'],
                 'risk_level': int(r['risk_level']),
                 'risk_label': r['risk_label'],
                 'conflict_index': round(float(r['conflict_index']), 1),
                 'innovation_z': round(float(r['innov_z']), 2),
+                'composite_score': round(float(r.get('composite_score', 0)), 1),
                 'guide': r['risk_guide'],
                 'events': int(r['events']),
                 'lat': None if pd.isna(r.get('lat')) else round(float(r.get('lat')), 4),
@@ -342,7 +346,7 @@ def save_result(anomalies: pd.DataFrame, target_date: str):
                 'llm_evidence_span': safe_json_text(r.get('llm_evidence_span', '')),
                 'llm_target_category': safe_json_text(r.get('llm_target_category', '')),
                 'llm_keep': bool(r.get('llm_keep', True)),
-            } for _, r in actionable_alerts.iterrows()
+            } for rank, (_, r) in enumerate(actionable_alerts.iterrows(), 1)
         ],
         'summary': [
             {
@@ -418,7 +422,6 @@ def run_single_day(target_date: str, fetch: bool = False, use_llm: bool = False)
     report = format_report(results, target_date)
     print(report)
     save_result(results, target_date)
-
 
 
 def run_backtest():

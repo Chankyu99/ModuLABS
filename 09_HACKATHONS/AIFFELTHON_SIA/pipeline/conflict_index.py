@@ -8,6 +8,7 @@ SIA 갈등 지수 산출 및 이상 징후 탐지 엔진 (칼만 필터 기반)
 
 import numpy as np
 import pandas as pd
+from concurrent.futures import ThreadPoolExecutor
 from pipeline.city_utils import canonicalize_city_by_feature_id, normalize_city_name
 from pipeline.config import (
     tone_weight, source_count_weight, ACTION_GEO_ALLOWED_COUNTRIES, CONFIRMED_CODES, MONITORED_COUNTRIES,
@@ -90,32 +91,39 @@ def compute_conflict_index(df: pd.DataFrame) -> pd.DataFrame:
         .reset_index()
     )
 
-    # 빈 날짜를 I=0으로 채워 연속 일자 시계열 보장
-    # 각 도시의 첫 등장~마지막 날짜 범위만 채움
-    filled_parts = []
-    for city, grp in agg.groupby('city'):
-        city_country = grp['country_code'].dropna().iloc[0] if grp['country_code'].notna().any() else ''
-        city_lat = float(grp['lat'].dropna().median()) if grp['lat'].notna().any() else np.nan
-        city_lon = float(grp['lon'].dropna().median()) if grp['lon'].notna().any() else np.nan
-        city_dates = pd.date_range(
-            start=pd.to_datetime(grp['date'].min(), format='%Y%m%d'),
-            end=pd.to_datetime(grp['date'].max(), format='%Y%m%d'),
-            freq='D'
-        ).strftime('%Y%m%d')
-        
-        grp_idx = grp.set_index('date').reindex(city_dates)
-        grp_idx['city'] = city
-        grp_idx['country_code'] = grp_idx['country_code'].fillna(city_country)
-        grp_idx['lat'] = grp_idx['lat'].fillna(city_lat)
-        grp_idx['lon'] = grp_idx['lon'].fillna(city_lon)
-        grp_idx['conflict_index'] = grp_idx['conflict_index'].fillna(0.0)
-        grp_idx['events'] = grp_idx['events'].fillna(0).astype(int)
-        grp_idx['mentions'] = grp_idx['mentions'].fillna(0).astype(int)
-        grp_idx['avg_tone'] = grp_idx['avg_tone'].fillna(0.0)
-        grp_idx.index.name = 'date'
-        filled_parts.append(grp_idx.reset_index())
+    # 도시별 메타 정보 및 날짜 범위를 한 번에 집계
+    city_meta = agg.groupby('city').agg(
+        country_code=('country_code', 'first'),
+        lat=('lat', 'median'),
+        lon=('lon', 'median'),
+        date_min=('date', 'min'),
+        date_max=('date', 'max'),
+    ).reset_index()
 
-    result = pd.concat(filled_parts, ignore_index=True)
+    # 도시별 날짜 범위만 grid로 확장 (전체 cartesian product 방지)
+    grid = pd.concat([
+        pd.DataFrame({
+            'date': pd.date_range(r.date_min, r.date_max, freq='D').strftime('%Y%m%d').tolist(),
+            'city': r.city,
+        })
+        for r in city_meta.itertuples()
+    ], ignore_index=True)
+
+    # merge로 빈 날짜 채우기 (loop 제거)
+    result = grid.merge(agg, on=['city', 'date'], how='left')
+    result = result.merge(
+        city_meta[['city', 'country_code', 'lat', 'lon']],
+        on='city', how='left', suffixes=('', '_meta'),
+    )
+    result['conflict_index'] = result['conflict_index'].fillna(0.0)
+    result['events']         = result['events'].fillna(0).astype(int)
+    result['mentions']       = result['mentions'].fillna(0).astype(int)
+    result['avg_tone']       = result['avg_tone'].fillna(0.0)
+    result['country_code']   = result['country_code'].fillna(result['country_code_meta'])
+    result['lat']            = result['lat'].fillna(result['lat_meta'])
+    result['lon']            = result['lon'].fillna(result['lon_meta'])
+    result = result.drop(columns=['country_code_meta', 'lat_meta', 'lon_meta'])
+
     return result.sort_values(['date', 'city']).reset_index(drop=True)
 
 
@@ -170,36 +178,42 @@ def kalman_innovation(signal: np.ndarray,
 
 # ─── 3. 종합 이상 징후 탐지 ───────────────────────────────
 
+def _process_city_kalman(args: tuple) -> pd.DataFrame | None:
+    """도시 하나에 대해 칼만 필터 + 리스크 분류를 수행 (병렬 실행 단위)."""
+    city, group = args
+    group = group.sort_values('date').reset_index(drop=True)
+    signal = group['conflict_index'].values.astype(float)
+
+    if len(signal) < MIN_HISTORY:
+        return None
+
+    kf = kalman_innovation(signal)
+
+    group = group.copy()
+    group['kalman_est'] = kf['estimate']
+    group['innovation'] = kf['innovation']
+    group['innov_z']    = kf['norm_innov']
+
+    risk_info          = group['innov_z'].apply(get_risk_level)
+    group['risk_level'] = risk_info.apply(lambda x: x['level'])
+    group['risk_label'] = risk_info.apply(lambda x: x['label'])
+    group['risk_emoji'] = risk_info.apply(lambda x: x['emoji'])
+    group['risk_guide'] = risk_info.apply(lambda x: x['guide'])
+    group['is_anomaly'] = group['risk_level'] >= 1
+
+    return group
+
+
 def detect_anomalies(city_daily: pd.DataFrame,
                      target_date: str = None) -> pd.DataFrame:
     """
     집계된 갈등 지수 데이터를 처리하여 이상 징후와 리스크 레벨을 매칭.
-    칼만 필터 Z-Score 단독으로 판정.
+    칼만 필터 Z-Score 단독으로 판정. 도시별 처리를 ThreadPoolExecutor로 병렬화.
     """
-    results = []
+    city_groups = list(city_daily.groupby('city'))
 
-    for city, group in city_daily.groupby('city'):
-        group = group.sort_values('date').reset_index(drop=True)
-        signal = group['conflict_index'].values.astype(float)
-
-        if len(signal) < MIN_HISTORY:
-            continue
-
-        kf = kalman_innovation(signal)
-
-        group = group.copy()
-        group['kalman_est'] = kf['estimate']
-        group['innovation'] = kf['innovation']
-        group['innov_z'] = kf['norm_innov']
-
-        risk_info = group['innov_z'].apply(get_risk_level)
-        group['risk_level']  = risk_info.apply(lambda x: x['level'])
-        group['risk_label']  = risk_info.apply(lambda x: x['label'])
-        group['risk_emoji']  = risk_info.apply(lambda x: x['emoji'])
-        group['risk_guide']  = risk_info.apply(lambda x: x['guide'])
-        group['is_anomaly']  = group['risk_level'] >= 1
-
-        results.append(group)
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        results = [r for r in executor.map(_process_city_kalman, city_groups) if r is not None]
 
     if not results:
         return pd.DataFrame()

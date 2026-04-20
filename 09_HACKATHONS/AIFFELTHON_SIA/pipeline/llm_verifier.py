@@ -16,121 +16,29 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
-import numpy as np
+import threading
 import pandas as pd
 import requests
 import trafilatura
 from bs4 import BeautifulSoup
 from google import genai
 from newspaper import Article as NewspaperArticle
-# 병렬 처리를 위한 라이브러리
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from pipeline.city_utils import normalize_city_key, normalize_city_name
 from pipeline.config import (
     CITY_BLACKLIST,
-    LLM_ALLOW_SINGLE_ARTICLE_EXACT,
-    LLM_ALLOW_ROI_PRIOR_SINGLE_SUPPORT,
-    LLM_ALLOW_STRATEGIC_SINGLE_SUPPORT,
-    LLM_CONFIDENCE_THRESHOLD,
-    LLM_MIN_EXACT_SUPPORT,
-    LLM_MODELS,
     LLM_PREFETCH_URLS,
-    ROI_CITIES,
-    LLM_STRATEGIC_KEYWORDS,
     LLM_TOP_K_URLS,
     LLM_TOP_N,
 )
 
 
-REQUEST_TIMEOUT = 7
+REQUEST_TIMEOUT = 4
+_cache_lock = threading.Lock()
 MAX_BODY_CHARS = 4000
 MAX_ARTICLES_PER_CANDIDATE = max(1, LLM_TOP_K_URLS)
 MAX_PREFETCH_URLS = max(MAX_ARTICLES_PER_CANDIDATE, LLM_PREFETCH_URLS)
-MODEL_CANDIDATES = list(dict.fromkeys([*LLM_MODELS, "gemini-2.5-flash"]))
-ROI_CITY_KEYS = {normalize_city_key(city) for city in ROI_CITIES}
-
-INVALID_LOCATION_TYPES = {
-    "province_only",
-    "country_only",
-    "region_only",
-    "org_not_city",
-    "weapon_not_city",
-    "actor_home_city",
-}
-VALID_LOCATION_TYPES = {"exact_city", "nearby_city"}
-
-SCHEMA: dict[str, Any] = {
-    "type": "object",
-    "additionalProperties": False,
-    "required": [
-        "is_relevant_event",
-        "location_validation",
-        "resolved_location",
-        "confidence",
-        "reason",
-        "event_summary_ko",
-        "imagery_need_ko",
-        "city_explicitly_mentioned",
-        "attack_explicitly_mentioned",
-        "target_explicitly_mentioned",
-        "strategic_target",
-        "target_category",
-        "evidence_span",
-    ],
-    "properties": {
-        "is_relevant_event": {"type": "boolean"},
-        "location_validation": {
-            "type": "string",
-            "enum": sorted(
-                VALID_LOCATION_TYPES
-                | INVALID_LOCATION_TYPES
-                | {"unclear"}
-            ),
-        },
-        "resolved_location": {"type": "string"},
-        "confidence": {
-            "type": "number",
-            "minimum": 0.0,
-            "maximum": 1.0,
-        },
-        "reason": {"type": "string"},
-        "event_summary_ko": {"type": "string"},
-        "imagery_need_ko": {"type": "string"},
-        "city_explicitly_mentioned": {"type": "boolean"},
-        "attack_explicitly_mentioned": {"type": "boolean"},
-        "target_explicitly_mentioned": {"type": "boolean"},
-        "strategic_target": {"type": "boolean"},
-        "target_category": {"type": "string"},
-        "evidence_span": {"type": "string"},
-    },
-}
-
-SYSTEM_PROMPT = """You validate whether a GDELT candidate city is the true operational event location for satellite tasking.
-
-Decide whether the candidate city is:
-- the exact attacked / incident city,
-- a nearby city in the same metro or operational area,
-- only a province / region / country level mention,
-- an organization / weapon / actor name incorrectly treated as a city,
-- or unclear.
-
-Rules:
-- Prefer the actual attacked or incident location over the actor's home country.
-- If the article only mentions a country or wide region, do not invent a city.
-- "nearby_city" is allowed only when the article clearly points to the same operational area or adjacent city.
-- If evidence is weak, return "unclear" with lower confidence instead of guessing.
-- city_explicitly_mentioned should be true only when the article directly names the candidate or resolved city.
-- attack_explicitly_mentioned should be true only when the article explicitly describes a strike / attack / blast / bombardment / interception / impact in that location.
-- target_explicitly_mentioned should be true only when the article explicitly mentions the attacked facility, base, airport, port, bridge, plant, or other target in that location.
-- strategic_target should be true only when the attacked target is a strategic military / nuclear / energy / port / airport / industrial facility worth satellite imaging.
-- target_category should be a short label like airport, missile_base, refinery, nuclear_site, port, bridge, industrial_plant, residential_area, media_building, other.
-- evidence_span should be a short quoted-like phrase or paraphrased snippet from the article showing the strongest evidence.
-- Write event_summary_ko in Korean as one short sentence describing what happened in this location.
-- Write imagery_need_ko in Korean as one short sentence describing why satellite imagery would be useful here.
-- If evidence is weak or the location is invalid, still write concise Korean strings that explain the uncertainty or why imagery is low value.
-- Return JSON only.
-"""
 
 
 @dataclass
@@ -351,19 +259,9 @@ def fetch_article(url: str) -> Article | None:
 
     return Article(url=url, title=title, source=source, published_utc=published, body=body)
 
-
-def build_article_bundle(articles: list[Article]) -> str:
-    chunks = []
-    for idx, article in enumerate(articles, start=1):
-        chunks.append(
-            f"""[Article {idx}]
-source: {article.source}
-url: {article.url}
-published_utc: {article.published_utc}
-title: {article.title}
-body: {article.body}"""
-        )
-    return "\n\n".join(chunks)
+# Legacy helper disabled: used by the old structured per-article verifier.
+# def build_article_bundle(articles: list[Article]) -> str:
+#     ...
 
 
 def _candidate_city_variants(city: str) -> set[str]:
@@ -378,76 +276,6 @@ def _candidate_city_variants(city: str) -> set[str]:
         norm.lower(),
     }
     return {clean_text(v).lower() for v in variants if clean_text(v)}
-
-
-def _article_city_score(article: Article, candidate_city: str) -> int:
-    text = " ".join([article.title or "", article.body or ""]).lower()
-    score = 0
-    for variant in _candidate_city_variants(candidate_city):
-        if not variant:
-            continue
-        if variant in text:
-            score += 3
-        compact = re.sub(r"[^a-z0-9]+", "", variant)
-        text_compact = re.sub(r"[^a-z0-9]+", "", text)
-        if compact and compact in text_compact:
-            score += 1
-    return score
-
-
-def _article_target_score(article: Article) -> int:
-    text = " ".join([article.title or "", article.body or ""]).lower()
-    score = 0
-    for keyword in LLM_STRATEGIC_KEYWORDS:
-        if keyword in text:
-            score += 2
-    return score
-
-
-def call_gemini(client: genai.Client, candidate_meta: dict[str, Any], article: Article) -> dict[str, Any]:
-    prompt = f"""Validate this single article for operational satellite tasking.
-
-Candidate metadata:
-- candidate_city: {candidate_meta.get('city')}
-- date: {candidate_meta.get('date')}
-- conflict_index: {candidate_meta.get('conflict_index')}
-- innovation_z: {candidate_meta.get('innov_z')}
-- events: {candidate_meta.get('events')}
-- candidate_lat: {candidate_meta.get('lat')}
-- candidate_lon: {candidate_meta.get('lon')}
-- actor_countries: {candidate_meta.get('actor_countries')}
-- event_codes: {candidate_meta.get('event_codes')}
-
-Article:
-{build_article_bundle([article])}
-"""
-
-    last_error: Exception | None = None
-    for model_name in MODEL_CANDIDATES:
-        try:
-            response = client.models.generate_content(
-                model=model_name,
-                contents=prompt,
-                config={
-                    "system_instruction": SYSTEM_PROMPT,
-                    "response_mime_type": "application/json",
-                    "response_json_schema": SCHEMA,
-                    "temperature": 0.1,
-                    "thinking_config": {"thinking_budget": 0},
-                },
-            )
-            text = getattr(response, "text", None)
-            if not text:
-                raise RuntimeError("empty Gemini response")
-            return json.loads(text)
-        except Exception as exc:
-            last_error = exc
-            time.sleep(1)
-
-    if last_error is None:
-        raise RuntimeError("all Gemini models failed")
-    raise last_error
-
 
 def extract_relevant_context(text: str, target_city: str) -> str:
     """파이썬 단계에서 기사 본문을 자르되, 못 찾으면 원문의 앞부분이라도 반환합니다."""
@@ -481,9 +309,8 @@ def build_gemini_prompt(target_city: str, articles_data: list, target_date: str)
     for idx, data in enumerate(articles_data, 1):
         articles_context += f"\n[Article {idx}]\nContent: {data['text']}\n"
 
-    # DATE_MISMATCH 관련 로직을 모두 삭제하고, 타격 여부(SUCCESS, AMBIGUOUS, DROPPED)에만 집중하도록 프롬프트 최적화
     return f"""
-    [Task] Evaluate military/conflict status for [{target_city}].
+    [Task] Evaluate military/conflict status for [{target_city}] on {target_date}.
     [Context] Read the provided text chunks. Ignore external metadata. Datelines (reporter locations) are not conflict zones.
 
     [Input]
@@ -492,15 +319,17 @@ def build_gemini_prompt(target_city: str, articles_data: list, target_date: str)
     [Definitions for Status]
     SUCCESS: Direct military attack or physical conflict explicitly occurred IN or ON [{target_city}].
     AMBIGUOUS: [{target_city}] is under indirect military tension (e.g., air raid sirens, evacuations, staging area) without direct strikes.
-    DROPPED: [{target_city}] is merely a dateline, not the target, or the text completely lacks evidence of an attack.
+    DATE_MISMATCH: The event matches the location, but clearly occurred in the past (e.g., 'last year', 'last June').
+    DROPPED: [{target_city}] is merely a dateline, not the target, or the text lacks evidence.
 
     [Instructions for Message]
     If Status is SUCCESS or AMBIGUOUS: Write a 1-line summary specifying WHO did WHAT to WHOM in Korean.
-    If Status is DROPPED: Write a 1-line reason explaining why it was rejected in Korean.
+    If Status is DATE_MISMATCH or DROPPED: Write a 1-line reason explaining why it was rejected in Korean.
+    Return the status token exactly as one of: SUCCESS, AMBIGUOUS, DATE_MISMATCH, DROPPED.
 
     [JSON Schema]
     {{
-        "status": "SUCCESS" | "AMBIGUOUS" | "DROPPED",
+        "status": "SUCCESS" | "AMBIGUOUS" | "DATE_MISMATCH" | "DROPPED",
         "message": "Output the summary or rejection reason here based on the status"
     }}
     """
@@ -571,28 +400,7 @@ def _select_candidate_urls(raw_events: pd.DataFrame) -> tuple[list[str], dict[st
         if len(urls) >= MAX_PREFETCH_URLS:
             break
 
-    event_codes = (
-        ranked["EventCode"]
-        .dropna()
-        .astype(int)
-        .astype(str)
-        .head(8)
-        .tolist()
-    )
-    actor_countries = sorted(
-        {
-            str(value)
-            for col in ["Actor1CountryCode", "Actor2CountryCode"]
-            if col in ranked.columns
-            for value in ranked[col].dropna().astype(str).tolist()
-            if value and value != "nan"
-        }
-    )
-
-    meta = {
-        "event_codes": event_codes,
-        "actor_countries": actor_countries,
-    }
+    meta = {}
     # URL slug 자체에 도시명이 있으면 약간 우선순위를 준다.
     urls = sorted(
         urls,
@@ -604,149 +412,6 @@ def _select_candidate_urls(raw_events: pd.DataFrame) -> tuple[list[str], dict[st
 
     return urls, meta
 
-
-def _is_strong_exact(output: dict[str, Any]) -> bool:
-    return (
-        bool(output.get("is_relevant_event", True))
-        and str(output.get("location_validation", "") or "") == "exact_city"
-        and bool(output.get("city_explicitly_mentioned", False))
-        and bool(output.get("attack_explicitly_mentioned", False))
-    )
-
-
-def _is_strong_nearby(output: dict[str, Any]) -> bool:
-    return (
-        bool(output.get("is_relevant_event", True))
-        and str(output.get("location_validation", "") or "") == "nearby_city"
-        and bool(output.get("city_explicitly_mentioned", False))
-        and bool(output.get("attack_explicitly_mentioned", False))
-    )
-
-
-def _is_strong_invalid(output: dict[str, Any]) -> bool:
-    return (
-        str(output.get("location_validation", "") or "") in INVALID_LOCATION_TYPES
-        and (
-            bool(output.get("city_explicitly_mentioned", False))
-            or bool(output.get("attack_explicitly_mentioned", False))
-            or float(output.get("confidence", 0.0) or 0.0) >= LLM_CONFIDENCE_THRESHOLD
-        )
-    )
-
-
-def _is_strategic_supported(output: dict[str, Any]) -> bool:
-    validation = str(output.get("location_validation", "") or "")
-    return (
-        bool(output.get("is_relevant_event", True))
-        and bool(output.get("strategic_target", False))
-        and bool(output.get("attack_explicitly_mentioned", False))
-        and bool(output.get("target_explicitly_mentioned", False))
-        and validation in VALID_LOCATION_TYPES
-    )
-
-
-def _is_roi_prior_supported(output: dict[str, Any], row: pd.Series) -> bool:
-    city_key = normalize_city_key(row.get("city", ""))
-    validation = str(output.get("location_validation", "") or "")
-    if city_key not in ROI_CITY_KEYS:
-        return False
-    return (
-        bool(output.get("is_relevant_event", True))
-        and validation in VALID_LOCATION_TYPES
-        and bool(output.get("attack_explicitly_mentioned", False))
-        and (
-            bool(output.get("city_explicitly_mentioned", False))
-            or bool(output.get("target_explicitly_mentioned", False))
-        )
-    )
-
-
-def _aggregate_article_outputs(article_outputs: list[dict[str, Any]], row: pd.Series) -> dict[str, Any]:
-    if not article_outputs:
-        return {
-            "llm_keep": True,
-            "llm_actionability": "unverified",
-            "llm_validation_type": "unverified",
-            "llm_confidence": -1.0,
-            "llm_reason": "LLM 검증용 기사 본문을 확보하지 못해 원본 후보를 유지했습니다.",
-            "llm_resolved_city": str(row["city"]),
-            "llm_event_summary": "",
-            "llm_imagery_need": "",
-            "llm_article_count": 0,
-            "llm_exact_support": 0,
-            "llm_nearby_support": 0,
-            "llm_invalid_support": 0,
-            "llm_unclear_count": 0,
-            "llm_evidence_span": "",
-            "llm_article_outputs": "[]",
-        }
-
-    exact_outputs = [o for o in article_outputs if _is_strong_exact(o)]
-    nearby_outputs = [o for o in article_outputs if _is_strong_nearby(o)]
-    invalid_outputs = [o for o in article_outputs if _is_strong_invalid(o)]
-    unclear_outputs = [o for o in article_outputs if str(o.get("location_validation", "") or "") == "unclear"]
-    strategic_outputs = [o for o in article_outputs if _is_strategic_supported(o)]
-    roi_prior_outputs = [o for o in article_outputs if _is_roi_prior_supported(o, row)]
-
-    actionable = False
-    if len(exact_outputs) >= LLM_MIN_EXACT_SUPPORT:
-        actionable = True
-    elif LLM_ALLOW_SINGLE_ARTICLE_EXACT and len(article_outputs) == 1 and len(exact_outputs) == 1:
-        actionable = True
-    elif len(exact_outputs) >= 1 and len(nearby_outputs) >= 1:
-        actionable = True
-    elif LLM_ALLOW_STRATEGIC_SINGLE_SUPPORT and len(strategic_outputs) >= 1:
-        actionable = True
-    elif LLM_ALLOW_ROI_PRIOR_SINGLE_SUPPORT and len(roi_prior_outputs) >= 1:
-        actionable = True
-
-    if actionable:
-        if strategic_outputs:
-            representative = strategic_outputs[0]
-        elif roi_prior_outputs:
-            representative = roi_prior_outputs[0]
-        elif exact_outputs:
-            representative = exact_outputs[0]
-        else:
-            representative = nearby_outputs[0]
-        actionability = "actionable"
-        keep = True
-        validation_type = str(representative.get("location_validation", "exact_city"))
-    elif len(invalid_outputs) >= max(1, len(article_outputs) // 2 + len(article_outputs) % 2) and not exact_outputs and not nearby_outputs:
-        representative = invalid_outputs[0]
-        actionability = "discard"
-        keep = False
-        validation_type = str(representative.get("location_validation", "discard"))
-    else:
-        representative = exact_outputs[0] if exact_outputs else (nearby_outputs[0] if nearby_outputs else article_outputs[0])
-        actionability = "suppress"
-        keep = True
-        validation_type = str(representative.get("location_validation", "unclear"))
-
-    mean_conf = float(np.mean([float(o.get("confidence", 0.0) or 0.0) for o in article_outputs])) if article_outputs else -1.0
-    resolved_city = normalize_city_name(representative.get("resolved_location") or row["city"])
-    evidence_span = str(representative.get("evidence_span", "") or "").strip()
-
-    return {
-        "llm_keep": keep,
-        "llm_actionability": actionability,
-        "llm_validation_type": validation_type,
-        "llm_confidence": mean_conf,
-        "llm_reason": str(representative.get("reason", "") or "").strip(),
-        "llm_resolved_city": resolved_city,
-        "llm_event_summary": str(representative.get("event_summary_ko", "") or "").strip(),
-        "llm_imagery_need": str(representative.get("imagery_need_ko", "") or "").strip(),
-        "llm_article_count": len(article_outputs),
-        "llm_exact_support": len(exact_outputs),
-        "llm_nearby_support": len(nearby_outputs),
-        "llm_invalid_support": len(invalid_outputs),
-        "llm_unclear_count": len(unclear_outputs),
-        "llm_strategic_support": len(strategic_outputs),
-        "llm_roi_prior_support": len(roi_prior_outputs),
-        "llm_evidence_span": evidence_span,
-        "llm_article_outputs": json.dumps(article_outputs, ensure_ascii=False),
-        "llm_target_category": str(representative.get("target_category", "") or "").strip(),
-    }
 
 
 def verify_top_cities(
@@ -801,12 +466,17 @@ def verify_top_cities(
         articles_data = []
 
         def _fetch_single_url(url):
-            if url not in article_cache:
-                article_cache[url] = fetch_article(url)
-            return url, article_cache[url]
+            with _cache_lock:
+                if url in article_cache:
+                    return url, article_cache[url]
+            article = fetch_article(url)
+            with _cache_lock:
+                article_cache[url] = article
+            return url, article
 
-        # URL 동시 접속 (최대 5개까지만 시도하여 속도 최적화)
-        with ThreadPoolExecutor(max_workers=5) as exec_url:
+        # URL 동시 접속 — 2개 확보 즉시 나머지 취소
+        exec_url = ThreadPoolExecutor(max_workers=5)
+        try:
             future_to_url = {exec_url.submit(_fetch_single_url, u): u for u in urls[:5]}
             for future in as_completed(future_to_url):
                 u, article = future.result()
@@ -814,10 +484,10 @@ def verify_top_cities(
                     extracted = extract_relevant_context(article.body, target_city)
                     if extracted:
                         articles_data.append({'text': extracted, 'url': u})
-                
-                # 핵심 기사를 2개 찾으면 조기 종료 (나머지 무시)
                 if len(articles_data) >= 2:
                     break
+        finally:
+            exec_url.shutdown(wait=False, cancel_futures=True)
 
         if not articles_data:
             return idx, {"llm_actionability": "suppress", "llm_reason": "유효한 언급을 포함한 기사 없음", "llm_validation_type": "TEXT_NOT_FOUND"}
@@ -907,12 +577,15 @@ def summarize_baseline_cities(baseline_df: pd.DataFrame, raw_df: pd.DataFrame, u
         urls, _ = _select_candidate_urls(raw_events)
         
         articles_data = []
-        for url in urls[:3]: # 전황 파악은 상위 3개 기사만 가볍게 확인
-            if url not in article_cache:
-                article_cache[url] = fetch_article(url)
-            article = article_cache[url]
-            if article and article.body:
-                extracted = extract_relevant_context(article.body, target_city)
+        for url in urls[:3]:
+            with _cache_lock:
+                cached = article_cache.get(url)
+            if cached is None:
+                cached = fetch_article(url)
+                with _cache_lock:
+                    article_cache[url] = cached
+            if cached and cached.body:
+                extracted = extract_relevant_context(cached.body, target_city)
                 if extracted:
                     articles_data.append({'text': extracted, 'url': url})
         
