@@ -15,6 +15,9 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = PROJECT_ROOT / "data" / "daily"
 OUTPUT_DIR = PROJECT_ROOT / "output"
 PARQUET_PATH = PROJECT_ROOT / "gdelt_main_final.parquet"
+LLM_CACHE_DIR = PROJECT_ROOT / "data" / "llm_cache"
+LLM_CACHE_TTL_DAYS = 7          # 캐시 자동 만료 기간 (일)
+LLM_PROMPT_VERSION = "v1"       # 프롬프트 변경 시 수동으로 올려 캐시 무효화
 
 # 2. 데이터 필터링 조건
 
@@ -54,8 +57,7 @@ ACTION_GEO_ALLOWED_COUNTRIES = [
 ]
 
 # 3. 갈등 지수(I) 산출 로직
-#
-# 로지스틱 회귀로 도출한 per-event 가중치 (PDF "칼만 필터 성능 검증" §8 기준).
+# 로지스틱 회귀로 도출한 per-event 가중치
 # 연속형 변수(log(NumSources), AvgTone, AvgTone², GoldsteinScale)는 StandardScaler로
 # 표준화(Z-score)된 뒤 아래 계수와 곱해진다. EventRootCode는 GoldsteinScale과 1:1
 # 매핑되므로 제외했고, NumMentions는 p-value가 0.05를 넘어 제외했다.
@@ -106,13 +108,9 @@ KALMAN_MIN_INIT_VAR = 1.0  # 초기 분산 하한선 (0 채우기 시 노이즈 
 # 5. 리스크 레벨 및 대응 가이드
 MIN_HISTORY = 30  # 칼만 필터 안정화를 위한 최소 관측 일수
 
-# 6. LLM 게이트키퍼 설정
-LLM_MODELS = [
-    "gemini-2.5-flash-preview",     # 속도+정확도 균형 (thinking 없이 빠른 응답)
-]
+
 LLM_TOP_N = 20          # 정밀 출력 후보(10~15개)를 충분히 커버하기 위한 상위 도시 수
 LLM_TOP_K_URLS = 5      # 도시당 초기 검증 기사 수
-LLM_CONFIDENCE_THRESHOLD = 0.3  # 이 이하면 신뢰도 낮음 표시
 LLM_PREFETCH_URLS = 8   # 후보당 먼저 가져와 볼 기사 수
 LLM_MIN_EXACT_SUPPORT = 2  # actionable 판정을 위한 최소 exact-city 기사 수
 LLM_ALLOW_SINGLE_ARTICLE_EXACT = True  # 기사 1건만 확보된 경우 exact-city면 통과 허용
@@ -148,8 +146,8 @@ LLM_STRATEGIC_KEYWORDS = [
 
 # Precision 우선 출력 정책
 REPORT_MAX_ALERTS = 15
-REPORT_MIN_CONFLICT_INDEX = 5.0
-REPORT_MIN_INNOV_Z = 3.0
+REPORT_MIN_CONFLICT_INDEX = 3.0
+REPORT_MIN_INNOV_Z = 1.5
 
 # 7. 지오코딩 블랙리스트 (조직명/무기명/지명 오류) -- 테스트 과정에서 잡히는 단어들 실시간 추가
 CITY_BLACKLIST = {
@@ -165,41 +163,6 @@ CITY_BLACKLIST = {
     'Ministry Of Foreign Affairs' # 외교부
 }
 
-RISK_LEVELS = {
-    3: {
-        'label': '위기 (RED)',
-        'threshold': 3.0,
-        'emoji': '🛑',
-        'guide': '대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.'
-    },
-    2: {
-        'label': '위험 (ORANGE)',
-        'threshold': 2.0,
-        'emoji': '🟠',
-        'guide': '물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.'
-    },
-    1: {
-        'label': '주의 (YELLOW)',
-        'threshold': 1.0,
-        'emoji': '🟡',
-        'guide': '긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.'
-    },
-    0: {
-        'label': '정상 (BLUE)',
-        'threshold': -np.inf,
-        'emoji': '🔵',
-        'guide': '평시 수준의 뉴스 흐름 유지.'
-    }
-}
-
-def get_risk_level(z_score: float) -> dict:
-    """Z-Score에 따른 리스크 등급 정보 반환"""
-    for level in sorted(RISK_LEVELS.keys(), reverse=True):
-        if z_score >= RISK_LEVELS[level]['threshold']:
-            res = RISK_LEVELS[level].copy()
-            res['level'] = level
-            return res
-    return RISK_LEVELS[0]
 
 # 8. Level 2a: 위성 촬영 스케줄 설정
 # 위성 선택 5대 기준: 센서 비율 / 해상도 / 군집 여부 / 데이터 접근성 / 활성 상태

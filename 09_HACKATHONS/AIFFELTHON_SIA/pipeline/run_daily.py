@@ -11,7 +11,6 @@ SIA 갈등 모니터링 파이프라인 - 일별 실행 및 백테스트 엔진
 import argparse
 import json
 import math
-# import sys  # unused
 from datetime import datetime
 from pathlib import Path
 
@@ -20,7 +19,6 @@ import pandas as pd
 from pipeline.city_utils import normalize_city_key
 from pipeline.config import (
     OUTPUT_DIR,
-    # RISK_LEVELS,  # unused
     LLM_ALLOW_STRATEGIC_SINGLE_SUPPORT,
     LLM_ALLOW_ROI_PRIOR_SINGLE_SUPPORT,
     CITY_BLACKLIST,
@@ -32,6 +30,129 @@ from pipeline.config import (
 )
 from pipeline.conflict_index import compute_conflict_index, detect_anomalies
 from pipeline.gdelt_fetcher import load_all_data, fetch_daily
+
+
+def ensure_llm_columns(results: pd.DataFrame) -> pd.DataFrame:
+    """리포트/저장을 위해 필요한 LLM 컬럼의 최소 스키마를 보장한다."""
+    if results.empty:
+        return results.copy()
+
+    normalized = results.copy()
+    defaults = {
+        'llm_confidence': -1.0,
+        'llm_reason': '',
+        'llm_validation_type': '',
+        'llm_semantic_status': '',
+        'llm_infra_status': '',
+        'llm_resolved_city': '',
+        'llm_event_summary': '',
+        'llm_imagery_need': '',
+        'llm_keep': True,
+        'llm_review_needed': False,
+        'llm_actionability': 'actionable',
+        'llm_article_count': 0,
+        'llm_exact_support': 0,
+        'llm_nearby_support': 0,
+        'llm_invalid_support': 0,
+        'llm_unclear_count': 0,
+        'llm_strategic_support': 0,
+        'llm_roi_prior_support': 0,
+        'llm_evidence_span': '',
+        'llm_target_category': '',
+        'llm_article_outputs': '',
+    }
+    for column, default in defaults.items():
+        if column not in normalized.columns:
+            normalized[column] = default
+        else:
+            normalized[column] = normalized[column].fillna(default)
+    return normalized
+
+
+def apply_llm_output_policy(results: pd.DataFrame) -> pd.DataFrame:
+    """LLM 검증 결과를 최종 출력 정책(actionable/review/suppress)으로 변환한다."""
+    if results.empty:
+        return results.copy()
+
+    decided = ensure_llm_columns(results)
+    has_llm_signal = (
+        decided['llm_validation_type'].astype(str).str.strip().ne('').any()
+        or decided['llm_semantic_status'].astype(str).str.strip().ne('').any()
+        or decided['llm_infra_status'].astype(str).str.strip().ne('').any()
+    )
+    if not has_llm_signal:
+        decided['llm_actionability'] = 'actionable'
+        return decided
+
+    semantic = decided['llm_semantic_status'].astype(str).str.upper().str.strip()
+    infra = decided['llm_infra_status'].astype(str).str.upper().str.strip()
+    article_count = pd.to_numeric(decided['llm_article_count'], errors='coerce').fillna(0).astype(int)
+    exact_support = pd.to_numeric(decided['llm_exact_support'], errors='coerce').fillna(0).astype(int)
+    strategic_support = pd.to_numeric(decided['llm_strategic_support'], errors='coerce').fillna(0).astype(int)
+    roi_prior_support = pd.to_numeric(decided['llm_roi_prior_support'], errors='coerce').fillna(0).astype(int)
+
+    actionability: list[str] = []
+    review_needed: list[bool] = []
+    keep_flags: list[bool] = []
+
+    for idx in decided.index:
+        semantic_status = semantic.loc[idx]
+        infra_status = infra.loc[idx]
+        articles = article_count.loc[idx]
+        exact = exact_support.loc[idx]
+        strategic = strategic_support.loc[idx]
+        roi_prior = roi_prior_support.loc[idx]
+
+        has_single_exact = (
+            LLM_ALLOW_SINGLE_ARTICLE_EXACT
+            and articles == 1
+            and exact >= 1
+        )
+        has_strategic_override = (
+            LLM_ALLOW_STRATEGIC_SINGLE_SUPPORT
+            and strategic >= 1
+        )
+        has_roi_override = (
+            LLM_ALLOW_ROI_PRIOR_SINGLE_SUPPORT
+            and roi_prior >= 1
+        )
+
+        if infra_status and infra_status != 'OK':
+            action = 'review'
+            keep = True
+            review = True
+        elif semantic_status in {'DROPPED', 'DATE_MISMATCH'}:
+            action = 'suppress'
+            keep = False
+            review = False
+        elif semantic_status == 'SUCCESS':
+            passed = (
+                exact >= LLM_MIN_EXACT_SUPPORT
+                or has_single_exact
+                or has_strategic_override
+                or has_roi_override
+            )
+            action = 'actionable' if passed else 'review'
+            keep = True
+            review = action == 'review'
+        elif semantic_status == 'AMBIGUOUS':
+            passed = has_strategic_override or has_roi_override
+            action = 'actionable' if passed else 'review'
+            keep = True
+            review = action == 'review'
+        else:
+            action = 'review'
+            keep = True
+            review = True
+
+        actionability.append(action)
+        keep_flags.append(keep)
+        review_needed.append(review)
+
+    decided['llm_actionability'] = actionability
+    decided['llm_keep'] = keep_flags
+    decided['llm_review_needed'] = review_needed
+    return decided
 
 
 def filter_blacklist(results: pd.DataFrame) -> pd.DataFrame:
@@ -137,8 +258,7 @@ def format_report(anomalies: pd.DataFrame, target_date: str) -> str:
         return '\n'.join(lines)
 
     alerts = today[today['is_anomaly'] == True].copy()
-    # normals = today[today['is_anomaly'] == False]  # unused: Track 2 block is currently disabled
-
+    
     def safe_text(value, default: str = "") -> str:
         if pd.isna(value):
             return default
@@ -158,11 +278,8 @@ def format_report(anomalies: pd.DataFrame, target_date: str) -> str:
             return imagery
         return safe_text(row.get('risk_guide', ''), "사건 핵심 요약을 추가 검토해야 합니다.")
 
-    default_actionability = 'suppress' if 'llm_actionability' in alerts.columns else 'actionable'
-    alerts['llm_actionability'] = alerts.get(
-        'llm_actionability',
-        pd.Series(default_actionability, index=alerts.index),
-    ).fillna(default_actionability).astype(str)
+    alerts = ensure_llm_columns(alerts)
+    alerts['llm_actionability'] = alerts['llm_actionability'].astype(str)
 
     score_mask = (
         (pd.to_numeric(alerts['conflict_index'], errors='coerce').fillna(0.0) >= REPORT_MIN_CONFLICT_INDEX)
@@ -174,7 +291,8 @@ def format_report(anomalies: pd.DataFrame, target_date: str) -> str:
         * _cands['innov_z'].apply(lambda z: math.log1p(max(float(z), 0)))
     )
     actionable_alerts = _cands.sort_values('composite_score', ascending=False).head(REPORT_MAX_ALERTS).copy()
-    suppressed_count = int((score_mask & ~alerts['llm_actionability'].eq('actionable')).sum())
+    review_alerts = alerts.loc[score_mask & alerts['llm_actionability'].eq('review')].sort_values('innov_z', ascending=False).copy()
+    suppressed_alerts = alerts.loc[score_mask & alerts['llm_actionability'].eq('suppress')].sort_values('innov_z', ascending=False).copy()
 
     lines.append(f"\n  🎯 [촬영이 필요한 도시 후보 선정 기준]")
     lines.append(f"    - 갈등 지수가 {REPORT_MIN_CONFLICT_INDEX:.0f} 이상이며, 평소 대비 보도량이 폭증(Z-score {REPORT_MIN_INNOV_Z:.1f} 이상)한 지역")
@@ -219,17 +337,23 @@ def format_report(anomalies: pd.DataFrame, target_date: str) -> str:
     else:
         lines.append(f"\n  ✅ 촬영이 필요한 도시 후보 없음 (현재 조건 기준)")
 
-    if suppressed_count > 0:
-        lines.append(f"\n 👤 분석관의 판단이 필요한 도시 후보 : {suppressed_count}개")
-
-        suppressed_alerts = alerts.loc[score_mask & ~alerts['llm_actionability'].eq('actionable')].sort_values('innov_z', ascending=False)
-        for _, row in suppressed_alerts.iterrows():
+    if not review_alerts.empty:
+        lines.append(f"\n 👤 분석관의 판단이 필요한 도시 후보 : {len(review_alerts)}개")
+        for _, row in review_alerts.iterrows():
             city_name = str(row['city']).split(',')[0][:15]
             z_score = float(row['innov_z'])
             reason = str(row.get('llm_reason', '사유 없음')).replace('\n', ' ')[:60]
             val_type = str(row.get('llm_validation_type', ''))
 
             lines.append(f"     - {city_name:15s} | Z={z_score:>5.1f} | [{val_type}] {reason}...")
+
+    if not suppressed_alerts.empty:
+        lines.append(f"\n  ⛔ 자동 제외된 도시 후보 : {len(suppressed_alerts)}개")
+        for _, row in suppressed_alerts.head(10).iterrows():
+            city_name = str(row['city']).split(',')[0][:15]
+            reason = str(row.get('llm_reason', '사유 없음')).replace('\n', ' ')[:60]
+            val_type = str(row.get('llm_validation_type', ''))
+            lines.append(f"     - {city_name:15s} | [{val_type}] {reason}...")
 
 
     # if not normals.empty:
@@ -273,11 +397,8 @@ def save_result(anomalies: pd.DataFrame, target_date: str):
         text = str(value)
         return "" if text.lower() == "nan" else text
 
-    default_actionability = 'suppress' if 'llm_actionability' in alerts.columns else 'actionable'
-    alerts['llm_actionability'] = alerts.get(
-        'llm_actionability',
-        pd.Series(default_actionability, index=alerts.index),
-    ).fillna(default_actionability).astype(str)
+    alerts = ensure_llm_columns(alerts)
+    alerts['llm_actionability'] = alerts['llm_actionability'].astype(str)
 
     score_mask = (
         (pd.to_numeric(alerts['conflict_index'], errors='coerce').fillna(0.0) >= REPORT_MIN_CONFLICT_INDEX)
@@ -291,9 +412,14 @@ def save_result(anomalies: pd.DataFrame, target_date: str):
     _act = alerts.loc[score_mask & alerts['llm_actionability'].eq('actionable')].copy()
     _act['composite_score'] = _composite(_act)
     actionable_alerts = _act.sort_values('composite_score', ascending=False).head(REPORT_MAX_ALERTS).copy()
+    review_alerts = (
+        alerts.loc[score_mask & alerts['llm_actionability'].eq('review')]
+        .sort_values(['conflict_index', 'innov_z'], ascending=[False, False])
+        .copy()
+    )
 
     suppressed_alerts = (
-        alerts.loc[score_mask & ~alerts['llm_actionability'].eq('actionable')]
+        alerts.loc[score_mask & alerts['llm_actionability'].eq('suppress')]
         .sort_values(['conflict_index', 'innov_z'], ascending=[False, False])
         .copy()
     )
@@ -304,7 +430,9 @@ def save_result(anomalies: pd.DataFrame, target_date: str):
         'total_cities': len(today),
         'raw_alert_count': len(alerts),
         'alert_count': len(actionable_alerts),
-        'suppressed_count': len(suppressed_alerts),
+        'review_count': len(review_alerts),
+        'hard_suppressed_count': len(suppressed_alerts),
+        'suppressed_count': len(review_alerts) + len(suppressed_alerts),
         'output_policy': {
             'max_alerts': REPORT_MAX_ALERTS,
             'min_conflict_index': REPORT_MIN_CONFLICT_INDEX,
@@ -393,7 +521,7 @@ def run_single_day(target_date: str, fetch: bool = False, use_llm: bool = False)
     # 3. LLM 게이트키퍼 검증
     if use_llm:
         try:
-            from pipeline.llm_verifier import verify_top_cities, summarize_baseline_cities
+            from pipeline.llm_verifier import verify_top_cities
         except ModuleNotFoundError:
             print("  [LLM] 검증 모듈이 없어 LLM 단계는 건너뜁니다.")
             results = filter_blacklist(results)
@@ -402,22 +530,12 @@ def run_single_day(target_date: str, fetch: bool = False, use_llm: bool = False)
             if url_path.exists():
                 url_df = pd.read_parquet(url_path, columns=['GLOBALEVENTID', 'SOURCEURL'])
                 
-                # --- [수정] Track 1 검증과 Track 2 요약을 각각 실행 ---
-                # Track 1: 이상 징후 (is_anomaly == True)
                 results = verify_top_cities(results, raw, url_df, target_date)
-                
-                # Track 2: 전략 거점 요약 (Z-score 탈락자 중 지수 5000 이상만 추려서 요약)
-                track2_mask = (results['is_anomaly'] == False) & (results['conflict_index'] >= 5000)
-                if track2_mask.any():
-                    track2_df = results[track2_mask].copy()
-                    # 요약 생성 후 원본에 합치기
-                    track2_summarized = summarize_baseline_cities(track2_df, raw, url_df, target_date)
-                    results.loc[track2_mask, 'llm_baseline_summary'] = track2_summarized['llm_baseline_summary']
-                
             else:
                 print("  [LLM] URL 매핑 파일 없음. 블랙리스트만 적용.")
                 results = filter_blacklist(results)
 
+    results = apply_llm_output_policy(results)
     results = attach_report_urls(results, raw, url_df)
     report = format_report(results, target_date)
     print(report)

@@ -7,12 +7,14 @@ LLM 기반 위치 검증기
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import random
 import re
 import time
 from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
@@ -29,17 +31,96 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pipeline.city_utils import normalize_city_key, normalize_city_name
 from pipeline.config import (
     CITY_BLACKLIST,
+    LLM_CACHE_DIR,
+    LLM_CACHE_TTL_DAYS,
     LLM_PREFETCH_URLS,
+    LLM_PROMPT_VERSION,
+    LLM_STRATEGIC_KEYWORDS,
     LLM_TOP_K_URLS,
     LLM_TOP_N,
+    ROI_CITIES,
 )
 
 
 REQUEST_TIMEOUT = 4
 _cache_lock = threading.Lock()
+_llm_cache_lock = threading.Lock()
 MAX_BODY_CHARS = 4000
 MAX_ARTICLES_PER_CANDIDATE = max(1, LLM_TOP_K_URLS)
 MAX_PREFETCH_URLS = max(MAX_ARTICLES_PER_CANDIDATE, LLM_PREFETCH_URLS)
+SUCCESS_STATUSES = {"SUCCESS", "AMBIGUOUS"}
+RETRYABLE_MARKERS = ("503", "UNAVAILABLE", "overloaded", "429", "RESOURCE_EXHAUSTED")
+
+
+def _compute_cache_key(parts: dict[str, Any]) -> str:
+    payload = json.dumps(parts, sort_keys=True, ensure_ascii=False).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _cache_path(key: str) -> Path:
+    return LLM_CACHE_DIR / key[:2] / f"{key}.json"
+
+
+def _load_llm_cache(key: str) -> str | None:
+    path = _cache_path(key)
+    if not path.exists():
+        return None
+    try:
+        with _llm_cache_lock:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        cached_at = datetime.fromisoformat(data["cached_at"])
+        if datetime.now(timezone.utc) - cached_at > timedelta(days=LLM_CACHE_TTL_DAYS):
+            path.unlink(missing_ok=True)
+            return None
+        return data["raw_response"]
+    except (json.JSONDecodeError, KeyError, ValueError):
+        return None
+
+
+def _save_llm_cache(key: str, raw_response: str, parts: dict[str, Any]) -> None:
+    path = _cache_path(key)
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        payload = {
+            "cached_at": datetime.now(timezone.utc).isoformat(),
+            "raw_response": raw_response,
+            **parts,
+        }
+        with _llm_cache_lock:
+            path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    except OSError:
+        pass
+
+
+def _gemini_cached_call(client, model: str, prompt: str, cache_parts: dict[str, Any],
+                       response_config: dict) -> str:
+    """캐시 hit이면 즉시 반환, miss이면 지수 백오프로 재시도 후 저장."""
+    key = _compute_cache_key(cache_parts)
+    cached = _load_llm_cache(key)
+    if cached is not None:
+        return cached
+
+    last_err = None
+    for attempt in range(5):
+        try:
+            response = client.models.generate_content(
+                model=model,
+                contents=prompt,
+                config=response_config,
+            )
+            raw = response.text
+            _save_llm_cache(key, raw, cache_parts)
+            return raw
+        except Exception as e:
+            last_err = e
+            err_text = str(e)
+            is_retryable = any(marker in err_text for marker in RETRYABLE_MARKERS)
+            if is_retryable and attempt < 4:
+                delay = (2 ** attempt) + random.uniform(0, 1)
+                time.sleep(delay)
+                continue
+            raise
+    raise RuntimeError(f"LLM 재시도 실패: {last_err}")
 
 
 @dataclass
@@ -260,10 +341,6 @@ def fetch_article(url: str) -> Article | None:
 
     return Article(url=url, title=title, source=source, published_utc=published, body=body)
 
-# Legacy helper disabled: used by the old structured per-article verifier.
-# def build_article_bundle(articles: list[Article]) -> str:
-#     ...
-
 
 def _candidate_city_variants(city: str) -> set[str]:
     raw = str(city).strip()
@@ -280,20 +357,26 @@ def _candidate_city_variants(city: str) -> set[str]:
 
 def extract_relevant_context(text: str, target_city: str) -> str:
     """파이썬 단계에서 기사 본문을 자르되, 못 찾으면 원문의 앞부분이라도 반환합니다."""
-    # "Kuwait City" -> "Kuwait"처럼 첫 단어만 추출하여 검색 조건 완화
-    target_lower = target_city.split()[0].lower()
-    
-    if text.lower().count(target_lower) < 1:
+    variants = _candidate_city_variants(target_city)
+    lowered_text = text.lower()
+
+    if not any(variant in lowered_text for variant in variants):
         # 지명 검색에 실패해도 빈손으로 보내지 않고, 기사 초반 1500자를 던져줍니다.
-        return text[:1500] 
+        return text[:1500]
 
     paragraphs = [p.strip() for p in text.split('\n') if p.strip()]
     if len(paragraphs) > 1:
-        relevant_paras = [p for p in paragraphs if target_lower in p.lower()]
+        relevant_paras = [
+            p for p in paragraphs
+            if any(variant in p.lower() for variant in variants)
+        ]
         return "\n\n".join(relevant_paras[:2]) if relevant_paras else text[:1500]
     else:
         sentences = [s.strip() for s in re.split(r'(?<=[.!?])\s+', text) if s.strip()]
-        found_indices = [i for i, s in enumerate(sentences) if target_lower in s.lower()]
+        found_indices = [
+            i for i, s in enumerate(sentences)
+            if any(variant in s.lower() for variant in variants)
+        ]
         used_indices = set()
         relevant_chunks = []
         for idx in found_indices[:2]:
@@ -334,6 +417,88 @@ def build_gemini_prompt(target_city: str, articles_data: list, target_date: str)
         "message": "Output the summary or rejection reason here based on the status"
     }}
     """
+
+
+def infer_target_category(*texts: str) -> str:
+    """기사/요약 텍스트에서 전략 표적 키워드를 약식 추론한다."""
+    joined = " ".join(clean_text(text).lower() for text in texts if text)
+    if not joined:
+        return ""
+
+    for keyword in LLM_STRATEGIC_KEYWORDS:
+        normalized = keyword.lower()
+        if normalized in joined:
+            return normalized.replace(" ", "_")
+    return ""
+
+
+def build_policy_inputs(
+    target_city: str,
+    articles_data: list[dict[str, str]],
+    semantic_status: str,
+    message: str,
+) -> dict[str, Any]:
+    """LLM 결과를 정책 판단용 정규 필드로 변환한다."""
+    article_count = len(articles_data)
+    city_name = normalize_city_name(target_city)
+    roi_match = city_name in ROI_CITIES
+    article_text = " ".join(item.get("text", "") for item in articles_data)
+    target_category = infer_target_category(message, article_text)
+
+    exact_support = article_count if semantic_status == "SUCCESS" else 0
+    nearby_support = article_count if semantic_status == "AMBIGUOUS" else 0
+    strategic_support = article_count if semantic_status in SUCCESS_STATUSES and target_category else 0
+    roi_prior_support = article_count if semantic_status in SUCCESS_STATUSES and roi_match else 0
+
+    confidence_map = {
+        "SUCCESS": 0.90,
+        "AMBIGUOUS": 0.60,
+        "DATE_MISMATCH": 0.20,
+        "DROPPED": 0.10,
+    }
+
+    return {
+        "llm_confidence": confidence_map.get(semantic_status, -1.0),
+        "llm_semantic_status": semantic_status,
+        "llm_infra_status": "OK",
+        "llm_validation_type": semantic_status,
+        "llm_reason": message,
+        "llm_event_summary": message if semantic_status in SUCCESS_STATUSES else "",
+        "llm_keep": semantic_status not in {"DROPPED", "DATE_MISMATCH"},
+        "llm_review_needed": semantic_status not in {"SUCCESS", "DROPPED", "DATE_MISMATCH"},
+        "llm_article_count": article_count,
+        "llm_exact_support": exact_support,
+        "llm_nearby_support": nearby_support,
+        "llm_invalid_support": 0,
+        "llm_unclear_count": 0,
+        "llm_strategic_support": strategic_support,
+        "llm_roi_prior_support": roi_prior_support,
+        "llm_target_category": target_category,
+        "llm_actionability": "unverified",
+    }
+
+
+def build_infra_failure_result(infra_status: str, reason: str) -> dict[str, Any]:
+    """인프라/수집 실패는 즉시 탈락시키지 않고 review 상태로 보낸다."""
+    return {
+        "llm_confidence": -1.0,
+        "llm_semantic_status": "UNVERIFIED",
+        "llm_infra_status": infra_status,
+        "llm_validation_type": infra_status,
+        "llm_reason": reason,
+        "llm_event_summary": "",
+        "llm_keep": True,
+        "llm_review_needed": True,
+        "llm_article_count": 0,
+        "llm_exact_support": 0,
+        "llm_nearby_support": 0,
+        "llm_invalid_support": 0,
+        "llm_unclear_count": 0,
+        "llm_strategic_support": 0,
+        "llm_roi_prior_support": 0,
+        "llm_target_category": "",
+        "llm_actionability": "review",
+    }
 
 def _filter_blacklist(results: pd.DataFrame) -> pd.DataFrame:
     if results.empty or "city" not in results.columns:
@@ -433,11 +598,13 @@ def verify_top_cities(
     # run_daily.py가 요구하는 기본 컬럼 뼈대 채우기
     defaults = {
         "llm_confidence": -1.0, "llm_reason": "", "llm_validation_type": "",
+        "llm_semantic_status": "", "llm_infra_status": "",
         "llm_resolved_city": "", "llm_event_summary": "", "llm_imagery_need": "",
         "llm_keep": True, "llm_actionability": "unverified", "llm_article_count": 0,
         "llm_exact_support": 0, "llm_nearby_support": 0, "llm_invalid_support": 0,
-        "llm_unclear_count": 0, "llm_strategic_support": 0, "llm_evidence_span": "",
-        "llm_target_category": "", "llm_article_outputs": "",
+        "llm_unclear_count": 0, "llm_strategic_support": 0, "llm_roi_prior_support": 0,
+        "llm_evidence_span": "", "llm_target_category": "", "llm_article_outputs": "",
+        "llm_review_needed": False,
     }
     for col, default in defaults.items():
         if col not in verified.columns:
@@ -491,44 +658,39 @@ def verify_top_cities(
             exec_url.shutdown(wait=False, cancel_futures=True)
 
         if not articles_data:
-            return idx, {"llm_actionability": "suppress", "llm_reason": "유효한 언급을 포함한 기사 없음", "llm_validation_type": "TEXT_NOT_FOUND"}
+            return idx, build_infra_failure_result("TEXT_NOT_FOUND", "유효한 언급을 포함한 기사 없음")
 
-        # 통합 프롬프트로 Gemini에게 1번만 호출
+        # 통합 프롬프트로 Gemini에게 1번만 호출 (캐시 우선 조회)
         prompt = build_gemini_prompt(target_city, articles_data, target_date)
-        # 503/UNAVAILABLE 같은 재시도 가치가 있는 에러만 지수 백오프로 재시도.
-        # 고정 2초 대신 1→2→4→8→16초 + 랜덤 jitter로 서버 과부하 회복 시간 확보.
-        RETRYABLE_MARKERS = ("503", "UNAVAILABLE", "overloaded", "429", "RESOURCE_EXHAUSTED")
-        for attempt in range(5):
-            try:
-                response = client.models.generate_content(
-                    model="gemini-2.5-flash",
-                    contents=prompt,
-                    config={"response_mime_type": "application/json", "temperature": 0.1}
-                )
-                llm_result = json.loads(response.text)
-                status = llm_result.get("status", "ERROR")
-                message = llm_result.get("message", "응답 없음")
+        articles_hash = hashlib.sha256(
+            "".join(a.get("text", "") for a in articles_data).encode("utf-8")
+        ).hexdigest()[:16]
+        cache_parts = {
+            "kind": "verify",
+            "model": "gemini-2.5-flash-preview",
+            "city": target_city,
+            "date": target_date,
+            "articles_hash": articles_hash,
+            "prompt_version": LLM_PROMPT_VERSION,
+        }
+        try:
+            raw = _gemini_cached_call(
+                client,
+                model="gemini-2.5-flash-preview",
+                prompt=prompt,
+                cache_parts=cache_parts,
+                response_config={"response_mime_type": "application/json", "temperature": 0.1},
+            )
+            llm_result = json.loads(raw)
+        except Exception as e:
+            return idx, build_infra_failure_result("LLM_ERROR", f"LLM 재시도 실패: {e}")
 
-                actionability = "actionable" if status in ["SUCCESS", "AMBIGUOUS"] else "suppress"
+        status = llm_result.get("status", "ERROR")
+        message = llm_result.get("message", "응답 없음")
+        if status not in {"SUCCESS", "AMBIGUOUS", "DATE_MISMATCH", "DROPPED"}:
+            return idx, build_infra_failure_result("BAD_RESPONSE", f"예상치 못한 LLM status: {status}")
 
-                return idx, {
-                    "llm_status": status,
-                    "llm_actionability": actionability,
-                    "llm_reason": message,
-                    "llm_event_summary": message if actionability == "actionable" else "",
-                    "llm_validation_type": status,
-                    "llm_article_count": len(articles_data),
-                    "llm_exact_support": len(articles_data) if status == "SUCCESS" else 0
-                }
-
-            except Exception as e:
-                err_text = str(e)
-                is_retryable = any(marker in err_text for marker in RETRYABLE_MARKERS)
-                if is_retryable and attempt < 4:
-                    delay = (2 ** attempt) + random.uniform(0, 1)  # 1→2→4→8→16초 + jitter
-                    time.sleep(delay)
-                    continue
-                return idx, {"llm_actionability": "suppress", "llm_reason": f"LLM {attempt+1}회 재시도 실패: {e}", "llm_validation_type": "ERROR"}
+        return idx, build_policy_inputs(target_city, articles_data, status, message)
 
     # --- 동시 호출을 2개로 제한: Gemini 서버 부담 완화 ---
     with ThreadPoolExecutor(max_workers=2) as executor:
@@ -603,7 +765,7 @@ def summarize_baseline_cities(baseline_df: pd.DataFrame, raw_df: pd.DataFrame, u
         for attempt in range(5):
             try:
                 response = client.models.generate_content(
-                    model="gemini-2.5-flash",
+                    model="gemini-2.5-flash-preview",
                     contents=prompt,
                     config={"temperature": 0.1}
                 )

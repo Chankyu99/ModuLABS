@@ -13,8 +13,48 @@ from pipeline.city_utils import canonicalize_city_by_feature_id, normalize_city_
 from pipeline.config import (
     LOGIT_WEIGHTS, ACTION_GEO_ALLOWED_COUNTRIES, CONFIRMED_CODES, MONITORED_COUNTRIES,
     KALMAN_Q_RATIO, KALMAN_R_RATIO, KALMAN_P0_RATIO, KALMAN_MIN_INIT_VAR,
-    MIN_HISTORY, get_risk_level,
+    MIN_HISTORY,
 )
+
+
+RISK_LEVELS = {
+    3: {
+        'label': '위기 (RED)',
+        'threshold': 3.0,
+        'emoji': '🛑',
+        'guide': '대규모 충돌/공격 포착. 즉시 위성 촬영 스케줄링 필수.'
+    },
+    2: {
+        'label': '위험 (ORANGE)',
+        'threshold': 2.0,
+        'emoji': '🟠',
+        'guide': '물리적 교전 확인. 우선순위 위성 촬영 및 정밀 분석 착수.'
+    },
+    1: {
+        'label': '주의 (YELLOW)',
+        'threshold': 1.0,
+        'emoji': '🟡',
+        'guide': '긴장 고조 및 국지적 징후 탐지. ROI 모니터링 명단 추가.'
+    },
+    0: {
+        'label': '정상 (BLUE)',
+        'threshold': -np.inf,
+        'emoji': '🔵',
+        'guide': '평시 수준의 뉴스 흐름 유지.'
+    }
+}
+
+
+def get_risk_level(z_score: float) -> dict:
+    """리스크 분류는 config 변경과 독립적으로 동작하도록 로컬 fallback을 둔다."""
+    for level in sorted(RISK_LEVELS.keys(), reverse=True):
+        if z_score >= RISK_LEVELS[level]['threshold']:
+            res = RISK_LEVELS[level].copy()
+            res['level'] = level
+            return res
+    res = RISK_LEVELS[0].copy()
+    res['level'] = 0
+    return res
 
 # ─── 1. 갈등 지수(I) 산출 로직 ──────────────────────────────
 
