@@ -11,9 +11,9 @@ import pandas as pd
 from concurrent.futures import ThreadPoolExecutor
 from pipeline.city_utils import canonicalize_city_by_feature_id, normalize_city_name
 from pipeline.config import (
-    tone_weight, source_count_weight, ACTION_GEO_ALLOWED_COUNTRIES, CONFIRMED_CODES, MONITORED_COUNTRIES,
+    LOGIT_WEIGHTS, ACTION_GEO_ALLOWED_COUNTRIES, CONFIRMED_CODES, MONITORED_COUNTRIES,
     KALMAN_Q_RATIO, KALMAN_R_RATIO, KALMAN_P0_RATIO, KALMAN_MIN_INIT_VAR,
-    MIN_HISTORY, get_risk_level, EVENT_WEIGHT_MAP
+    MIN_HISTORY, get_risk_level,
 )
 
 # ─── 1. 갈등 지수(I) 산출 로직 ──────────────────────────────
@@ -21,8 +21,15 @@ from pipeline.config import (
 def compute_conflict_index(df: pd.DataFrame) -> pd.DataFrame:
     """
     GDELT 원본 이벤트 데이터를 도시별 일별 갈등 지수(I)로 변환.
-    
-    공식: I = Sigma(NumMentions * log(1+NumSources) * W(AvgTone) * W(EventRootCode))
+
+    per-event 점수는 로지스틱 회귀에서 학습한 계수(LOGIT_WEIGHTS)를 사용한다.
+        score = const
+              + w_log_sources  * Z(log1p(NumSources))
+              + w_avg_tone     * Z(AvgTone)
+              + w_avg_tone_sq  * Z(AvgTone²)
+              + w_goldstein    * Z(GoldsteinScale)
+    연속형 변수는 필터링 데이터 전체에서 mean/std를 구해 StandardScaler와 동일한
+    방식으로 표준화한다(옵션 C). 도시·일자별 합계가 conflict_index가 된다.
     """
     if df.empty:
         return pd.DataFrame(columns=['date', 'city', 'country_code', 'lat', 'lon',
@@ -53,27 +60,40 @@ def compute_conflict_index(df: pd.DataFrame) -> pd.DataFrame:
             keep='first'
         )
 
-    # 날짜 형식 정리 및 가중치 적용
+    # 날짜 형식 정리
     filtered['date'] = filtered['SQLDATE'].astype(str).str[:8]
     filtered['city'] = filtered['ActionGeo_FullName'].astype(str).map(normalize_city_name)
     filtered['city'] = canonicalize_city_by_feature_id(filtered['city'], filtered['ActionGeo_FeatureID'])
-    filtered['weight'] = filtered['AvgTone'].apply(tone_weight)
-    filtered['source_weight'] = pd.to_numeric(filtered['NumSources'], errors='coerce').fillna(0.0).apply(source_count_weight)
-    
-    # EventRootCode 기반 행동 심각도 가중치
-    if 'EventRootCode' in filtered.columns:
-        event_weight = filtered['EventRootCode'].astype(int).map(EVENT_WEIGHT_MAP).fillna(0.7)
-    else:
-        # Fallback: EventCode의 앞 2자리 활용
-        event_weight = filtered['EventCode'].astype(str).str[:2].astype(int).map(EVENT_WEIGHT_MAP).fillna(0.7)
-        
-    filtered['weighted_mention'] = (
-        filtered['NumMentions'] 
-        * np.log1p(filtered['NumSources'])  # log(1+NumSources)로 다매체 보도 가중
-        * filtered['source_weight']         # single-source는 남기되 penalty 부여
-        * filtered['weight']
-        * event_weight
+
+    # per-event feature 산출 (로지스틱 회귀 공식 입력)
+    log_sources = np.log1p(pd.to_numeric(filtered['NumSources'], errors='coerce').fillna(0.0))
+    avg_tone    = pd.to_numeric(filtered['AvgTone'], errors='coerce').fillna(0.0)
+    avg_tone_sq = avg_tone ** 2
+    goldstein   = pd.to_numeric(filtered['GoldsteinScale'], errors='coerce').fillna(0.0)
+
+    # StandardScaler (옵션 C) — 필터링 데이터에서 즉석 mean/std 계산
+    def _standardize(s: pd.Series) -> pd.Series:
+        std = s.std(ddof=0)
+        if std < 1e-10:
+            return pd.Series(0.0, index=s.index)
+        return (s - s.mean()) / std
+
+    z_log_sources = _standardize(log_sources)
+    z_avg_tone    = _standardize(avg_tone)
+    z_avg_tone_sq = _standardize(avg_tone_sq)
+    z_goldstein   = _standardize(goldstein)
+
+    # per-event 로지스틱 점수 → 시그모이드로 변환해 [0,1] 타격 확률로 사용
+    # conflict_index는 이 확률의 합이므로 "기대 타격 건수"로 해석된다.
+    w = LOGIT_WEIGHTS
+    logit = (
+        w['const']
+        + w['log_sources']  * z_log_sources
+        + w['avg_tone']     * z_avg_tone
+        + w['avg_tone_sq']  * z_avg_tone_sq
+        + w['goldstein']    * z_goldstein
     )
+    filtered['weighted_mention'] = 1.0 / (1.0 + np.exp(-logit))
 
     # 도시별/일별로 데이터 집계
     agg = (
@@ -166,7 +186,8 @@ def kalman_innovation(signal: np.ndarray,
         S = P_pred + R  # 오차 공분산
         
         # 표준화 (Standardized Innovation)
-        norm_innov[t] = innovation[t] / max(np.sqrt(S), 1e-10)
+        # norm_innov[t] = innovation[t] / max(np.sqrt(S), 1e-10)
+        norm_innov[t] = np.clip(innovation[t] / max(np.sqrt(S), 1e-10), -10, 10)
 
         # 3단계: 업데이트 (Update)
         K = P_pred / S # 칼만 이득 (Kalman Gain)

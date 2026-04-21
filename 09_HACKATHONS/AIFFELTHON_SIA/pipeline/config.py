@@ -54,24 +54,36 @@ ACTION_GEO_ALLOWED_COUNTRIES = [
 ]
 
 # 3. 갈등 지수(I) 산출 로직
+#
+# 로지스틱 회귀로 도출한 per-event 가중치 (PDF "칼만 필터 성능 검증" §8 기준).
+# 연속형 변수(log(NumSources), AvgTone, AvgTone², GoldsteinScale)는 StandardScaler로
+# 표준화(Z-score)된 뒤 아래 계수와 곱해진다. EventRootCode는 GoldsteinScale과 1:1
+# 매핑되므로 제외했고, NumMentions는 p-value가 0.05를 넘어 제외했다.
+LOGIT_WEIGHTS = {
+    "const":       -2.9137,
+    "log_sources":  0.0970,
+    "avg_tone":    -0.9307,
+    "avg_tone_sq": -1.3231,
+    "goldstein":   -0.1226,
+}
 
-def tone_weight(avg_tone: float) -> float:
-    """기사 어조(AvgTone)에 따른 심각도 가중치 반환"""
-    if avg_tone < -15: return 0.5  # 극단적 부정 (자극적 보도 가능성)
-    if avg_tone < -5:  return 1.0  # 위험 구간 (실제 갈등 징후가 가장 뚜렷함)
-    if avg_tone < 0:   return 0.3  # 약한 부정
-    return 0.1                     # 중립 또는 긍정 (단순 배경 소음)
-
-
-def source_count_weight(num_sources: float) -> float:
-    """단일 매체 보도는 남기되 soft penalty를 준다."""
-    if num_sources <= 0:
-        return 0.0
-    if num_sources < 2:
-        return 0.60
-    if num_sources < 3:
-        return 0.85
-    return 1.0
+# --- 이전 계단형 가중치 (로지스틱 회귀 도입 이전) ---
+# def tone_weight(avg_tone: float) -> float:
+#     """기사 어조(AvgTone)에 따른 심각도 가중치 반환"""
+#     if avg_tone < -15: return 0.5
+#     if avg_tone < -5:  return 1.0
+#     if avg_tone < 0:   return 0.3
+#     return 0.1
+#
+# def source_count_weight(num_sources: float) -> float:
+#     """단일 매체 보도는 남기되 soft penalty를 준다."""
+#     if num_sources <= 0:
+#         return 0.0
+#     if num_sources < 2:
+#         return 0.60
+#     if num_sources < 3:
+#         return 0.85
+#     return 1.0
 
 # 4. 칼만 필터(Kalman Filter) 파라미터
 # Spatial GT 기준으로는 평시보다 변화 폭을 더 빠르게 따라가도록 Q를 키우고,
@@ -81,13 +93,15 @@ KALMAN_R_RATIO = 0.25   # 관측 노이즈 (데이터에 대한 신뢰도)
 KALMAN_P0_RATIO = 2.0   # 초기 불확실성 계수
 KALMAN_MIN_INIT_VAR = 1.0  # 초기 분산 하한선 (0 채우기 시 노이즈 증폭 방지)
 
-EVENT_WEIGHT_MAP = {
-    20: 1.0, 
-    19: 1.0,
-    18: 0.9,
-    17: 0.8,
-    15: 0.7
-}
+# --- 이전 EventRootCode 기반 가산치 맵 (로지스틱 회귀 분석 결과 GoldsteinScale과
+# --- 1:1 매핑으로 드러나 다중공선성 방지를 위해 제외) ---
+# EVENT_WEIGHT_MAP = {
+#     20: 1.0,
+#     19: 1.0,
+#     18: 0.9,
+#     17: 0.8,
+#     15: 0.7
+# }
 
 # 5. 리스크 레벨 및 대응 가이드
 MIN_HISTORY = 30  # 칼만 필터 안정화를 위한 최소 관측 일수
@@ -134,7 +148,7 @@ LLM_STRATEGIC_KEYWORDS = [
 
 # Precision 우선 출력 정책
 REPORT_MAX_ALERTS = 15
-REPORT_MIN_CONFLICT_INDEX = 120.0
+REPORT_MIN_CONFLICT_INDEX = 5.0
 REPORT_MIN_INNOV_Z = 3.0
 
 # 7. 지오코딩 블랙리스트 (조직명/무기명/지명 오류) -- 테스트 과정에서 잡히는 단어들 실시간 추가

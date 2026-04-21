@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import os
+import random
 import re
 import time
 from dataclasses import dataclass
@@ -494,8 +495,10 @@ def verify_top_cities(
 
         # 통합 프롬프트로 Gemini에게 1번만 호출
         prompt = build_gemini_prompt(target_city, articles_data, target_date)
-        # --- [수정된 부분: 최대 3번까지 끈질기게 재시도] ---
-        for attempt in range(3):
+        # 503/UNAVAILABLE 같은 재시도 가치가 있는 에러만 지수 백오프로 재시도.
+        # 고정 2초 대신 1→2→4→8→16초 + 랜덤 jitter로 서버 과부하 회복 시간 확보.
+        RETRYABLE_MARKERS = ("503", "UNAVAILABLE", "overloaded", "429", "RESOURCE_EXHAUSTED")
+        for attempt in range(5):
             try:
                 response = client.models.generate_content(
                     model="gemini-2.5-flash",
@@ -505,9 +508,9 @@ def verify_top_cities(
                 llm_result = json.loads(response.text)
                 status = llm_result.get("status", "ERROR")
                 message = llm_result.get("message", "응답 없음")
-                
+
                 actionability = "actionable" if status in ["SUCCESS", "AMBIGUOUS"] else "suppress"
-                
+
                 return idx, {
                     "llm_status": status,
                     "llm_actionability": actionability,
@@ -517,15 +520,18 @@ def verify_top_cities(
                     "llm_article_count": len(articles_data),
                     "llm_exact_support": len(articles_data) if status == "SUCCESS" else 0
                 }
-                
-            except Exception as e:
-                if attempt < 2:  # 에러 나면 2초 대기 후 다시 시도
-                    time.sleep(2)
-                    continue
-                return idx, {"llm_actionability": "suppress", "llm_reason": f"LLM 3회 재시도 실패: {e}", "llm_validation_type": "ERROR"}
 
-    # --- 도시 5개씩 동시에 처리 (Outer Loop 병렬화) ---
-    with ThreadPoolExecutor(max_workers=3) as executor:
+            except Exception as e:
+                err_text = str(e)
+                is_retryable = any(marker in err_text for marker in RETRYABLE_MARKERS)
+                if is_retryable and attempt < 4:
+                    delay = (2 ** attempt) + random.uniform(0, 1)  # 1→2→4→8→16초 + jitter
+                    time.sleep(delay)
+                    continue
+                return idx, {"llm_actionability": "suppress", "llm_reason": f"LLM {attempt+1}회 재시도 실패: {e}", "llm_validation_type": "ERROR"}
+
+    # --- 동시 호출을 2개로 제한: Gemini 서버 부담 완화 ---
+    with ThreadPoolExecutor(max_workers=2) as executor:
         futures = {executor.submit(process_city, idx, row): idx for idx, row in ranked_today.iterrows()}
         for future in as_completed(futures):
             idx, result_dict = future.result()
@@ -593,18 +599,27 @@ def summarize_baseline_cities(baseline_df: pd.DataFrame, raw_df: pd.DataFrame, u
             return idx, "관련 기사 확보 실패"
 
         prompt = build_baseline_prompt(target_city, articles_data, target_date)
-        try:
-            response = client.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=prompt,
-                config={"temperature": 0.1}
-            )
-            return idx, response.text.strip()
-        except Exception:
-            return idx, "요약 생성 실패"
+        RETRYABLE_MARKERS = ("503", "UNAVAILABLE", "overloaded", "429", "RESOURCE_EXHAUSTED")
+        for attempt in range(5):
+            try:
+                response = client.models.generate_content(
+                    model="gemini-2.5-flash",
+                    contents=prompt,
+                    config={"temperature": 0.1}
+                )
+                return idx, response.text.strip()
+            except Exception as e:
+                err_text = str(e)
+                is_retryable = any(marker in err_text for marker in RETRYABLE_MARKERS)
+                if is_retryable and attempt < 4:
+                    delay = (2 ** attempt) + random.uniform(0, 1)
+                    time.sleep(delay)
+                    continue
+                return idx, "요약 생성 실패"
+        return idx, "요약 생성 실패"
 
-    # 병렬 처리로 요약
-    with ThreadPoolExecutor(max_workers=5) as executor:
+    # 동시 호출을 2개로 제한 (이전 5)
+    with ThreadPoolExecutor(max_workers=2) as executor:
         futures = {executor.submit(process_baseline, idx, row): idx for idx, row in baseline_df.head(top_n).iterrows()}
         for future in as_completed(futures):
             idx, summary = future.result()

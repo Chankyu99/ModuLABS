@@ -1,0 +1,130 @@
+{
+  "date": "20260328",
+  "generated_at": "2026-04-21T12:46:35.443149",
+  "total_cities": 190,
+  "raw_alert_count": 6,
+  "alert_count": 0,
+  "suppressed_count": 0,
+  "output_policy": {
+    "max_alerts": 15,
+    "min_conflict_index": 5.0,
+    "min_innovation_z": 3.0,
+    "min_exact_support": 2,
+    "allow_single_article_exact": true,
+    "allow_strategic_single_support": true,
+    "allow_roi_prior_single_support": true
+  },
+  "alerts": [],
+  "summary": [
+    {
+      "city": "Tehran",
+      "risk_level": 0,
+      "conflict_index": 14.2,
+      "z_score": -0.13,
+      "source_url": "",
+      "llm_validation_type": "",
+      "llm_resolved_city": "",
+      "llm_event_summary": "",
+      "llm_imagery_need": ""
+    },
+    {
+      "city": "Gaza",
+      "risk_level": 2,
+      "conflict_index": 7.5,
+      "z_score": 2.7,
+      "source_url": "",
+      "llm_validation_type": "",
+      "llm_resolved_city": "",
+      "llm_event_summary": "",
+      "llm_imagery_need": ""
+    },
+    {
+      "city": "Beirut",
+      "risk_level": 1,
+      "conflict_index": 3.9,
+      "z_score": 1.26,
+      "source_url": "",
+      "llm_validation_type": "",
+      "llm_resolved_city": "",
+      "llm_event_summary": "",
+      "llm_imagery_need": ""
+    },
+    {
+      "city": "Jerusalem",
+      "risk_level": 1,
+      "conflict_index": 3.7,
+      "z_score": 1.23,
+      "source_url": "",
+      "llm_validation_type": "",
+      "llm_resolved_city": "",
+      "llm_event_summary": "",
+      "llm_imagery_need": ""
+    },
+    {
+      "city": "Tel Aviv",
+      "risk_level": 0,
+      "conflict_index": 2.5,
+      "z_score": -2.9,
+      "source_url": "",
+      "llm_validation_type": "",
+      "llm_resolved_city": "",
+      "llm_event_summary": "",
+      "llm_imagery_need": ""
+    },
+    {
+      "city": "Riyadh",
+      "risk_level": 1,
+      "conflict_index": 1.6,
+      "z_score": 1.86,
+      "source_url": "",
+      "llm_validation_type": "",
+      "llm_resolved_city": "",
+      "llm_event_summary": "",
+      "llm_imagery_need": ""
+    },
+    {
+      "city": "Beersheba",
+      "risk_level": 1,
+      "conflict_index": 1.1,
+      "z_score": 1.57,
+      "source_url": "",
+      "llm_validation_type": "",
+      "llm_resolved_city": "",
+      "llm_event_summary": "",
+      "llm_imagery_need": ""
+    },
+    {
+      "city": "Jezzine",
+      "risk_level": 1,
+      "conflict_index": 1.1,
+      "z_score": 1.64,
+      "source_url": "",
+      "llm_validation_type": "",
+      "llm_resolved_city": "",
+      "llm_event_summary": "",
+      "llm_imagery_need": ""
+    },
+    {
+      "city": "Kharg Island",
+      "risk_level": 0,
+      "conflict_index": 1.0,
+      "z_score": -2.33,
+      "source_url": "",
+      "llm_validation_type": "",
+      "llm_resolved_city": "",
+      "llm_event_summary": "",
+      "llm_imagery_need": ""
+    },
+    {
+      "city": "Isfahan",
+      "risk_level": 0,
+      "conflict_index": 0.9,
+      "z_score": -1.49,
+      "source_url": "",
+      "llm_validation_type": "",
+      "llm_resolved_city": "",
+      "llm_event_summary": "",
+      "llm_imagery_need": ""
+    }
+  ]
+}
