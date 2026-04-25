@@ -15,7 +15,7 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
-from pipeline.config import OUTPUT_DIR, ROI_CITIES
+from pipeline.config import OUTPUT_DIR, ROI_CITIES, PREDICTION_HOURS
 from pipeline.schedule_builder import build_schedule, print_schedule, save_schedule
 
 
@@ -69,6 +69,10 @@ def extract_level2a_inputs(level1_data: dict) -> tuple[dict, dict]:
             "lat": coords["lat"],
             "lon": coords["lon"],
             "country_code": alert.get("country_code", ""),
+            "guide": alert.get("guide", ""),
+            "llm_status": alert.get("llm_status", "UNVERIFIED"),
+            "llm_event_summary": alert.get("llm_event_summary", ""),
+            "source_urls": alert.get("source_urls", []),
         }
         valid_cities[city] = coords
 
@@ -103,7 +107,7 @@ def resolve_prediction_context(
 def build_schedule_from_level1_result(
     level1_data: dict,
     target_date: str,
-    hours: int = 72,
+    hours: int = PREDICTION_HOURS,
     mode: str = "operational",
     tle_date: str | None = None,
     refresh: bool = False,
@@ -135,7 +139,7 @@ def build_schedule_from_level1_result(
 
 def run_level2a_for_date(
     target_date: str,
-    hours: int = 72,
+    hours: int = PREDICTION_HOURS,
     mode: str = "operational",
     tle_date: str | None = None,
     refresh: bool = False,

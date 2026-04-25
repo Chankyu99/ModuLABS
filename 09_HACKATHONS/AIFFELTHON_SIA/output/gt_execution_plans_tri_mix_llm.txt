@@ -1,0 +1,252 @@
+DATE 20260228
+alerts=12 | scheduled_cities=12 | EO=33/111 | SAR=1986/1986
+  SATELLITE SpaceEye-T (7)
+    1. Dubai | optical | 우선 촬영 | 2026-02-28T06:14:05Z | cloud=0 | daylight=True
+    2. Jerusalem | optical | 우선 촬영 | 2026-02-28T07:50:16Z | cloud=3 | daylight=True
+    3. Ben Gurion | optical | 주의 관측 | 2026-03-01T07:31:16Z | cloud=2 | daylight=True
+    4. Kermanshah | optical | 주의 관측 | 2026-03-03T06:53:03Z | cloud=0 | daylight=True
+    5. Tehran | optical | 우선 촬영 | 2026-03-04T06:34:05Z | cloud=0 | daylight=True
+    6. Tel Aviv | optical | 우선 촬영 | 2026-03-05T07:48:23Z | cloud=0 | daylight=True
+    7. Minab | optical | 우선 촬영 | 2026-03-06T05:52:49Z | cloud=0 | daylight=True
+  SATELLITE ICEYE-60539 (1)
+    1. Tel Aviv | sar | 즉시 촬영 | 2026-03-01T08:38:57Z | cloud=60 | daylight=True
+  SATELLITE ICEYE-58288 (1)
+    1. Tehran | sar | 즉시 촬영 | 2026-03-02T18:41:29Z | cloud=4 | daylight=False
+  SATELLITE ICEYE-56963 (1)
+    1. Manama | sar | 정밀 관측 | 2026-03-03T11:36:44Z | cloud=100 | daylight=True
+  SATELLITE ICEYE-62389 (1)
+    1. Doha | sar | 우선 촬영 | 2026-03-04T08:58:37Z | cloud=64 | daylight=True
+  SATELLITE ICEYE-43800 (1)
+    1. Tabriz | sar | 주의 관측 | 2026-03-04T17:39:14Z | cloud=21 | daylight=False
+  SATELLITE ICEYE-62384 (1)
+    1. Jerusalem | sar | 정밀 관측 | 2026-03-05T02:09:19Z | cloud=5 | daylight=False
+  SATELLITE ICEYE-44390 (1)
+    1. Dubai | sar | 우선 촬영 | 2026-03-06T03:46:51Z | cloud=96 | daylight=True
+  SATELLITE PlanetScope-60489 (1)
+    1. Manama | optical | 우선 촬영 | 2026-03-06T07:44:20Z | cloud=0 | daylight=True
+  SATELLITE ICEYE-46497 (1)
+    1. Riyadh | sar | 주의 관측 | 2026-03-06T13:18:25Z | cloud=85 | daylight=True
+  SATELLITE ICEYE-56947 (1)
+    1. Minab | sar | 즉시 촬영 | 2026-03-06T23:10:03Z | cloud=0 | daylight=False
+  SATELLITE ICEYE-59100 (1)
+    1. Kharg Island | sar | 주의 관측 | 2026-03-06T23:10:29Z | cloud=0 | daylight=False
+
+DATE 20260301
+alerts=14 | scheduled_cities=14 | EO=48/139 | SAR=2345/2345
+  SATELLITE SpaceEye-T (8)
+    1. Jerusalem | optical | 우선 촬영 | 2026-03-01T07:31:11Z | cloud=12 | daylight=True
+    2. Rasht | optical | 우선 촬영 | 2026-03-03T06:53:42Z | cloud=0 | daylight=True
+    3. Tehran | optical | 우선 촬영 | 2026-03-04T06:34:04Z | cloud=0 | daylight=True
+    4. Dubai | optical | 우선 촬영 | 2026-03-05T06:12:06Z | cloud=3 | daylight=True
+    5. Tel Aviv | optical | 우선 촬영 | 2026-03-05T07:48:23Z | cloud=0 | daylight=True
+    6. Minab | optical | 우선 촬영 | 2026-03-06T05:52:48Z | cloud=0 | daylight=True
+    7. Beit Shemesh | optical | 우선 촬영 | 2026-03-06T07:29:09Z | cloud=5 | daylight=True
+    8. Erbil | optical | 주의 관측 | 2026-03-07T07:10:41Z | cloud=9 | daylight=True
+  SATELLITE ICEYE-58288 (2)
+    1. Tehran | sar | 즉시 촬영 | 2026-03-02T18:41:29Z | cloud=4 | daylight=False
+    2. Doha | sar | 주의 관측 | 2026-03-05T18:48:57Z | cloud=100 | daylight=False
+  SATELLITE ICEYE-44390 (2)
+    1. Kashmir | sar | 주의 관측 | 2026-03-04T15:02:29Z | cloud=2 | daylight=False
+    2. Dubai | sar | 즉시 촬영 | 2026-03-06T03:46:50Z | cloud=96 | daylight=True
+  SATELLITE ICEYE-43800 (2)
+    1. Tabriz | sar | 주의 관측 | 2026-03-04T17:39:12Z | cloud=21 | daylight=False
+    2. Jerusalem | sar | 즉시 촬영 | 2026-03-07T18:28:40Z | cloud=10 | daylight=False
+  SATELLITE ICEYE-46497 (2)
+    1. Beit Shemesh | sar | 즉시 촬영 | 2026-03-06T02:40:28Z | cloud=0 | daylight=False
+    2. Riyadh | sar | 주의 관측 | 2026-03-06T13:18:26Z | cloud=85 | daylight=True
+  SATELLITE ICEYE-60539 (1)
+    1. Tel Aviv | sar | 즉시 촬영 | 2026-03-01T08:38:57Z | cloud=60 | daylight=True
+  SATELLITE ICEYE-44389 (1)
+    1. Minab | sar | 즉시 촬영 | 2026-03-01T16:03:39Z | cloud=0 | daylight=False
+  SATELLITE ICEYE-62384 (1)
+    1. Hebron | sar | 주의 관측 | 2026-03-05T02:09:15Z | cloud=48 | daylight=False
+  SATELLITE ICEYE-60546 (1)
+    1. Rasht | sar | 정밀 관측 | 2026-03-05T18:56:59Z | cloud=31 | daylight=False
+  SATELLITE ICEYE-62700 (1)
+    1. Isfahan | sar | 주의 관측 | 2026-03-06T07:42:29Z | cloud=84 | daylight=True
+
+DATE 20260302
+alerts=16 | scheduled_cities=16 | EO=53/150 | SAR=2657/2657
+  SATELLITE SpaceEye-T (9)
+    1. Kuwait City | optical | 주의 관측 | 2026-03-02T07:10:53Z | cloud=0 | daylight=True
+    2. Rasht | optical | 주의 관측 | 2026-03-03T06:53:42Z | cloud=0 | daylight=True
+    3. Tehran | optical | 우선 촬영 | 2026-03-04T06:34:04Z | cloud=0 | daylight=True
+    4. Dubai | optical | 우선 촬영 | 2026-03-05T06:12:06Z | cloud=3 | daylight=True
+    5. Jerusalem | optical | 우선 촬영 | 2026-03-05T07:48:17Z | cloud=0 | daylight=True
+    6. Minab | optical | 우선 촬영 | 2026-03-06T05:52:48Z | cloud=0 | daylight=True
+    7. Beirut | optical | 우선 촬영 | 2026-03-06T07:29:39Z | cloud=26 | daylight=True
+    8. Baghdad | optical | 우선 촬영 | 2026-03-07T07:09:56Z | cloud=0 | daylight=True
+    9. Natanz | optical | 우선 촬영 | 2026-03-08T06:50:27Z | cloud=9 | daylight=True
+  SATELLITE ICEYE-62384 (2)
+    1. Baghdad | sar | 정밀 관측 | 2026-03-03T02:35:51Z | cloud=0 | daylight=False
+    2. Hebron | sar | 우선 촬영 | 2026-03-05T02:09:15Z | cloud=48 | daylight=False
+  SATELLITE ICEYE-48918 (2)
+    1. Beit Shemesh | sar | 즉시 촬영 | 2026-03-03T03:15:05Z | cloud=1 | daylight=False
+    2. Dubai | sar | 정밀 관측 | 2026-03-03T14:27:40Z | cloud=90 | daylight=False
+  SATELLITE ICEYE-46497 (2)
+    1. Beirut | sar | 즉시 촬영 | 2026-03-06T02:39:57Z | cloud=15 | daylight=False
+    2. Kashmir | sar | 주의 관측 | 2026-03-08T01:00:40Z | cloud=100 | daylight=False
+  SATELLITE ICEYE-58288 (1)
+    1. Tehran | sar | 즉시 촬영 | 2026-03-02T18:41:29Z | cloud=4 | daylight=False
+  SATELLITE ICEYE-62389 (1)
+    1. Doha | sar | 주의 관측 | 2026-03-04T08:58:37Z | cloud=64 | daylight=True
+  SATELLITE PlanetScope-58322 (1)
+    1. Beit Shemesh | optical | 우선 촬영 | 2026-03-05T09:08:54Z | cloud=0 | daylight=True
+  SATELLITE ICEYE-44389 (1)
+    1. Gulf Of Oman | sar | 주의 관측 | 2026-03-05T16:18:21Z | cloud=2 | daylight=False
+  SATELLITE ICEYE-55049 (1)
+    1. Ras Tanura | sar | 주의 관측 | 2026-03-05T19:04:15Z | cloud=100 | daylight=False
+  SATELLITE ICEYE-56947 (1)
+    1. Minab | sar | 즉시 촬영 | 2026-03-06T23:09:50Z | cloud=0 | daylight=False
+  SATELLITE ICEYE-43800 (1)
+    1. Jerusalem | sar | 즉시 촬영 | 2026-03-07T18:28:44Z | cloud=10 | daylight=False
+  SATELLITE ICEYE-59100 (1)
+    1. Natanz | sar | 즉시 촬영 | 2026-03-07T23:01:20Z | cloud=2 | daylight=False
+  SATELLITE PlanetScope-60491 (1)
+    1. Tel Aviv | optical | 우선 촬영 | 2026-03-08T08:57:06Z | cloud=4 | daylight=True
+  SATELLITE PlanetScope-58319 (1)
+    1. Hebron | optical | 우선 촬영 | 2026-03-08T09:26:09Z | cloud=10 | daylight=True
+  SATELLITE ICEYE-44390 (1)
+    1. Tel Aviv | sar | 즉시 촬영 | 2026-03-08T16:35:13Z | cloud=0 | daylight=False
+
+DATE 20260305
+alerts=9 | scheduled_cities=9 | EO=33/96 | SAR=1558/1558
+  SATELLITE SpaceEye-T (6)
+    1. Tehran | optical | 우선 촬영 | 2026-03-05T06:14:56Z | cloud=34 | daylight=True
+    2. Jerusalem | optical | 우선 촬영 | 2026-03-05T07:48:17Z | cloud=0 | daylight=True
+    3. Minab | optical | 우선 촬영 | 2026-03-06T05:52:48Z | cloud=0 | daylight=True
+    4. Shakarabad | optical | 주의 관측 | 2026-03-09T06:31:22Z | cloud=13 | daylight=True
+    5. Tel Aviv | optical | 우선 촬영 | 2026-03-10T07:46:01Z | cloud=0 | daylight=True
+    6. Beirut | optical | 우선 촬영 | 2026-03-11T07:27:12Z | cloud=0 | daylight=True
+  SATELLITE ICEYE-46497 (2)
+    1. Beirut | sar | 즉시 촬영 | 2026-03-06T02:39:56Z | cloud=15 | daylight=False
+    2. Tabriz | sar | 주의 관측 | 2026-03-10T13:10:42Z | cloud=67 | daylight=True
+  SATELLITE ICEYE-43800 (2)
+    1. Jerusalem | sar | 즉시 촬영 | 2026-03-07T18:28:37Z | cloud=10 | daylight=False
+    2. Tehran | sar | 즉시 촬영 | 2026-03-08T06:03:23Z | cloud=100 | daylight=True
+  SATELLITE PlanetScope-60505 (1)
+    1. Gulf Of Oman | optical | 우선 촬영 | 2026-03-05T07:21:33Z | cloud=47 | daylight=True
+  SATELLITE ICEYE-44389 (1)
+    1. Gulf Of Oman | sar | 우선 촬영 | 2026-03-05T16:18:19Z | cloud=2 | daylight=False
+  SATELLITE ICEYE-44390 (1)
+    1. Tel Aviv | sar | 즉시 촬영 | 2026-03-08T16:35:07Z | cloud=0 | daylight=False
+  SATELLITE ICEYE-60549 (1)
+    1. Kfar Kila | sar | 주의 관측 | 2026-03-08T19:55:09Z | cloud=0 | daylight=False
+  SATELLITE ICEYE-60546 (1)
+    1. Minab | sar | 정밀 관측 | 2026-03-11T06:49:03Z | cloud=100 | daylight=True
+
+DATE 20260311
+alerts=3 | scheduled_cities=3 | EO=10/33 | SAR=536/536
+  SATELLITE SpaceEye-T (2)
+    1. Tel Aviv | optical | 우선 촬영 | 2026-03-11T07:26:49Z | cloud=0 | daylight=True
+    2. Tehran | optical | 우선 촬영 | 2026-03-14T06:29:11Z | cloud=1 | daylight=True
+  SATELLITE PlanetScope-58304 (1)
+    1. Beirut | optical | 우선 촬영 | 2026-03-12T09:18:36Z | cloud=0 | daylight=True
+  SATELLITE ICEYE-44390 (1)
+    1. Beirut | sar | 정밀 관측 | 2026-03-12T16:31:41Z | cloud=2 | daylight=False
+  SATELLITE ICEYE-56961 (1)
+    1. Tehran | sar | 즉시 촬영 | 2026-03-13T00:01:31Z | cloud=100 | daylight=False
+  SATELLITE ICEYE-56963 (1)
+    1. Tel Aviv | sar | 즉시 촬영 | 2026-03-15T00:08:25Z | cloud=27 | daylight=False
+
+DATE 20260317
+alerts=7 | scheduled_cities=7 | EO=12/58 | SAR=1218/1218
+  SATELLITE SpaceEye-T (4)
+    1. Baghdad | optical | 우선 촬영 | 2026-03-17T07:04:39Z | cloud=0 | daylight=True
+    2. Tehran | optical | 우선 촬영 | 2026-03-18T06:45:38Z | cloud=1 | daylight=True
+    3. Jerusalem | optical | 우선 촬영 | 2026-03-19T07:59:41Z | cloud=18 | daylight=True
+    4. Tel Aviv | optical | 우선 촬영 | 2026-03-20T07:40:26Z | cloud=33 | daylight=True
+  SATELLITE ICEYE-59102 (2)
+    1. Baghdad | sar | 즉시 촬영 | 2026-03-19T11:51:40Z | cloud=100 | daylight=True
+    2. Tel Aviv | sar | 즉시 촬영 | 2026-03-23T23:50:18Z | cloud=-1 | daylight=False
+  SATELLITE ICEYE-62384 (1)
+    1. Fujairah | sar | 주의 관측 | 2026-03-18T18:19:47Z | cloud=28 | daylight=False
+  SATELLITE ICEYE-44389 (1)
+    1. Jerusalem | sar | 즉시 촬영 | 2026-03-20T17:50:35Z | cloud=9 | daylight=False
+  SATELLITE ICEYE-58302 (1)
+    1. Tehran | sar | 즉시 촬영 | 2026-03-20T19:09:05Z | cloud=89 | daylight=False
+  SATELLITE ICEYE-48918 (1)
+    1. Beirut | sar | 정밀 관측 | 2026-03-22T03:20:01Z | cloud=65 | daylight=False
+  SATELLITE ICEYE-62700 (1)
+    1. Dubai | sar | 주의 관측 | 2026-03-22T07:22:29Z | cloud=62 | daylight=True
+
+DATE 20260322
+alerts=12 | scheduled_cities=12 | EO=25/104 | SAR=2108/2108
+  SATELLITE SpaceEye-T (6)
+    1. Bushehr | optical | 주의 관측 | 2026-03-23T06:40:53Z | cloud=19 | daylight=True
+    2. Tehran | optical | 우선 촬영 | 2026-03-24T06:23:13Z | cloud=20 | daylight=True
+    3. Misgav Am | optical | 우선 촬영 | 2026-03-24T07:56:56Z | cloud=19 | daylight=True
+    4. Dimona | optical | 우선 촬영 | 2026-03-25T07:37:00Z | cloud=13 | daylight=True
+    5. Andimeshk | optical | 우선 촬영 | 2026-03-27T06:57:57Z | cloud=27 | daylight=True
+    6. Natanz | optical | 정밀 관측 | 2026-03-28T06:38:38Z | cloud=44 | daylight=True
+  SATELLITE ICEYE-60539 (3)
+    1. Misgav Am | sar | 즉시 촬영 | 2026-03-24T19:56:01Z | cloud=33 | daylight=False
+    2. Maalot-Tarshiha | sar | 주의 관측 | 2026-03-25T19:57:22Z | cloud=99 | daylight=False
+    3. Jerusalem | sar | 우선 촬영 | 2026-03-26T19:58:27Z | cloud=100 | daylight=False
+  SATELLITE ICEYE-59102 (2)
+    1. Dimona | sar | 즉시 촬영 | 2026-03-23T23:50:00Z | cloud=-1 | daylight=False
+    2. Tehran | sar | 즉시 촬영 | 2026-03-25T11:25:48Z | cloud=100 | daylight=True
+  SATELLITE ICEYE-46497 (2)
+    1. Hebron | sar | 즉시 촬영 | 2026-03-24T14:04:13Z | cloud=70 | daylight=True
+    2. Natanz | sar | 정밀 관측 | 2026-03-27T01:39:20Z | cloud=100 | daylight=False
+  SATELLITE ICEYE-48918 (1)
+    1. Beirut | sar | 주의 관측 | 2026-03-22T03:19:58Z | cloud=65 | daylight=False
+  SATELLITE PlanetScope-58308 (1)
+    1. Hebron | optical | 우선 촬영 | 2026-03-24T09:21:01Z | cloud=30 | daylight=True
+  SATELLITE ICEYE-59103 (1)
+    1. Tel Aviv | sar | 주의 관측 | 2026-03-25T12:33:41Z | cloud=100 | daylight=True
+  SATELLITE ICEYE-56963 (1)
+    1. Isfahan | sar | 주의 관측 | 2026-03-25T23:04:12Z | cloud=100 | daylight=False
+  SATELLITE ICEYE-55049 (1)
+    1. Andimeshk | sar | 우선 촬영 | 2026-03-28T07:51:49Z | cloud=62 | daylight=True
+
+DATE 20260326
+alerts=7 | scheduled_cities=7 | EO=18/62 | SAR=1208/1208
+  SATELLITE SpaceEye-T (4)
+    1. Bandar Abbas | optical | 우선 촬영 | 2026-03-28T06:36:51Z | cloud=2 | daylight=True
+    2. Isfahan | optical | 우선 촬영 | 2026-03-29T06:19:02Z | cloud=0 | daylight=True
+    3. Tel Aviv | optical | 우선 촬영 | 2026-03-30T07:33:50Z | cloud=29 | daylight=True
+    4. Kharg Island | optical | 우선 촬영 | 2026-04-01T06:53:31Z | cloud=0 | daylight=True
+  SATELLITE ICEYE-62384 (3)
+    1. Bandar Abbas | sar | 정밀 관측 | 2026-03-27T14:47:54Z | cloud=84 | daylight=False
+    2. Hebron | sar | 정밀 관측 | 2026-03-29T22:41:45Z | cloud=8 | daylight=False
+    3. Kharg Island | sar | 정밀 관측 | 2026-03-30T14:09:26Z | cloud=100 | daylight=True
+  SATELLITE ICEYE-60539 (2)
+    1. Jerusalem | sar | 주의 관측 | 2026-03-26T19:58:27Z | cloud=100 | daylight=False
+    2. Tel Aviv | sar | 즉시 촬영 | 2026-03-27T19:59:56Z | cloud=20 | daylight=False
+  SATELLITE ICEYE-46497 (1)
+    1. Isfahan | sar | 즉시 촬영 | 2026-03-27T01:39:34Z | cloud=34 | daylight=False
+  SATELLITE ICEYE-46496 (1)
+    1. Abu Dhabi | sar | 주의 관측 | 2026-03-30T23:35:09Z | cloud=-1 | daylight=False
+
+DATE 20260328
+alerts=8 | scheduled_cities=8 | EO=11/67 | SAR=1419/1419
+  SATELLITE SpaceEye-T (3)
+    1. Beersheba | optical | 주의 관측 | 2026-03-30T07:33:37Z | cloud=23 | daylight=True
+    2. Tehran | optical | 우선 촬영 | 2026-04-02T06:35:36Z | cloud=2 | daylight=True
+    3. Beirut | optical | 우선 촬영 | 2026-04-03T07:50:00Z | cloud=1 | daylight=True
+  SATELLITE ICEYE-62384 (1)
+    1. Hebron | sar | 주의 관측 | 2026-03-29T22:41:44Z | cloud=8 | daylight=False
+  SATELLITE ICEYE-62389 (1)
+    1. Eshtaol | sar | 주의 관측 | 2026-03-30T22:13:34Z | cloud=7 | daylight=False
+  SATELLITE ICEYE-46496 (1)
+    1. Jezzine | sar | 주의 관측 | 2026-04-02T12:16:47Z | cloud=98 | daylight=True
+  SATELLITE ICEYE-59102 (1)
+    1. Jerusalem | sar | 우선 촬영 | 2026-04-02T12:28:20Z | cloud=100 | daylight=True
+  SATELLITE ICEYE-60546 (1)
+    1. Al Manar | sar | 주의 관측 | 2026-04-03T19:36:41Z | cloud=0 | daylight=False
+  SATELLITE ICEYE-62707 (1)
+    1. Beirut | sar | 우선 촬영 | 2026-04-03T20:06:06Z | cloud=1 | daylight=False
+  SATELLITE ICEYE-59100 (1)
+    1. Tehran | sar | 정밀 관측 | 2026-04-03T23:05:14Z | cloud=1 | daylight=False
+
+DATE 20260331
+alerts=4 | scheduled_cities=4 | EO=14/36 | SAR=752/752
+  SATELLITE SpaceEye-T (3)
+    1. Tehran | optical | 주의 관측 | 2026-04-02T06:35:35Z | cloud=2 | daylight=True
+    2. Beirut | optical | 우선 촬영 | 2026-04-04T07:30:27Z | cloud=0 | daylight=True
+    3. Kharg Island | optical | 주의 관측 | 2026-04-06T06:49:33Z | cloud=0 | daylight=True
+  SATELLITE ICEYE-59102 (1)
+    1. Hebron | sar | 정밀 관측 | 2026-04-02T12:28:22Z | cloud=77 | daylight=True
+  SATELLITE ICEYE-62389 (1)
+    1. Beirut | sar | 즉시 촬영 | 2026-04-06T19:03:22Z | cloud=23 | daylight=False

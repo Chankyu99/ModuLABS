@@ -1,0 +1,316 @@
+{
+  "schema_version": "1.0.0",
+  "meta": {
+    "generated_at": "2026-04-24T06:15:38Z",
+    "mode": "backtest",
+    "target_date": "20260316",
+    "window": {
+      "start_kst": "2026-03-16T09:00:00+09:00",
+      "end_kst":   "2026-03-23T09:00:00+09:00"
+    },
+    "tle": {
+      "reference_date": "20260316",
+      "source": "historical-cache"
+    },
+    "tracking": {
+      "satellites": 80,
+      "cities": 16
+    },
+    "pass_stats": {
+      "total_passes": 15919,
+      "in_swath": 2799,
+      "schedulable": 2683,
+      "city_representative": 16,
+      "final_plan": 25,
+      "eo_candidates": 153,
+      "eo_schedulable": 37,
+      "sar_candidates": 2646,
+      "sar_schedulable": 2646
+    }
+  },
+
+  "cities": [
+    {
+      "city_id": "KHARG_ISLAND",
+      "name": "Kharg Island",
+      "aliases": ["Kharg"],
+      "threat_level": "RED",
+      "z_score": 12.918,
+      "coords": { "lat": 29.2285, "lon": 50.3162, "source": "L1" },
+      "llm_verification": { "status": "AMBIGUOUS", "cache_hit": true, "source_count": 25 },
+      "shot_count": 4
+    },
+    {
+      "city_id": "BEIRUT",
+      "name": "Beirut",
+      "aliases": ["Beyrouth"],
+      "threat_level": "RED",
+      "z_score": 8.412,
+      "coords": { "lat": 33.8938, "lon": 35.5018, "source": "L1" },
+      "llm_verification": { "status": "SUCCESS", "cache_hit": true, "source_count": 19 },
+      "shot_count": 2
+    },
+    {
+      "city_id": "JERUSALEM",
+      "name": "Jerusalem",
+      "aliases": ["Al Quds", "Yerushalayim"],
+      "threat_level": "RED",
+      "z_score": 6.673,
+      "coords": { "lat": 31.7683, "lon": 35.2137, "source": "L1" },
+      "llm_verification": { "status": "SUCCESS", "cache_hit": true, "source_count": 19 },
+      "shot_count": 2
+    },
+    {
+      "city_id": "DUBAI",
+      "name": "Dubai",
+      "threat_level": "RED",
+      "z_score": 3.956,
+      "coords": { "lat": 25.2048, "lon": 55.2708, "source": "L1" },
+      "llm_verification": { "status": "SUCCESS", "cache_hit": true, "source_count": 26 },
+      "shot_count": 2
+    },
+    {
+      "city_id": "FUJAIRAH",
+      "name": "Fujairah",
+      "threat_level": "RED",
+      "z_score": 3.533,
+      "coords": { "lat": 25.1288, "lon": 56.3264, "source": "L1" },
+      "llm_verification": { "status": "SUCCESS", "cache_hit": true, "source_count": 16 },
+      "shot_count": 2
+    },
+    {
+      "city_id": "KHARG",
+      "name": "Kharg",
+      "threat_level": "ORANGE",
+      "z_score": 2.892,
+      "coords": { "lat": 29.2285, "lon": 50.3162, "source": "L1" },
+      "llm_verification": { "status": "SUCCESS", "cache_hit": true, "source_count": 16 },
+      "shot_count": 2
+    },
+    {
+      "city_id": "BAGHDAD",
+      "name": "Baghdad",
+      "threat_level": "ORANGE",
+      "z_score": 2.793,
+      "coords": { "lat": 33.3152, "lon": 44.3661, "source": "L1" },
+      "llm_verification": { "status": "SUCCESS", "cache_hit": true, "source_count": 21 },
+      "shot_count": 2
+    },
+    {
+      "city_id": "ISFAHAN",
+      "name": "Isfahan",
+      "aliases": ["Esfahan"],
+      "threat_level": "ORANGE",
+      "z_score": 2.679,
+      "coords": { "lat": 32.6546, "lon": 51.6680, "source": "L1" },
+      "llm_verification": { "status": "SUCCESS", "cache_hit": true, "source_count": 11 },
+      "shot_count": 2
+    },
+    {
+      "city_id": "TEL_AVIV",
+      "name": "Tel Aviv",
+      "threat_level": "ORANGE",
+      "z_score": 2.263,
+      "coords": { "lat": 32.0853, "lon": 34.7818, "source": "L1" },
+      "llm_verification": { "status": "SUCCESS", "cache_hit": true, "source_count": 21 },
+      "shot_count": 2
+    },
+    {
+      "city_id": "AVIVIM",
+      "name": "Avivim",
+      "threat_level": "YELLOW",
+      "z_score": 1.709,
+      "coords": { "lat": 33.1083, "lon": 35.4269, "source": "L1" },
+      "llm_verification": { "status": "SUCCESS", "cache_hit": true, "source_count": 2 },
+      "shot_count": 1
+    },
+    {
+      "city_id": "MEHRABAD",
+      "name": "Mehrabad",
+      "threat_level": "YELLOW",
+      "z_score": 1.473,
+      "coords": { "lat": 35.6890, "lon": 51.3134, "source": "L1" },
+      "llm_verification": { "status": "SUCCESS", "cache_hit": true, "source_count": 7 },
+      "shot_count": 1
+    },
+    {
+      "city_id": "ABU_DHABI",
+      "name": "Abu Dhabi",
+      "threat_level": "YELLOW",
+      "z_score": 1.446,
+      "coords": { "lat": 24.4539, "lon": 54.3773, "source": "L1" },
+      "llm_verification": { "status": "SUCCESS", "cache_hit": true, "source_count": 4 },
+      "shot_count": 1
+    },
+    {
+      "city_id": "JORDAN_VALLEY",
+      "name": "Jordan Valley",
+      "threat_level": "YELLOW",
+      "z_score": 1.419,
+      "coords": { "lat": 32.3000, "lon": 35.5000, "source": "L1" },
+      "llm_verification": { "status": "SUCCESS", "cache_hit": true, "source_count": 6 },
+      "shot_count": 1
+    },
+    {
+      "city_id": "METULA",
+      "name": "Metula",
+      "aliases": ["Metulla"],
+      "threat_level": "YELLOW",
+      "z_score": 1.241,
+      "coords": { "lat": 33.2797, "lon": 35.5772, "source": "L1" },
+      "llm_verification": { "status": "SUCCESS", "cache_hit": true, "source_count": 9 },
+      "shot_count": 1
+    },
+    {
+      "city_id": "RAMAT_GAN",
+      "name": "Ramat Gan",
+      "threat_level": "YELLOW",
+      "z_score": 1.085,
+      "coords": { "lat": 32.0833, "lon": 34.8167, "source": "L1" },
+      "llm_verification": { "status": "SUCCESS", "cache_hit": true, "source_count": 3 },
+      "shot_count": 1
+    },
+    {
+      "city_id": "GAZAN",
+      "name": "Gazan",
+      "aliases": ["Najafabad"],
+      "threat_level": "YELLOW",
+      "z_score": 1.020,
+      "coords": { "lat": 31.5000, "lon": 34.4667, "source": "L1" },
+      "llm_verification": { "status": "SUCCESS", "cache_hit": true, "source_count": 4 },
+      "shot_count": 1
+    }
+  ],
+
+  "shots": [
+    {
+      "shot_id": "SHOT_20260316_0001",
+      "city_id": "TEL_AVIV",
+      "city_name": "Tel Aviv",
+      "threat_level": "ORANGE",
+      "capture_time_kst": "2026-03-16T16:24:00+09:00",
+      "satellite": { "name": "SpaceEye-T", "sensor_type": "optical" },
+      "sensor": "optical",
+      "priority": { "label": "정밀 관측", "key": "precise", "rank": 3 },
+      "context": {
+        "llm_summary": "Iran fired two salvos toward Tel Aviv, and Hezbollah fired an advanced missile at Palmachim air base south of Tel Aviv.",
+        "operational_note": "ORANGE 지역이며 광학 촬영 가능",
+        "sources": [
+          { "url": "https://www.keysnews.com/news/national/israel-launches-fresh-strike-on-south-beirut/article_5909411b-9637-56dc-8f38-b4e3fd30d755.html" },
+          { "url": "https://www.livemint.com/opinion/columns/us-iran-war-global-economy-oil-prices-geopolitical-shift-india-energy-security-11773578848179.html" }
+        ]
+      }
+    },
+    {
+      "shot_id": "SHOT_20260316_0002",
+      "city_id": "FUJAIRAH",
+      "city_name": "Fujairah",
+      "threat_level": "RED",
+      "capture_time_kst": "2026-03-16T16:32:00+09:00",
+      "satellite": { "name": "PlanetScope-60509", "sensor_type": "optical" },
+      "sensor": "optical",
+      "priority": { "label": "우선 촬영", "key": "priority", "rank": 2 },
+      "target": { "facility_name": "Fujairah oil facilities", "facility_type": "oil_terminal" },
+      "context": {
+        "llm_summary": "Iranian drone strikes caused fires at Fujairah oil facilities on March 16, 2026.",
+        "operational_note": "RED 지역이며 광학 촬영 여건이 EO 촬영 매우 좋음",
+        "sources": [
+          { "url": "https://theindianawaaz.com/trump-says-washington-not-ready-for-any-deal-with-tehran-as-war-in-west-asia-escalate/" },
+          { "url": "https://www.spacewar.com/afp/260316221056.5810v2wk.html" }
+        ]
+      }
+    },
+    {
+      "shot_id": "SHOT_20260316_0003",
+      "city_id": "BAGHDAD",
+      "city_name": "Baghdad",
+      "threat_level": "ORANGE",
+      "capture_time_kst": "2026-03-17T16:04:00+09:00",
+      "satellite": { "name": "SpaceEye-T", "sensor_type": "optical" },
+      "sensor": "optical",
+      "priority": { "label": "우선 촬영", "key": "priority", "rank": 2 },
+      "target": { "facility_name": "Green Zone / US embassy / Baghdad airbase", "facility_type": "embassy_military" },
+      "context": {
+        "llm_summary": "Drone attack sparked fire at a luxury hotel in Baghdad's Green Zone, and the US embassy and Baghdad airbase were targeted by drones and rockets on March 16, 2026.",
+        "operational_note": "ORANGE 지역이며 광학 촬영 여건이 EO 촬영 매우 좋음",
+        "sources": [
+          { "url": "https://www.spacewar.com/afp/260316221056.5810v2wk.html" },
+          { "url": "https://www.rediff.com/news/special/trump-is-caught-between-two-bad-options/20260316.htm" }
+        ]
+      }
+    },
+    {
+      "shot_id": "SHOT_20260316_0019",
+      "city_id": "KHARG_ISLAND",
+      "city_name": "Kharg Island",
+      "threat_level": "RED",
+      "capture_time_kst": "2026-03-19T20:28:00+09:00",
+      "satellite": { "name": "ICEYE-59103", "sensor_type": "sar" },
+      "sensor": "sar",
+      "priority": { "label": "즉시 촬영", "key": "immediate", "rank": 1 },
+      "weather": { "cloud_cover_pct": 72, "is_night": true },
+      "context": {
+        "llm_summary": "US President Donald Trump issued warnings on Friday and Saturday that the US could launch strikes on Kharg Island, indicating indirect tension.",
+        "operational_note": "RED 지역이며 구름이 많아 SAR 촬영 우선",
+        "sources": [
+          { "url": "https://abcnews.com/US/war-iran-enters-3rd-week/story?id=131094834" },
+          { "url": "https://theindianawaaz.com/trump-says-washington-not-ready-for-any-deal-with-tehran-as-war-in-west-asia-escalate/" }
+        ]
+      }
+    },
+    {
+      "shot_id": "SHOT_20260316_0025",
+      "city_id": "GAZAN",
+      "city_name": "Gazan",
+      "threat_level": "YELLOW",
+      "capture_time_kst": "2026-03-23T00:32:00+09:00",
+      "satellite": { "name": "ICEYE-44390", "sensor_type": "sar" },
+      "sensor": "sar",
+      "priority": { "label": "주의 관측", "key": "watch", "rank": 4 },
+      "context": {
+        "llm_summary": "Israeli bombing of schools, hospitals, and religious buildings, and killing of Gazan children, is being conducted in Gazan.",
+        "operational_note": "YELLOW 지역의 보조 감시용 SAR 후보",
+        "sources": [
+          { "url": "https://www.lewrockwell.com/2026/03/phil-giraldi/time-to-pull-the-plug-on-trump-and-netanyahu/" },
+          { "url": "https://townhall.com/columnists/alanjosephbauer/2026/03/16/weve-seen-this-movie-before-n2672865" }
+        ]
+      },
+      "flags": {
+        "adjective_location": true,
+        "non_bda_event": true
+      }
+    }
+  ],
+
+  "satellite_allocation": [
+    { "satellite_name": "SpaceEye-T",        "sensor_type": "optical", "shot_count": 7 },
+    { "satellite_name": "ICEYE-62384",       "sensor_type": "sar",     "shot_count": 2 },
+    { "satellite_name": "ICEYE-58294",       "sensor_type": "sar",     "shot_count": 2 },
+    { "satellite_name": "ICEYE-60546",       "sensor_type": "sar",     "shot_count": 2 },
+    { "satellite_name": "ICEYE-62700",       "sensor_type": "sar",     "shot_count": 2 },
+    { "satellite_name": "PlanetScope-60509", "sensor_type": "optical", "shot_count": 1 },
+    { "satellite_name": "PlanetScope-60497", "sensor_type": "optical", "shot_count": 1 },
+    { "satellite_name": "ICEYE-60548",       "sensor_type": "sar",     "shot_count": 1 },
+    { "satellite_name": "ICEYE-55049",       "sensor_type": "sar",     "shot_count": 1 },
+    { "satellite_name": "ICEYE-43800",       "sensor_type": "sar",     "shot_count": 1 },
+    { "satellite_name": "ICEYE-59103",       "sensor_type": "sar",     "shot_count": 1 },
+    { "satellite_name": "ICEYE-59102",       "sensor_type": "sar",     "shot_count": 1 },
+    { "satellite_name": "ICEYE-44389",       "sensor_type": "sar",     "shot_count": 1 },
+    { "satellite_name": "ICEYE-56963",       "sensor_type": "sar",     "shot_count": 1 },
+    { "satellite_name": "ICEYE-44390",       "sensor_type": "sar",     "shot_count": 1 }
+  ],
+
+  "diagnostics": {
+    "alias_merges": [
+      { "city_id": "BEIRUT",    "from": ["Beirut", "Beyrouth"],              "to": "Beirut" },
+      { "city_id": "JERUSALEM", "from": ["Jerusalem", "Al Quds", "Yerushalayim"], "to": "Jerusalem" },
+      { "city_id": "METULA",    "from": ["Metula", "Metulla"],               "to": "Metula" }
+    ],
+    "warnings": [
+      { "code": "DUP_TARGET",   "message": "'Kharg'와 'Kharg Island'가 별도 도시로 처리되어 동일 대상에 SpaceEye-T 슬롯 2회 배정됨.", "ref": "KHARG" },
+      { "code": "ADJ_LOCATION", "message": "'Gazan'은 형용사 추출로 지명화된 것으로 의심됨.", "ref": "GAZAN" },
+      { "code": "COORD_MISMATCH", "message": "요약이 가리키는 실제 교전지는 Khiam(레바논)이나 촬영 좌표는 Metula(이스라엘).", "ref": "METULA" },
+      { "code": "NON_BDA_EVENT", "message": "정착민 관련 민간 사건으로 위성 BDA 대상에 부적합.", "ref": "JORDAN_VALLEY" }
+    ]
+  }
+}

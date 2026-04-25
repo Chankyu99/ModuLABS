@@ -1,0 +1,297 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sia.example/schemas/schedule/v1.json",
+  "title": "SIA Satellite Tasking Schedule",
+  "description": "SIA 파이프라인이 L1(위기 탐지) + L2a(촬영 스케줄링) 결과를 대시보드/다운스트림 소비자에게 전달하기 위한 표준 출력 스키마.",
+  "type": "object",
+  "required": ["schema_version", "meta", "cities", "shots"],
+  "additionalProperties": false,
+
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+
+    "meta": { "$ref": "#/$defs/Meta" },
+    "cities": {
+      "type": "array",
+      "description": "L1 탐지된 후보 도시. Z-score 내림차순 정렬 권장.",
+      "items": { "$ref": "#/$defs/City" }
+    },
+    "shots": {
+      "type": "array",
+      "description": "L2a 스케줄러가 산출한 촬영 계획. capture_time_kst 오름차순 정렬 권장.",
+      "items": { "$ref": "#/$defs/Shot" }
+    },
+    "satellite_allocation": {
+      "type": "array",
+      "description": "위성별 자원 사용 요약 (하단 카드용 집계치).",
+      "items": { "$ref": "#/$defs/SatelliteAllocation" }
+    },
+    "diagnostics": { "$ref": "#/$defs/Diagnostics" }
+  },
+
+  "$defs": {
+
+    "Meta": {
+      "type": "object",
+      "required": ["generated_at", "mode", "target_date", "window", "tracking"],
+      "additionalProperties": false,
+      "properties": {
+        "generated_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "리포트 생성 시각 (UTC, ISO-8601)."
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["backtest", "live", "forecast"]
+        },
+        "target_date": {
+          "type": "string",
+          "pattern": "^[0-9]{8}$",
+          "description": "탐지 기준일 YYYYMMDD (KST)."
+        },
+        "window": {
+          "type": "object",
+          "required": ["start_kst", "end_kst"],
+          "additionalProperties": false,
+          "properties": {
+            "start_kst": { "type": "string", "format": "date-time" },
+            "end_kst":   { "type": "string", "format": "date-time" }
+          }
+        },
+        "tle": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "reference_date": { "type": "string", "pattern": "^[0-9]{8}$" },
+            "source": { "type": "string", "enum": ["historical-cache", "live-fetch", "simulated"] }
+          }
+        },
+        "tracking": {
+          "type": "object",
+          "required": ["satellites", "cities"],
+          "additionalProperties": false,
+          "properties": {
+            "satellites": { "type": "integer", "minimum": 0 },
+            "cities":     { "type": "integer", "minimum": 0 }
+          }
+        },
+        "pass_stats": {
+          "type": "object",
+          "description": "파이프라인 퍼널 통계.",
+          "additionalProperties": false,
+          "properties": {
+            "total_passes":       { "type": "integer", "minimum": 0 },
+            "in_swath":           { "type": "integer", "minimum": 0 },
+            "schedulable":        { "type": "integer", "minimum": 0 },
+            "city_representative":{ "type": "integer", "minimum": 0 },
+            "final_plan":         { "type": "integer", "minimum": 0 },
+            "eo_candidates":      { "type": "integer", "minimum": 0 },
+            "eo_schedulable":     { "type": "integer", "minimum": 0 },
+            "sar_candidates":     { "type": "integer", "minimum": 0 },
+            "sar_schedulable":    { "type": "integer", "minimum": 0 }
+          }
+        }
+      }
+    },
+
+    "City": {
+      "type": "object",
+      "required": ["city_id", "name", "threat_level", "z_score", "coords"],
+      "additionalProperties": false,
+      "properties": {
+        "city_id":      { "type": "string", "description": "전처리 단계에서 부여된 canonical ID (예: '-801546')." },
+        "name":         { "type": "string" },
+        "aliases":      { "type": "array", "items": { "type": "string" } },
+        "threat_level": { "type": "string", "enum": ["RED", "ORANGE", "YELLOW"] },
+        "z_score":      { "type": "number" },
+        "coords": {
+          "type": "object",
+          "required": ["lat", "lon"],
+          "additionalProperties": false,
+          "properties": {
+            "lat":    { "type": "number", "minimum": -90,  "maximum": 90 },
+            "lon":    { "type": "number", "minimum": -180, "maximum": 180 },
+            "source": { "type": "string", "enum": ["L1", "facility-gazetteer", "manual"] }
+          }
+        },
+        "llm_verification": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "status":         { "type": "string", "enum": ["SUCCESS", "AMBIGUOUS", "FAILED", "SKIPPED"] },
+            "cache_hit":      { "type": "boolean" },
+            "source_count":   { "type": "integer", "minimum": 0 },
+            "mention_count":  { "type": "integer", "minimum": 0 }
+          }
+        },
+        "shot_count": { "type": "integer", "minimum": 0 }
+      }
+    },
+
+    "Shot": {
+      "type": "object",
+      "required": ["shot_id", "city_id", "capture_time_kst", "satellite", "sensor", "priority", "threat_level"],
+      "additionalProperties": false,
+      "properties": {
+        "shot_id":          { "type": "string", "description": "일관된 식별자. 예: 'SHOT_20260316_0001'." },
+        "city_id":          { "type": "string" },
+        "city_name":        { "type": "string", "description": "조회 편의용 비정규화 필드." },
+        "threat_level":     { "type": "string", "enum": ["RED", "ORANGE", "YELLOW"] },
+        "capture_time_kst": { "type": "string", "format": "date-time" },
+        "capture_time_utc": { "type": "string", "format": "date-time" },
+
+        "satellite": {
+          "type": "object",
+          "required": ["name", "sensor_type"],
+          "additionalProperties": false,
+          "properties": {
+            "name":        { "type": "string" },
+            "norad_id":    { "type": ["integer", "null"] },
+            "sensor_type": { "type": "string", "enum": ["optical", "sar"] },
+            "constellation": { "type": ["string", "null"] }
+          }
+        },
+
+        "sensor": { "type": "string", "enum": ["optical", "sar"] },
+
+        "priority": {
+          "type": "object",
+          "required": ["label", "key", "rank"],
+          "additionalProperties": false,
+          "properties": {
+            "label": { "type": "string", "enum": ["즉시 촬영", "우선 촬영", "정밀 관측", "주의 관측"] },
+            "key":   { "type": "string", "enum": ["immediate", "priority", "precise", "watch"] },
+            "rank":  { "type": "integer", "minimum": 1, "maximum": 4, "description": "1=즉시, 4=주의." }
+          }
+        },
+
+        "target": {
+          "type": "object",
+          "description": "도시 centroid가 아닌 실제 관심 시설 좌표가 있으면 여기에. 없으면 city.coords로 폴백.",
+          "additionalProperties": false,
+          "properties": {
+            "coords": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "lat": { "type": "number", "minimum": -90,  "maximum": 90 },
+                "lon": { "type": "number", "minimum": -180, "maximum": 180 }
+              }
+            },
+            "facility_name": { "type": ["string", "null"] },
+            "facility_type": { "type": ["string", "null"], "description": "예: 'oil_field', 'air_base', 'refinery', 'urban'." }
+          }
+        },
+
+        "geometry": {
+          "type": "object",
+          "description": "위성 통과 기하. BDA 타당성 검토에 필요.",
+          "additionalProperties": false,
+          "properties": {
+            "elevation_deg":  { "type": "number" },
+            "off_nadir_deg":  { "type": "number" },
+            "azimuth_deg":    { "type": "number" },
+            "pass_direction": { "type": "string", "enum": ["ascending", "descending"] },
+            "swath_km":       { "type": "number" }
+          }
+        },
+
+        "weather": {
+          "type": "object",
+          "description": "광학 촬영 가용성 판정 근거.",
+          "additionalProperties": false,
+          "properties": {
+            "cloud_cover_pct": { "type": "number", "minimum": 0, "maximum": 100 },
+            "condition_score": { "type": "number", "description": "0~1 정규화. 1=최상." },
+            "is_night":        { "type": "boolean" },
+            "sun_elevation_deg": { "type": "number" }
+          }
+        },
+
+        "context": {
+          "type": "object",
+          "description": "분석관 패널용 해설 콘텐츠.",
+          "additionalProperties": false,
+          "properties": {
+            "llm_summary":      { "type": "string", "description": "한 문장 이벤트 요약." },
+            "operational_note": { "type": "string", "description": "스케줄러가 이 조합을 고른 이유." },
+            "sources": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["url"],
+                "additionalProperties": false,
+                "properties": {
+                  "url":           { "type": "string", "format": "uri" },
+                  "mention_count": { "type": "integer", "minimum": 0 },
+                  "publisher":     { "type": ["string", "null"] }
+                }
+              }
+            }
+          }
+        },
+
+        "flags": {
+          "type": "object",
+          "description": "후처리/QA에서 발견된 주의 사항.",
+          "additionalProperties": false,
+          "properties": {
+            "duplicate_target":    { "type": "boolean", "description": "별칭 중복(Kharg = Kharg Island 등)." },
+            "adjective_location":  { "type": "boolean", "description": "형용사 파싱 오류 의심('Gazan' 등)." },
+            "coord_mismatch":      { "type": "boolean", "description": "요약 내용이 가리키는 실제 지점과 좌표 불일치." },
+            "non_bda_event":       { "type": "boolean", "description": "군사 BDA 대상이 아닌 이벤트." }
+          }
+        }
+      }
+    },
+
+    "SatelliteAllocation": {
+      "type": "object",
+      "required": ["satellite_name", "sensor_type", "shot_count"],
+      "additionalProperties": false,
+      "properties": {
+        "satellite_name": { "type": "string" },
+        "sensor_type":    { "type": "string", "enum": ["optical", "sar"] },
+        "shot_count":     { "type": "integer", "minimum": 0 },
+        "shot_ids":       { "type": "array", "items": { "type": "string" } }
+      }
+    },
+
+    "Diagnostics": {
+      "type": "object",
+      "description": "파이프라인 내부 경고 (대시보드는 조용히 표시하거나 무시 가능).",
+      "additionalProperties": false,
+      "properties": {
+        "alias_merges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "city_id":  { "type": "string" },
+              "from":     { "type": "array", "items": { "type": "string" } },
+              "to":       { "type": "string" }
+            }
+          }
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["code", "message"],
+            "additionalProperties": false,
+            "properties": {
+              "code":    { "type": "string", "description": "예: 'DUP_TARGET', 'ADJ_LOCATION', 'LOW_Z_RECALL'." },
+              "message": { "type": "string" },
+              "ref":     { "type": ["string", "null"], "description": "관련 city_id 또는 shot_id." }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,2049 @@
+{
+  "scenario": "tri-mix",
+  "used_llm": true,
+  "window_days": 7,
+  "mentions_threshold": 100,
+  "date_count": 10,
+  "completed_dates": [
+    "20260228",
+    "20260301",
+    "20260302",
+    "20260305",
+    "20260311",
+    "20260317",
+    "20260322",
+    "20260326",
+    "20260328",
+    "20260331"
+  ],
+  "level1_summary": {
+    "window_days": 7,
+    "prediction_count_total": 92,
+    "tp_count": 54,
+    "tp_count_a": 51,
+    "fp_count": 38,
+    "gt_count_total": 100,
+    "gt_count_a": 67,
+    "gt_count_c": 33,
+    "hit_count_total": 39,
+    "hit_count_a": 36,
+    "hit_count_c": 3,
+    "precision": 0.587,
+    "precision_a": 0.5543,
+    "recall_total": 0.39,
+    "recall_a": 0.5373,
+    "recall_c": 0.0909,
+    "f1": 0.4686,
+    "f1_a": 0.5457,
+    "gt_hits": [
+      {
+        "gt_date": "20260228",
+        "gt_city": "Tehran",
+        "prediction_date": "20260228",
+        "prediction_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260228",
+        "gt_city": "Minab",
+        "prediction_date": "20260228",
+        "prediction_city": "Minab",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260228",
+        "gt_city": "Tel Aviv",
+        "prediction_date": "20260228",
+        "prediction_city": "Tel Aviv",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260228",
+        "gt_city": "Dubai",
+        "prediction_date": "20260228",
+        "prediction_city": "Dubai",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260228",
+        "gt_city": "Manama",
+        "prediction_date": "20260228",
+        "prediction_city": "Manama",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260228",
+        "gt_city": "Kuwait",
+        "prediction_date": "20260302",
+        "prediction_city": "Kuwait City",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260228",
+        "gt_city": "Tabriz",
+        "prediction_date": "20260228",
+        "prediction_city": "Tabriz",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260301",
+        "gt_city": "Beit Shemesh",
+        "prediction_date": "20260301",
+        "prediction_city": "Tel Aviv",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 41.24
+      },
+      {
+        "gt_date": "20260301",
+        "gt_city": "Tehran",
+        "prediction_date": "20260301",
+        "prediction_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260301",
+        "gt_city": "Tabriz",
+        "prediction_date": "20260301",
+        "prediction_city": "Tabriz",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260301",
+        "gt_city": "Najafabad",
+        "prediction_date": "20260301",
+        "prediction_city": "Isfahan",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 28.68
+      },
+      {
+        "gt_date": "20260301",
+        "gt_city": "Dubai",
+        "prediction_date": "20260301",
+        "prediction_city": "Dubai",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260302",
+        "gt_city": "Natanz",
+        "prediction_date": "20260302",
+        "prediction_city": "Natanz",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260302",
+        "gt_city": "Tehran",
+        "prediction_date": "20260302",
+        "prediction_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260302",
+        "gt_city": "Ras Tanura",
+        "prediction_date": "20260302",
+        "prediction_city": "Ras Tanura",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260302",
+        "gt_city": "Kuwait City",
+        "prediction_date": "20260302",
+        "prediction_city": "Kuwait City",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260302",
+        "gt_city": "Gulf of Oman",
+        "prediction_date": "20260302",
+        "prediction_city": "Gulf Of Oman",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260302",
+        "gt_city": "Baghdad",
+        "prediction_date": "20260302",
+        "prediction_city": "Baghdad",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260305",
+        "gt_city": "Tehran",
+        "prediction_date": "20260305",
+        "prediction_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260305",
+        "gt_city": "Tabriz",
+        "prediction_date": "20260305",
+        "prediction_city": "Tabriz",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260311",
+        "gt_city": "Beirut",
+        "prediction_date": "20260311",
+        "prediction_city": "Beirut",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260311",
+        "gt_city": "Dubai",
+        "prediction_date": "20260317",
+        "prediction_city": "Dubai",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260311",
+        "gt_city": "Tehran",
+        "prediction_date": "20260311",
+        "prediction_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260317",
+        "gt_city": "Tehran",
+        "prediction_date": "20260317",
+        "prediction_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260317",
+        "gt_city": "Ramat Gan",
+        "prediction_date": "20260317",
+        "prediction_city": "Tel Aviv",
+        "tier": "C",
+        "match_type": "geo",
+        "distance_km": 4.49
+      },
+      {
+        "gt_date": "20260317",
+        "gt_city": "Fujairah",
+        "prediction_date": "20260317",
+        "prediction_city": "Fujairah",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260317",
+        "gt_city": "Baghdad",
+        "prediction_date": "20260317",
+        "prediction_city": "Baghdad",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260322",
+        "gt_city": "Tehran",
+        "prediction_date": "20260322",
+        "prediction_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260322",
+        "gt_city": "Tel Aviv",
+        "prediction_date": "20260322",
+        "prediction_city": "Tel Aviv",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260322",
+        "gt_city": "Abu Dhabi",
+        "prediction_date": "20260326",
+        "prediction_city": "Abu Dhabi",
+        "tier": "C",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260322",
+        "gt_city": "Esfahan",
+        "prediction_date": "20260322",
+        "prediction_city": "Isfahan",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260322",
+        "gt_city": "Qasmiyeh",
+        "prediction_date": "20260322",
+        "prediction_city": "Misgav Am",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 29.38
+      },
+      {
+        "gt_date": "20260326",
+        "gt_city": "Tehran",
+        "prediction_date": "20260328",
+        "prediction_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260326",
+        "gt_city": "Esfahan",
+        "prediction_date": "20260326",
+        "prediction_city": "Isfahan",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260326",
+        "gt_city": "Tel Aviv",
+        "prediction_date": "20260326",
+        "prediction_city": "Tel Aviv",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260326",
+        "gt_city": "Abu Dhabi",
+        "prediction_date": "20260326",
+        "prediction_city": "Abu Dhabi",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260328",
+        "gt_city": "Tehran",
+        "prediction_date": "20260328",
+        "prediction_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260331",
+        "gt_city": "Parchin",
+        "prediction_date": "20260331",
+        "prediction_city": "Tehran",
+        "tier": "C",
+        "match_type": "geo",
+        "distance_km": 33.84
+      },
+      {
+        "gt_date": "20260331",
+        "gt_city": "Khojir",
+        "prediction_date": "20260331",
+        "prediction_city": "Tehran",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 24.33
+      }
+    ],
+    "tp_predictions": [
+      {
+        "prediction_date": "20260228",
+        "prediction_city": "Tehran",
+        "gt_date": "20260228",
+        "gt_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260228",
+        "prediction_city": "Tel Aviv",
+        "gt_date": "20260228",
+        "gt_city": "Tel Aviv",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260228",
+        "prediction_city": "Minab",
+        "gt_date": "20260228",
+        "gt_city": "Minab",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260228",
+        "prediction_city": "Dubai",
+        "gt_date": "20260228",
+        "gt_city": "Dubai",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260228",
+        "prediction_city": "Manama",
+        "gt_date": "20260228",
+        "gt_city": "Manama",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260228",
+        "prediction_city": "Tabriz",
+        "gt_date": "20260228",
+        "gt_city": "Tabriz",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260228",
+        "prediction_city": "Ben Gurion",
+        "gt_date": "20260228",
+        "gt_city": "Tel Aviv",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 12.86
+      },
+      {
+        "prediction_date": "20260301",
+        "prediction_city": "Tehran",
+        "gt_date": "20260228",
+        "gt_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260301",
+        "prediction_city": "Tel Aviv",
+        "gt_date": "20260228",
+        "gt_city": "Tel Aviv",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260301",
+        "prediction_city": "Minab",
+        "gt_date": "20260228",
+        "gt_city": "Minab",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260301",
+        "prediction_city": "Dubai",
+        "gt_date": "20260228",
+        "gt_city": "Dubai",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260301",
+        "prediction_city": "Beit Shemesh",
+        "gt_date": "20260228",
+        "gt_city": "Tel Aviv",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 42.13
+      },
+      {
+        "prediction_date": "20260301",
+        "prediction_city": "Jerusalem",
+        "gt_date": "20260301",
+        "gt_city": "Beit Shemesh",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 23.29
+      },
+      {
+        "prediction_date": "20260301",
+        "prediction_city": "Isfahan",
+        "gt_date": "20260301",
+        "gt_city": "Najafabad",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 28.68
+      },
+      {
+        "prediction_date": "20260301",
+        "prediction_city": "Hebron",
+        "gt_date": "20260301",
+        "gt_city": "Beit Shemesh",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 26.02
+      },
+      {
+        "prediction_date": "20260301",
+        "prediction_city": "Tabriz",
+        "gt_date": "20260228",
+        "gt_city": "Tabriz",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260302",
+        "prediction_city": "Tehran",
+        "gt_date": "20260228",
+        "gt_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260302",
+        "prediction_city": "Jerusalem",
+        "gt_date": "20260301",
+        "gt_city": "Beit Shemesh",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 23.29
+      },
+      {
+        "prediction_date": "20260302",
+        "prediction_city": "Tel Aviv",
+        "gt_date": "20260228",
+        "gt_city": "Tel Aviv",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260302",
+        "prediction_city": "Beit Shemesh",
+        "gt_date": "20260228",
+        "gt_city": "Tel Aviv",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 42.13
+      },
+      {
+        "prediction_date": "20260302",
+        "prediction_city": "Minab",
+        "gt_date": "20260228",
+        "gt_city": "Minab",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260302",
+        "prediction_city": "Natanz",
+        "gt_date": "20260302",
+        "gt_city": "Natanz",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260302",
+        "prediction_city": "Hebron",
+        "gt_date": "20260301",
+        "gt_city": "Beit Shemesh",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 26.02
+      },
+      {
+        "prediction_date": "20260302",
+        "prediction_city": "Baghdad",
+        "gt_date": "20260302",
+        "gt_city": "Baghdad",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260302",
+        "prediction_city": "Dubai",
+        "gt_date": "20260228",
+        "gt_city": "Dubai",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260302",
+        "prediction_city": "Gulf Of Oman",
+        "gt_date": "20260302",
+        "gt_city": "Gulf of Oman",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260302",
+        "prediction_city": "Kuwait City",
+        "gt_date": "20260228",
+        "gt_city": "Kuwait",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260302",
+        "prediction_city": "Ras Tanura",
+        "gt_date": "20260302",
+        "gt_city": "Ras Tanura",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260305",
+        "prediction_city": "Tehran",
+        "gt_date": "20260228",
+        "gt_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260305",
+        "prediction_city": "Tel Aviv",
+        "gt_date": "20260228",
+        "gt_city": "Tel Aviv",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260305",
+        "prediction_city": "Jerusalem",
+        "gt_date": "20260301",
+        "gt_city": "Beit Shemesh",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 23.29
+      },
+      {
+        "prediction_date": "20260305",
+        "prediction_city": "Gulf Of Oman",
+        "gt_date": "20260302",
+        "gt_city": "Gulf of Oman",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260305",
+        "prediction_city": "Minab",
+        "gt_date": "20260228",
+        "gt_city": "Minab",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260305",
+        "prediction_city": "Tabriz",
+        "gt_date": "20260228",
+        "gt_city": "Tabriz",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260311",
+        "prediction_city": "Tehran",
+        "gt_date": "20260305",
+        "gt_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260311",
+        "prediction_city": "Beirut",
+        "gt_date": "20260311",
+        "gt_city": "Beirut",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260317",
+        "prediction_city": "Tehran",
+        "gt_date": "20260311",
+        "gt_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260317",
+        "prediction_city": "Tel Aviv",
+        "gt_date": "20260317",
+        "gt_city": "Ramat Gan",
+        "tier": "C",
+        "match_type": "geo",
+        "distance_km": 4.49
+      },
+      {
+        "prediction_date": "20260317",
+        "prediction_city": "Baghdad",
+        "gt_date": "20260317",
+        "gt_city": "Baghdad",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260317",
+        "prediction_city": "Beirut",
+        "gt_date": "20260311",
+        "gt_city": "Beirut",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260317",
+        "prediction_city": "Fujairah",
+        "gt_date": "20260317",
+        "gt_city": "Fujairah",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260317",
+        "prediction_city": "Dubai",
+        "gt_date": "20260311",
+        "gt_city": "Dubai",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260322",
+        "prediction_city": "Misgav Am",
+        "gt_date": "20260322",
+        "gt_city": "Qasmiyeh",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 29.38
+      },
+      {
+        "prediction_date": "20260322",
+        "prediction_city": "Tehran",
+        "gt_date": "20260317",
+        "gt_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260322",
+        "prediction_city": "Maalot-Tarshiha",
+        "gt_date": "20260322",
+        "gt_city": "Qasmiyeh",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 35.71
+      },
+      {
+        "prediction_date": "20260322",
+        "prediction_city": "Tel Aviv",
+        "gt_date": "20260317",
+        "gt_city": "Ramat Gan",
+        "tier": "C",
+        "match_type": "geo",
+        "distance_km": 4.49
+      },
+      {
+        "prediction_date": "20260322",
+        "prediction_city": "Isfahan",
+        "gt_date": "20260322",
+        "gt_city": "Esfahan",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260326",
+        "prediction_city": "Tel Aviv",
+        "gt_date": "20260322",
+        "gt_city": "Tel Aviv",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260326",
+        "prediction_city": "Isfahan",
+        "gt_date": "20260322",
+        "gt_city": "Esfahan",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260326",
+        "prediction_city": "Abu Dhabi",
+        "gt_date": "20260322",
+        "gt_city": "Abu Dhabi",
+        "tier": "C",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260328",
+        "prediction_city": "Tehran",
+        "gt_date": "20260322",
+        "gt_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260328",
+        "prediction_city": "Eshtaol",
+        "gt_date": "20260322",
+        "gt_city": "Tel Aviv",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 40.13
+      },
+      {
+        "prediction_date": "20260328",
+        "prediction_city": "Jezzine",
+        "gt_date": "20260322",
+        "gt_city": "Qasmiyeh",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 38.73
+      },
+      {
+        "prediction_date": "20260331",
+        "prediction_city": "Tehran",
+        "gt_date": "20260326",
+        "gt_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      }
+    ],
+    "fp_predictions": [
+      {
+        "prediction_date": "20260228",
+        "prediction_city": "Doha"
+      },
+      {
+        "prediction_date": "20260228",
+        "prediction_city": "Jerusalem"
+      },
+      {
+        "prediction_date": "20260228",
+        "prediction_city": "Kermanshah"
+      },
+      {
+        "prediction_date": "20260228",
+        "prediction_city": "Kharg Island"
+      },
+      {
+        "prediction_date": "20260228",
+        "prediction_city": "Riyadh"
+      },
+      {
+        "prediction_date": "20260301",
+        "prediction_city": "Rasht"
+      },
+      {
+        "prediction_date": "20260301",
+        "prediction_city": "Doha"
+      },
+      {
+        "prediction_date": "20260301",
+        "prediction_city": "Erbil"
+      },
+      {
+        "prediction_date": "20260301",
+        "prediction_city": "Kashmir"
+      },
+      {
+        "prediction_date": "20260301",
+        "prediction_city": "Riyadh"
+      },
+      {
+        "prediction_date": "20260302",
+        "prediction_city": "Beirut"
+      },
+      {
+        "prediction_date": "20260302",
+        "prediction_city": "Rasht"
+      },
+      {
+        "prediction_date": "20260302",
+        "prediction_city": "Kashmir"
+      },
+      {
+        "prediction_date": "20260302",
+        "prediction_city": "Doha"
+      },
+      {
+        "prediction_date": "20260305",
+        "prediction_city": "Beirut"
+      },
+      {
+        "prediction_date": "20260305",
+        "prediction_city": "Shakarabad"
+      },
+      {
+        "prediction_date": "20260305",
+        "prediction_city": "Kfar Kila"
+      },
+      {
+        "prediction_date": "20260311",
+        "prediction_city": "Tel Aviv"
+      },
+      {
+        "prediction_date": "20260317",
+        "prediction_city": "Jerusalem"
+      },
+      {
+        "prediction_date": "20260322",
+        "prediction_city": "Dimona"
+      },
+      {
+        "prediction_date": "20260322",
+        "prediction_city": "Hebron"
+      },
+      {
+        "prediction_date": "20260322",
+        "prediction_city": "Jerusalem"
+      },
+      {
+        "prediction_date": "20260322",
+        "prediction_city": "Andimeshk"
+      },
+      {
+        "prediction_date": "20260322",
+        "prediction_city": "Natanz"
+      },
+      {
+        "prediction_date": "20260322",
+        "prediction_city": "Bushehr"
+      },
+      {
+        "prediction_date": "20260322",
+        "prediction_city": "Beirut"
+      },
+      {
+        "prediction_date": "20260326",
+        "prediction_city": "Kharg Island"
+      },
+      {
+        "prediction_date": "20260326",
+        "prediction_city": "Bandar Abbas"
+      },
+      {
+        "prediction_date": "20260326",
+        "prediction_city": "Hebron"
+      },
+      {
+        "prediction_date": "20260326",
+        "prediction_city": "Jerusalem"
+      },
+      {
+        "prediction_date": "20260328",
+        "prediction_city": "Beirut"
+      },
+      {
+        "prediction_date": "20260328",
+        "prediction_city": "Jerusalem"
+      },
+      {
+        "prediction_date": "20260328",
+        "prediction_city": "Beersheba"
+      },
+      {
+        "prediction_date": "20260328",
+        "prediction_city": "Al Manar"
+      },
+      {
+        "prediction_date": "20260328",
+        "prediction_city": "Hebron"
+      },
+      {
+        "prediction_date": "20260331",
+        "prediction_city": "Beirut"
+      },
+      {
+        "prediction_date": "20260331",
+        "prediction_city": "Hebron"
+      },
+      {
+        "prediction_date": "20260331",
+        "prediction_city": "Kharg Island"
+      }
+    ]
+  },
+  "level2_summary": {
+    "window_days": 7,
+    "prediction_count_total": 92,
+    "tp_count": 54,
+    "tp_count_a": 51,
+    "fp_count": 38,
+    "gt_count_total": 100,
+    "gt_count_a": 67,
+    "gt_count_c": 33,
+    "hit_count_total": 39,
+    "hit_count_a": 36,
+    "hit_count_c": 3,
+    "precision": 0.587,
+    "precision_a": 0.5543,
+    "recall_total": 0.39,
+    "recall_a": 0.5373,
+    "recall_c": 0.0909,
+    "f1": 0.4686,
+    "f1_a": 0.5457,
+    "gt_hits": [
+      {
+        "gt_date": "20260228",
+        "gt_city": "Tehran",
+        "prediction_date": "20260228",
+        "prediction_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260228",
+        "gt_city": "Minab",
+        "prediction_date": "20260228",
+        "prediction_city": "Minab",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260228",
+        "gt_city": "Tel Aviv",
+        "prediction_date": "20260228",
+        "prediction_city": "Tel Aviv",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260228",
+        "gt_city": "Dubai",
+        "prediction_date": "20260228",
+        "prediction_city": "Dubai",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260228",
+        "gt_city": "Manama",
+        "prediction_date": "20260228",
+        "prediction_city": "Manama",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260228",
+        "gt_city": "Kuwait",
+        "prediction_date": "20260302",
+        "prediction_city": "Kuwait City",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260228",
+        "gt_city": "Tabriz",
+        "prediction_date": "20260228",
+        "prediction_city": "Tabriz",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260301",
+        "gt_city": "Beit Shemesh",
+        "prediction_date": "20260301",
+        "prediction_city": "Tel Aviv",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 41.24
+      },
+      {
+        "gt_date": "20260301",
+        "gt_city": "Tehran",
+        "prediction_date": "20260301",
+        "prediction_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260301",
+        "gt_city": "Tabriz",
+        "prediction_date": "20260301",
+        "prediction_city": "Tabriz",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260301",
+        "gt_city": "Najafabad",
+        "prediction_date": "20260301",
+        "prediction_city": "Isfahan",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 28.68
+      },
+      {
+        "gt_date": "20260301",
+        "gt_city": "Dubai",
+        "prediction_date": "20260301",
+        "prediction_city": "Dubai",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260302",
+        "gt_city": "Natanz",
+        "prediction_date": "20260302",
+        "prediction_city": "Natanz",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260302",
+        "gt_city": "Tehran",
+        "prediction_date": "20260302",
+        "prediction_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260302",
+        "gt_city": "Ras Tanura",
+        "prediction_date": "20260302",
+        "prediction_city": "Ras Tanura",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260302",
+        "gt_city": "Kuwait City",
+        "prediction_date": "20260302",
+        "prediction_city": "Kuwait City",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260302",
+        "gt_city": "Gulf of Oman",
+        "prediction_date": "20260302",
+        "prediction_city": "Gulf Of Oman",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260302",
+        "gt_city": "Baghdad",
+        "prediction_date": "20260302",
+        "prediction_city": "Baghdad",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260305",
+        "gt_city": "Tehran",
+        "prediction_date": "20260305",
+        "prediction_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260305",
+        "gt_city": "Tabriz",
+        "prediction_date": "20260305",
+        "prediction_city": "Tabriz",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260311",
+        "gt_city": "Beirut",
+        "prediction_date": "20260311",
+        "prediction_city": "Beirut",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260311",
+        "gt_city": "Dubai",
+        "prediction_date": "20260317",
+        "prediction_city": "Dubai",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260311",
+        "gt_city": "Tehran",
+        "prediction_date": "20260311",
+        "prediction_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260317",
+        "gt_city": "Tehran",
+        "prediction_date": "20260317",
+        "prediction_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260317",
+        "gt_city": "Ramat Gan",
+        "prediction_date": "20260317",
+        "prediction_city": "Tel Aviv",
+        "tier": "C",
+        "match_type": "geo",
+        "distance_km": 4.49
+      },
+      {
+        "gt_date": "20260317",
+        "gt_city": "Fujairah",
+        "prediction_date": "20260317",
+        "prediction_city": "Fujairah",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260317",
+        "gt_city": "Baghdad",
+        "prediction_date": "20260317",
+        "prediction_city": "Baghdad",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260322",
+        "gt_city": "Tehran",
+        "prediction_date": "20260322",
+        "prediction_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260322",
+        "gt_city": "Tel Aviv",
+        "prediction_date": "20260322",
+        "prediction_city": "Tel Aviv",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260322",
+        "gt_city": "Abu Dhabi",
+        "prediction_date": "20260326",
+        "prediction_city": "Abu Dhabi",
+        "tier": "C",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260322",
+        "gt_city": "Esfahan",
+        "prediction_date": "20260322",
+        "prediction_city": "Isfahan",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260322",
+        "gt_city": "Qasmiyeh",
+        "prediction_date": "20260322",
+        "prediction_city": "Misgav Am",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 29.38
+      },
+      {
+        "gt_date": "20260326",
+        "gt_city": "Tehran",
+        "prediction_date": "20260328",
+        "prediction_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260326",
+        "gt_city": "Esfahan",
+        "prediction_date": "20260326",
+        "prediction_city": "Isfahan",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260326",
+        "gt_city": "Tel Aviv",
+        "prediction_date": "20260326",
+        "prediction_city": "Tel Aviv",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260326",
+        "gt_city": "Abu Dhabi",
+        "prediction_date": "20260326",
+        "prediction_city": "Abu Dhabi",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260328",
+        "gt_city": "Tehran",
+        "prediction_date": "20260328",
+        "prediction_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "gt_date": "20260331",
+        "gt_city": "Parchin",
+        "prediction_date": "20260331",
+        "prediction_city": "Tehran",
+        "tier": "C",
+        "match_type": "geo",
+        "distance_km": 33.84
+      },
+      {
+        "gt_date": "20260331",
+        "gt_city": "Khojir",
+        "prediction_date": "20260331",
+        "prediction_city": "Tehran",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 24.33
+      }
+    ],
+    "tp_predictions": [
+      {
+        "prediction_date": "20260228",
+        "prediction_city": "Tehran",
+        "gt_date": "20260228",
+        "gt_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260228",
+        "prediction_city": "Tel Aviv",
+        "gt_date": "20260228",
+        "gt_city": "Tel Aviv",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260228",
+        "prediction_city": "Minab",
+        "gt_date": "20260228",
+        "gt_city": "Minab",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260228",
+        "prediction_city": "Dubai",
+        "gt_date": "20260228",
+        "gt_city": "Dubai",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260228",
+        "prediction_city": "Manama",
+        "gt_date": "20260228",
+        "gt_city": "Manama",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260228",
+        "prediction_city": "Tabriz",
+        "gt_date": "20260228",
+        "gt_city": "Tabriz",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260228",
+        "prediction_city": "Ben Gurion",
+        "gt_date": "20260228",
+        "gt_city": "Tel Aviv",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 12.86
+      },
+      {
+        "prediction_date": "20260301",
+        "prediction_city": "Tehran",
+        "gt_date": "20260228",
+        "gt_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260301",
+        "prediction_city": "Tel Aviv",
+        "gt_date": "20260228",
+        "gt_city": "Tel Aviv",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260301",
+        "prediction_city": "Minab",
+        "gt_date": "20260228",
+        "gt_city": "Minab",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260301",
+        "prediction_city": "Dubai",
+        "gt_date": "20260228",
+        "gt_city": "Dubai",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260301",
+        "prediction_city": "Beit Shemesh",
+        "gt_date": "20260228",
+        "gt_city": "Tel Aviv",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 42.13
+      },
+      {
+        "prediction_date": "20260301",
+        "prediction_city": "Jerusalem",
+        "gt_date": "20260301",
+        "gt_city": "Beit Shemesh",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 23.29
+      },
+      {
+        "prediction_date": "20260301",
+        "prediction_city": "Isfahan",
+        "gt_date": "20260301",
+        "gt_city": "Najafabad",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 28.68
+      },
+      {
+        "prediction_date": "20260301",
+        "prediction_city": "Hebron",
+        "gt_date": "20260301",
+        "gt_city": "Beit Shemesh",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 26.02
+      },
+      {
+        "prediction_date": "20260301",
+        "prediction_city": "Tabriz",
+        "gt_date": "20260228",
+        "gt_city": "Tabriz",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260302",
+        "prediction_city": "Tehran",
+        "gt_date": "20260228",
+        "gt_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260302",
+        "prediction_city": "Jerusalem",
+        "gt_date": "20260301",
+        "gt_city": "Beit Shemesh",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 23.29
+      },
+      {
+        "prediction_date": "20260302",
+        "prediction_city": "Tel Aviv",
+        "gt_date": "20260228",
+        "gt_city": "Tel Aviv",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260302",
+        "prediction_city": "Beit Shemesh",
+        "gt_date": "20260228",
+        "gt_city": "Tel Aviv",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 42.13
+      },
+      {
+        "prediction_date": "20260302",
+        "prediction_city": "Minab",
+        "gt_date": "20260228",
+        "gt_city": "Minab",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260302",
+        "prediction_city": "Natanz",
+        "gt_date": "20260302",
+        "gt_city": "Natanz",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260302",
+        "prediction_city": "Hebron",
+        "gt_date": "20260301",
+        "gt_city": "Beit Shemesh",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 26.02
+      },
+      {
+        "prediction_date": "20260302",
+        "prediction_city": "Baghdad",
+        "gt_date": "20260302",
+        "gt_city": "Baghdad",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260302",
+        "prediction_city": "Dubai",
+        "gt_date": "20260228",
+        "gt_city": "Dubai",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260302",
+        "prediction_city": "Gulf Of Oman",
+        "gt_date": "20260302",
+        "gt_city": "Gulf of Oman",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260302",
+        "prediction_city": "Kuwait City",
+        "gt_date": "20260228",
+        "gt_city": "Kuwait",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260302",
+        "prediction_city": "Ras Tanura",
+        "gt_date": "20260302",
+        "gt_city": "Ras Tanura",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260305",
+        "prediction_city": "Tehran",
+        "gt_date": "20260228",
+        "gt_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260305",
+        "prediction_city": "Tel Aviv",
+        "gt_date": "20260228",
+        "gt_city": "Tel Aviv",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260305",
+        "prediction_city": "Jerusalem",
+        "gt_date": "20260301",
+        "gt_city": "Beit Shemesh",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 23.29
+      },
+      {
+        "prediction_date": "20260305",
+        "prediction_city": "Gulf Of Oman",
+        "gt_date": "20260302",
+        "gt_city": "Gulf of Oman",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260305",
+        "prediction_city": "Minab",
+        "gt_date": "20260228",
+        "gt_city": "Minab",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260305",
+        "prediction_city": "Tabriz",
+        "gt_date": "20260228",
+        "gt_city": "Tabriz",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260311",
+        "prediction_city": "Tehran",
+        "gt_date": "20260305",
+        "gt_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260311",
+        "prediction_city": "Beirut",
+        "gt_date": "20260311",
+        "gt_city": "Beirut",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260317",
+        "prediction_city": "Tehran",
+        "gt_date": "20260311",
+        "gt_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260317",
+        "prediction_city": "Tel Aviv",
+        "gt_date": "20260317",
+        "gt_city": "Ramat Gan",
+        "tier": "C",
+        "match_type": "geo",
+        "distance_km": 4.49
+      },
+      {
+        "prediction_date": "20260317",
+        "prediction_city": "Baghdad",
+        "gt_date": "20260317",
+        "gt_city": "Baghdad",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260317",
+        "prediction_city": "Beirut",
+        "gt_date": "20260311",
+        "gt_city": "Beirut",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260317",
+        "prediction_city": "Fujairah",
+        "gt_date": "20260317",
+        "gt_city": "Fujairah",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260317",
+        "prediction_city": "Dubai",
+        "gt_date": "20260311",
+        "gt_city": "Dubai",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260322",
+        "prediction_city": "Misgav Am",
+        "gt_date": "20260322",
+        "gt_city": "Qasmiyeh",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 29.38
+      },
+      {
+        "prediction_date": "20260322",
+        "prediction_city": "Tehran",
+        "gt_date": "20260317",
+        "gt_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260322",
+        "prediction_city": "Maalot-Tarshiha",
+        "gt_date": "20260322",
+        "gt_city": "Qasmiyeh",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 35.71
+      },
+      {
+        "prediction_date": "20260322",
+        "prediction_city": "Tel Aviv",
+        "gt_date": "20260317",
+        "gt_city": "Ramat Gan",
+        "tier": "C",
+        "match_type": "geo",
+        "distance_km": 4.49
+      },
+      {
+        "prediction_date": "20260322",
+        "prediction_city": "Isfahan",
+        "gt_date": "20260322",
+        "gt_city": "Esfahan",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260326",
+        "prediction_city": "Tel Aviv",
+        "gt_date": "20260322",
+        "gt_city": "Tel Aviv",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260326",
+        "prediction_city": "Isfahan",
+        "gt_date": "20260322",
+        "gt_city": "Esfahan",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260326",
+        "prediction_city": "Abu Dhabi",
+        "gt_date": "20260322",
+        "gt_city": "Abu Dhabi",
+        "tier": "C",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260328",
+        "prediction_city": "Tehran",
+        "gt_date": "20260322",
+        "gt_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      },
+      {
+        "prediction_date": "20260328",
+        "prediction_city": "Eshtaol",
+        "gt_date": "20260322",
+        "gt_city": "Tel Aviv",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 40.13
+      },
+      {
+        "prediction_date": "20260328",
+        "prediction_city": "Jezzine",
+        "gt_date": "20260322",
+        "gt_city": "Qasmiyeh",
+        "tier": "A",
+        "match_type": "geo",
+        "distance_km": 38.73
+      },
+      {
+        "prediction_date": "20260331",
+        "prediction_city": "Tehran",
+        "gt_date": "20260326",
+        "gt_city": "Tehran",
+        "tier": "A",
+        "match_type": "name",
+        "distance_km": 0.0
+      }
+    ],
+    "fp_predictions": [
+      {
+        "prediction_date": "20260228",
+        "prediction_city": "Doha"
+      },
+      {
+        "prediction_date": "20260228",
+        "prediction_city": "Jerusalem"
+      },
+      {
+        "prediction_date": "20260228",
+        "prediction_city": "Kermanshah"
+      },
+      {
+        "prediction_date": "20260228",
+        "prediction_city": "Kharg Island"
+      },
+      {
+        "prediction_date": "20260228",
+        "prediction_city": "Riyadh"
+      },
+      {
+        "prediction_date": "20260301",
+        "prediction_city": "Rasht"
+      },
+      {
+        "prediction_date": "20260301",
+        "prediction_city": "Doha"
+      },
+      {
+        "prediction_date": "20260301",
+        "prediction_city": "Erbil"
+      },
+      {
+        "prediction_date": "20260301",
+        "prediction_city": "Kashmir"
+      },
+      {
+        "prediction_date": "20260301",
+        "prediction_city": "Riyadh"
+      },
+      {
+        "prediction_date": "20260302",
+        "prediction_city": "Beirut"
+      },
+      {
+        "prediction_date": "20260302",
+        "prediction_city": "Rasht"
+      },
+      {
+        "prediction_date": "20260302",
+        "prediction_city": "Kashmir"
+      },
+      {
+        "prediction_date": "20260302",
+        "prediction_city": "Doha"
+      },
+      {
+        "prediction_date": "20260305",
+        "prediction_city": "Beirut"
+      },
+      {
+        "prediction_date": "20260305",
+        "prediction_city": "Shakarabad"
+      },
+      {
+        "prediction_date": "20260305",
+        "prediction_city": "Kfar Kila"
+      },
+      {
+        "prediction_date": "20260311",
+        "prediction_city": "Tel Aviv"
+      },
+      {
+        "prediction_date": "20260317",
+        "prediction_city": "Jerusalem"
+      },
+      {
+        "prediction_date": "20260322",
+        "prediction_city": "Dimona"
+      },
+      {
+        "prediction_date": "20260322",
+        "prediction_city": "Hebron"
+      },
+      {
+        "prediction_date": "20260322",
+        "prediction_city": "Jerusalem"
+      },
+      {
+        "prediction_date": "20260322",
+        "prediction_city": "Andimeshk"
+      },
+      {
+        "prediction_date": "20260322",
+        "prediction_city": "Natanz"
+      },
+      {
+        "prediction_date": "20260322",
+        "prediction_city": "Bushehr"
+      },
+      {
+        "prediction_date": "20260322",
+        "prediction_city": "Beirut"
+      },
+      {
+        "prediction_date": "20260326",
+        "prediction_city": "Kharg Island"
+      },
+      {
+        "prediction_date": "20260326",
+        "prediction_city": "Bandar Abbas"
+      },
+      {
+        "prediction_date": "20260326",
+        "prediction_city": "Hebron"
+      },
+      {
+        "prediction_date": "20260326",
+        "prediction_city": "Jerusalem"
+      },
+      {
+        "prediction_date": "20260328",
+        "prediction_city": "Beirut"
+      },
+      {
+        "prediction_date": "20260328",
+        "prediction_city": "Jerusalem"
+      },
+      {
+        "prediction_date": "20260328",
+        "prediction_city": "Beersheba"
+      },
+      {
+        "prediction_date": "20260328",
+        "prediction_city": "Al Manar"
+      },
+      {
+        "prediction_date": "20260328",
+        "prediction_city": "Hebron"
+      },
+      {
+        "prediction_date": "20260331",
+        "prediction_city": "Beirut"
+      },
+      {
+        "prediction_date": "20260331",
+        "prediction_city": "Hebron"
+      },
+      {
+        "prediction_date": "20260331",
+        "prediction_city": "Kharg Island"
+      }
+    ]
+  }
+}

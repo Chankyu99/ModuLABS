@@ -1,0 +1,22 @@
+{
+  "date": "20260421",
+  "generated_at": "2026-04-22T14:58:41Z",
+  "alert_count": 1,
+  "alerts": [
+    {
+      "city": "Hebron",
+      "risk_level": 1,
+      "risk_label": "YELLOW",
+      "conflict_index": -5.403,
+      "innovation_z": 1.453,
+      "severity_score": 1.453,
+      "events": 36,
+      "lat": 31.5333,
+      "lon": 35.1,
+      "country_code": "IS",
+      "guide": "모니터링",
+      "llm_status": "SUCCESS",
+      "llm_event_summary": "Israeli settler killed teenager in Hebron"
+    }
+  ]
+}

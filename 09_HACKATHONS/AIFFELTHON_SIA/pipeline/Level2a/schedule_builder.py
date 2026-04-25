@@ -264,6 +264,55 @@ def build_city_best_recommendations(events: list[dict]) -> list[dict]:
     return city_best
 
 
+def build_city_execution_plan(events: list[dict]) -> list[dict]:
+    """실제 실행 이벤트를 도시별로 묶고 빠른 순서대로 정렬한다."""
+    grouped: dict[str, list[dict]] = {}
+    for event in events:
+        grouped.setdefault(event["city"], []).append(event.copy())
+
+    city_plan = []
+    for city, items in grouped.items():
+        items.sort(key=lambda x: x["pass_time_utc"])
+        for order, item in enumerate(items, 1):
+            item["city_execution_order"] = order
+            item["source_urls"] = list(item.get("source_urls", []))[:2]
+        city_plan.append(
+            {
+                "city": city,
+                "scheduled_count": len(items),
+                "first_pass_time_utc": items[0]["pass_time_utc"] if items else "",
+                "timeline": items,
+            }
+        )
+
+    city_plan.sort(
+        key=lambda item: (
+            item["first_pass_time_utc"],
+            -item["scheduled_count"],
+            item["city"],
+        )
+    )
+    return city_plan
+
+
+def build_satellite_allocation_summary(execution_plan: list[dict]) -> list[dict]:
+    """위성별 사용량 요약을 대시보드/콘솔 요약용으로 반환한다."""
+    allocation = []
+    for satellite_plan in execution_plan:
+        timeline = satellite_plan.get("timeline", [])
+        sensor_type = normalize_sensor_type(timeline[0].get("sensor_type")) if timeline else "unknown"
+        allocation.append(
+            {
+                "satellite": satellite_plan["satellite"],
+                "sensor_type": sensor_type,
+                "scheduled_count": satellite_plan.get("scheduled_count", len(timeline)),
+                "cities": [item.get("city", "") for item in timeline],
+            }
+        )
+    allocation.sort(key=lambda item: (-item["scheduled_count"], item["satellite"]))
+    return allocation
+
+
 def build_sensor_condition_summary(events: list[dict]) -> dict:
     """센서별 촬영 가능/제약 요약을 만든다."""
     summary = {
@@ -330,7 +379,9 @@ def build_satellite_execution_plan(
     satellite_times: dict[str, list[datetime]] = {}
     gap_seconds = max(min_gap_minutes, 0) * 60
 
-    for event in sorted(events, key=_recommendation_sort_key):
+    sorted_events = sorted(events, key=_recommendation_sort_key)
+
+    def try_assign_event(event: dict) -> bool:
         city = event["city"]
         satellite = event["satellite"]
         sensor = normalize_sensor_type(event.get("sensor_type"))
@@ -340,7 +391,7 @@ def build_satellite_execution_plan(
         city_limit = 2 if risk in {"RED", "ORANGE"} else 1
 
         if len(existing_city_events) >= city_limit:
-            continue
+            return False
 
         # RED/ORANGE 도시의 두 번째 슬롯은 가능하면 다른 센서로 채워
         # "primary + backup" 구성을 유도한다.
@@ -350,7 +401,7 @@ def build_satellite_execution_plan(
                 for item in existing_city_events
             }
             if sensor in existing_sensors:
-                continue
+                return False
 
         existing_times = satellite_times.setdefault(satellite, [])
         has_conflict = any(abs((pass_dt - prev).total_seconds()) < gap_seconds for prev in existing_times)
@@ -363,12 +414,47 @@ def build_satellite_execution_plan(
                 "urgency_index": round(get_urgency_index(event), 2),
                 "reason": f"same-satellite gap<{min_gap_minutes}m",
             })
-            continue
+            return False
 
         selected = event.copy()
         selected_events.append(selected)
         existing_city_events.append(selected)
         existing_times.append(pass_dt)
+        return True
+
+    for event in sorted_events:
+        try_assign_event(event)
+
+    # SpaceEye-T 광학 후보가 있고 도시 슬롯이 남아 있으면 best-effort로 추가한다.
+    events_by_city: dict[str, list[dict]] = {}
+    for event in sorted_events:
+        events_by_city.setdefault(event["city"], []).append(event)
+
+    for city, candidates in events_by_city.items():
+        existing_city_events = city_assignments.setdefault(city, [])
+        if any(item.get("satellite") == "SpaceEye-T" for item in existing_city_events):
+            continue
+
+        risk = next(
+            (item.get("risk_label", item.get("risk_level", "N/A")) for item in candidates),
+            "N/A",
+        )
+        city_limit = 2 if risk in {"RED", "ORANGE"} else 1
+        if len(existing_city_events) >= city_limit:
+            continue
+
+        spaceeye_candidates = [
+            event for event in candidates
+            if event.get("satellite") == "SpaceEye-T"
+            and normalize_sensor_type(event.get("sensor_type")) == "optical"
+            and event.get("shootable")
+        ]
+        if not spaceeye_candidates:
+            continue
+
+        for candidate in sorted(spaceeye_candidates, key=_recommendation_sort_key):
+            if try_assign_event(candidate):
+                break
 
     grouped: dict[str, list[dict]] = {}
     for event in selected_events:
@@ -506,8 +592,16 @@ def build_schedule(
             checked["risk_label"] = city_info.get("risk_label", "N/A")
             checked["innovation_z"] = city_info.get("innovation_z", 0.0)
             checked["severity_score"] = city_info.get("severity_score", 0.0)
+            checked["guide"] = city_info.get("guide", "")
+            checked["llm_status"] = city_info.get("llm_status", "UNVERIFIED")
+            checked["llm_event_summary"] = city_info.get("llm_event_summary", "")
+            checked["source_urls"] = list(city_info.get("source_urls", []))[:2]
         else:
             checked["risk_label"] = city_info
+            checked["guide"] = ""
+            checked["llm_status"] = "UNVERIFIED"
+            checked["llm_event_summary"] = ""
+            checked["source_urls"] = []
             
         checked["priority_band"] = classify_priority_band(checked)
         checked["quality_score"] = compute_quality_score(checked)
@@ -522,6 +616,8 @@ def build_schedule(
     final_shootable.sort(key=_recommendation_sort_key)
     city_best_recommendations = build_city_best_recommendations(final_shootable)
     satellite_execution = build_satellite_execution_plan(final_shootable)
+    city_execution_plan = build_city_execution_plan(satellite_execution["scheduled_events"])
+    satellite_allocation = build_satellite_allocation_summary(satellite_execution["execution_plan"])
     sensor_condition_summary = build_sensor_condition_summary(weather_checked)
 
     # ── Step 5: 결과 조립 ──
@@ -545,6 +641,8 @@ def build_schedule(
         "recommendations": final_shootable,
         "city_best_recommendations": city_best_recommendations,
         "sensor_condition_summary": sensor_condition_summary,
+        "city_execution_plan": city_execution_plan,
+        "satellite_allocation": satellite_allocation,
         "satellite_execution_plan": satellite_execution["execution_plan"],
         "execution_min_gap_minutes": satellite_execution["min_capture_gap_minutes"],
         "scheduled_events": len(satellite_execution["scheduled_events"]),
@@ -572,9 +670,11 @@ def save_schedule(schedule: dict, filename: str | None = None) -> Path:
     return filepath
 
 
-def print_schedule(schedule: dict) -> None:
+def print_schedule(schedule: dict, verbose: bool = False) -> None:
     """스케줄 리포트를 터미널에 출력한다."""
     recs = schedule.get("city_best_recommendations") or schedule.get("recommendations", [])
+    city_execution_plan = schedule.get("city_execution_plan", [])
+    satellite_allocation = schedule.get("satellite_allocation", [])
     execution_plan = schedule.get("satellite_execution_plan", [])
     sensor_summary = schedule.get("sensor_condition_summary", {})
 
@@ -616,30 +716,58 @@ def print_schedule(schedule: dict) -> None:
     if schedule.get("stale_passes_removed", 0):
         print(f"  ℹ️ 운영 기준 시각 이전 통과 {schedule['stale_passes_removed']}건은 자동 제외했습니다.\n")
 
-    if not execution_plan:
+    if not city_execution_plan:
         if recs:
             print("  ⚠️ 추천 후보는 있으나 실행 계획으로 확정된 일정이 없습니다.\n")
         else:
             print("  ⚠️ 촬영 가능한 통과 이벤트가 없습니다.\n")
         return
 
-    gap = schedule.get("execution_min_gap_minutes", MIN_CAPTURE_GAP_MINUTES)
-    print(f"  ── 위성별 실행 계획 (최소 간격 {gap}분) ──")
-    for satellite_plan in execution_plan:
-        print(f"  [{satellite_plan['satellite']}] {satellite_plan['scheduled_count']}건")
-        print(f"  {'순번':>2s} | {'도시':15s} | {'대응 우선순위':12s} | "
-              f"{'촬영 시각(KST)':16s} | {'핵심 메시지'}")
-        print("  " + "─" * 93)
-        for item in satellite_plan["timeline"][:12]:
+    if satellite_allocation:
+        summary = " | ".join(
+            f"{item['satellite']} {item['scheduled_count']}건·{item['sensor_type'].upper()}"
+            for item in satellite_allocation
+        )
+        print(f"  🛰️ 위성 할당: {summary}\n")
+
+    print("  ── 도시별 실행 계획 (빠른 순) ──")
+    for city_plan in city_execution_plan:
+        print(f"  [{city_plan['city']}] {city_plan['scheduled_count']}건")
+        print(f"  {'순번':>2s} | {'위성':14s} | {'센서':6s} | {'대응 우선순위':12s} | {'촬영 시각(KST)':16s}")
+        print("  " + "─" * 82)
+        for order, item in enumerate(city_plan["timeline"], 1):
             print(
-                f"  {item['execution_order']:>2d} | {item['city']:15s} | "
+                f"  {item.get('city_execution_order', order):>2d} | {item['satellite']:14s} | "
+                f"{item.get('sensor_type', 'n/a'):6s} | "
                 f"{item.get('action_priority_label', '확인 필요'):12s} | "
-                f"{_format_display_time_kst(item['pass_time_utc']):16s} | "
-                f"{item.get('recommendation_reason', '')}"
+                f"{_format_display_time_kst(item['pass_time_utc']):16s}"
             )
-        if len(satellite_plan["timeline"]) > 12:
-            print(f"  ... 외 {len(satellite_plan['timeline']) - 12}건")
+            if item.get("llm_event_summary"):
+                print(f"     LLM: {item['llm_event_summary']}")
+            for idx, url in enumerate(item.get("source_urls", [])[:2], 1):
+                print(f"     URL{idx}: {url}")
+            if item.get("recommendation_reason"):
+                print(f"     NOTE: {item['recommendation_reason']}")
         print()
+
+    if verbose and execution_plan:
+        gap = schedule.get("execution_min_gap_minutes", MIN_CAPTURE_GAP_MINUTES)
+        print(f"  ── 위성별 실행 계획 (최소 간격 {gap}분) ──")
+        for satellite_plan in execution_plan:
+            print(f"  [{satellite_plan['satellite']}] {satellite_plan['scheduled_count']}건")
+            print(f"  {'순번':>2s} | {'도시':15s} | {'대응 우선순위':12s} | "
+                  f"{'촬영 시각(KST)':16s} | {'핵심 메시지'}")
+            print("  " + "─" * 93)
+            for item in satellite_plan["timeline"][:12]:
+                print(
+                    f"  {item['execution_order']:>2d} | {item['city']:15s} | "
+                    f"{item.get('action_priority_label', '확인 필요'):12s} | "
+                    f"{_format_display_time_kst(item['pass_time_utc']):16s} | "
+                    f"{item.get('recommendation_reason', '')}"
+                )
+            if len(satellite_plan["timeline"]) > 12:
+                print(f"  ... 외 {len(satellite_plan['timeline']) - 12}건")
+            print()
 
     print()
 

@@ -1,0 +1,310 @@
+{
+  "date": "20260316",
+  "generated_at": "2026-04-24T06:15:38Z",
+  "alert_count": 16,
+  "alerts": [
+    {
+      "city": "Kharg Island",
+      "risk_level": 3,
+      "risk_label": "RED",
+      "conflict_index": 44.111,
+      "innovation_z": 12.918,
+      "severity_score": 12.918,
+      "events": 100,
+      "lat": 29.2458,
+      "lon": 50.3158,
+      "country_code": "IR",
+      "guide": "즉시 대응",
+      "llm_status": "AMBIGUOUS",
+      "llm_event_summary": "US President Donald Trump issued warnings on Friday and Saturday that the US could launch strikes on Kharg Island, indicating indirect tension.",
+      "source_urls": [
+        "https://abcnews.com/US/war-iran-enters-3rd-week/story?id=131094834",
+        "https://theindianawaaz.com/trump-says-washington-not-ready-for-any-deal-with-tehran-as-war-in-west-asia-escalate/"
+      ]
+    },
+    {
+      "city": "Beirut",
+      "risk_level": 3,
+      "risk_label": "RED",
+      "conflict_index": 37.754,
+      "innovation_z": 8.412,
+      "severity_score": 8.412,
+      "events": 79,
+      "lat": 33.8719,
+      "lon": 35.5097,
+      "country_code": "LE",
+      "guide": "즉시 대응",
+      "llm_status": "SUCCESS",
+      "llm_event_summary": "Israeli military launched new attacks and stepped up strikes on the Lebanese capital, Beirut, targeting Hezbollah militants early Tuesday (March 10).",
+      "source_urls": [
+        "https://www.clickondetroit.com/business/2026/03/16/iran-hits-gulf-neighbors-and-keeps-stranglehold-on-oil-shipping-as-concerns-rise-of-energy-crisis/",
+        "https://www.sun-sentinel.com/2026/03/16/israel-steps-up-campaign-in-lebanon-as-iran-keeps-stranglehold-on-shipping/"
+      ]
+    },
+    {
+      "city": "Jerusalem",
+      "risk_level": 3,
+      "risk_label": "RED",
+      "conflict_index": 17.906,
+      "innovation_z": 6.673,
+      "severity_score": 6.673,
+      "events": 100,
+      "lat": 31.7667,
+      "lon": 35.2333,
+      "country_code": "IS",
+      "guide": "즉시 대응",
+      "llm_status": "SUCCESS",
+      "llm_event_summary": "Intercepted Iranian missile attack sprayed shrapnel through Jerusalem’s Old City, hitting the Greek Orthodox Patriarchate, Western Wall, and Al Aqsa Mosque compound early Tuesday.",
+      "source_urls": [
+        "https://www.jpost.com/middle-east/article-890075",
+        "https://www.twincities.com/2026/03/16/us-iran-war-shipping/"
+      ]
+    },
+    {
+      "city": "Dubai",
+      "risk_level": 3,
+      "risk_label": "RED",
+      "conflict_index": 16.423,
+      "innovation_z": 3.956,
+      "severity_score": 3.956,
+      "events": 37,
+      "lat": 25.2522,
+      "lon": 55.28,
+      "country_code": "AE",
+      "guide": "즉시 대응",
+      "llm_status": "SUCCESS",
+      "llm_event_summary": "Iran launched drone attacks on Dubai International Airport, causing fires and flight suspensions on Sunday and Monday.",
+      "source_urls": [
+        "https://www.sun-sentinel.com/2026/03/16/israel-steps-up-campaign-in-lebanon-as-iran-keeps-stranglehold-on-shipping/",
+        "https://www.news18.com/agency-feeds/israel-steps-up-campaign-in-lebanon-iran-keeps-stranglehold-on-shipping-9972385.html"
+      ]
+    },
+    {
+      "city": "Fujairah",
+      "risk_level": 3,
+      "risk_label": "RED",
+      "conflict_index": 11.598,
+      "innovation_z": 3.533,
+      "severity_score": 3.533,
+      "events": 18,
+      "lat": 25.1164,
+      "lon": 56.3414,
+      "country_code": "AE",
+      "guide": "즉시 대응",
+      "llm_status": "SUCCESS",
+      "llm_event_summary": "Iranian drone strikes caused fires at Fujairah oil facilities on March 16, 2026.",
+      "source_urls": [
+        "https://theindianawaaz.com/trump-says-washington-not-ready-for-any-deal-with-tehran-as-war-in-west-asia-escalate/",
+        "https://www.spacewar.com/afp/260316221056.5810v2wk.html"
+      ]
+    },
+    {
+      "city": "Kharg",
+      "risk_level": 2,
+      "risk_label": "ORANGE",
+      "conflict_index": 10.524,
+      "innovation_z": 2.892,
+      "severity_score": 2.892,
+      "events": 27,
+      "lat": 29.25,
+      "lon": 50.3286,
+      "country_code": "IR",
+      "guide": "정밀 분석",
+      "llm_status": "SUCCESS",
+      "llm_event_summary": "US carried out strikes on military targets on Kharg Island within the past 7 days.",
+      "source_urls": [
+        "http://europe.chinadaily.com.cn/a/202603/16/WS69b75728a310d6866eb3df60.html",
+        "https://www.cnbc.com/2026/03/16/trump-iran-kharg-island-strikes-oil-exports.html"
+      ]
+    },
+    {
+      "city": "Baghdad",
+      "risk_level": 2,
+      "risk_label": "ORANGE",
+      "conflict_index": 12.351,
+      "innovation_z": 2.793,
+      "severity_score": 2.793,
+      "events": 33,
+      "lat": 33.3386,
+      "lon": 44.3939,
+      "country_code": "IZ",
+      "guide": "정밀 분석",
+      "llm_status": "SUCCESS",
+      "llm_event_summary": "Drone attack sparked fire at a luxury hotel in Baghdad's Green Zone, and the US embassy and Baghdad airbase were targeted by drones and rockets on March 16, 2026.",
+      "source_urls": [
+        "https://www.spacewar.com/afp/260316221056.5810v2wk.html",
+        "https://www.rediff.com/news/special/trump-is-caught-between-two-bad-options/20260316.htm"
+      ]
+    },
+    {
+      "city": "Isfahan",
+      "risk_level": 2,
+      "risk_label": "ORANGE",
+      "conflict_index": 10.358,
+      "innovation_z": 2.679,
+      "severity_score": 2.679,
+      "events": 20,
+      "lat": 32.6597,
+      "lon": 51.6714,
+      "country_code": "IR",
+      "guide": "정밀 분석",
+      "llm_status": "SUCCESS",
+      "llm_event_summary": "Israel / strikes / missile-related facilities in Isfahan",
+      "source_urls": [
+        "https://www.brisbanetimes.com.au/world/north-america/with-the-iran-war-entering-its-third-week-what-is-trump-s-exit-strategy-20260316-p5oar1.html",
+        "https://www.omanobserver.om/article/1186195/world/region/wars-third-week-trump-faces-stark-choices"
+      ]
+    },
+    {
+      "city": "Tel Aviv",
+      "risk_level": 2,
+      "risk_label": "ORANGE",
+      "conflict_index": 20.845,
+      "innovation_z": 2.263,
+      "severity_score": 2.263,
+      "events": 67,
+      "lat": 32.0667,
+      "lon": 34.7667,
+      "country_code": "IS",
+      "guide": "정밀 분석",
+      "llm_status": "SUCCESS",
+      "llm_event_summary": "Iran fired two salvos toward Tel Aviv, and Hezbollah fired an advanced missile at Palmachim air base south of Tel Aviv.",
+      "source_urls": [
+        "https://www.keysnews.com/news/national/israel-launches-fresh-strike-on-south-beirut/article_5909411b-9637-56dc-8f38-b4e3fd30d755.html",
+        "https://www.livemint.com/opinion/columns/us-iran-war-global-economy-oil-prices-geopolitical-shift-india-energy-security-11773578848179.html"
+      ]
+    },
+    {
+      "city": "Avivim",
+      "risk_level": 1,
+      "risk_label": "YELLOW",
+      "conflict_index": 5.478,
+      "innovation_z": 1.709,
+      "severity_score": 1.709,
+      "events": 11,
+      "lat": 33.0889,
+      "lon": 35.4723,
+      "country_code": "IS",
+      "guide": "모니터링",
+      "llm_status": "SUCCESS",
+      "llm_event_summary": "Hezbollah attacked Avivim with missiles, rockets, and artillery shells on March 15, 2026.",
+      "source_urls": [
+        "https://www.naharnet.com:443/stories/en/318981-hezbollah-clashes-with-israeli-forces-trying-to-enter-south-lebanon",
+        "https://ict.org.il/operation-epic-fury-sitrep-15-mar-2026/"
+      ]
+    },
+    {
+      "city": "Mehrabad",
+      "risk_level": 1,
+      "risk_label": "YELLOW",
+      "conflict_index": 4.963,
+      "innovation_z": 1.473,
+      "severity_score": 1.473,
+      "events": 10,
+      "lat": 30.064,
+      "lon": 55.1322,
+      "country_code": "IR",
+      "guide": "모니터링",
+      "llm_status": "SUCCESS",
+      "llm_event_summary": "Israeli military conducted an air strike destroying an aircraft used by Iran's leadership at Mehrabad Airport on March 16.",
+      "source_urls": [
+        "http://www.bignewsnetwork.com/news/278926281/which-side-are-you-on-iran-security-chief-calls-for-unity-among-muslim-majority-countries-amid-war",
+        "https://www.freepressjournal.in/world/israel-says-it-destroyed-aircraft-used-by-irans-supreme-leader-khamenei-at-tehran-airport"
+      ]
+    },
+    {
+      "city": "Abu Dhabi",
+      "risk_level": 1,
+      "risk_label": "YELLOW",
+      "conflict_index": 4.834,
+      "innovation_z": 1.446,
+      "severity_score": 1.446,
+      "events": 7,
+      "lat": 24.4667,
+      "lon": 54.3667,
+      "country_code": "AE",
+      "guide": "모니터링",
+      "llm_status": "SUCCESS",
+      "llm_event_summary": "Drone hit Shah oil field and missile struck civilian vehicle, killing one Palestinian civilian, in Abu Dhabi on Monday.",
+      "source_urls": [
+        "https://www.wsls.com/news/2026/03/16/the-latest-trump-calls-for-allies-to-help-reopen-strait-of-hormuz/",
+        "https://www.deccanchronicle.com/world/americas/trump-calls-for-help-to-reopen-the-strait-of-hormuz-1944187"
+      ]
+    },
+    {
+      "city": "Jordan Valley",
+      "risk_level": 1,
+      "risk_label": "YELLOW",
+      "conflict_index": 1.528,
+      "innovation_z": 1.419,
+      "severity_score": 1.419,
+      "events": 8,
+      "lat": 32.6667,
+      "lon": 35.5,
+      "country_code": "IS",
+      "guide": "모니터링",
+      "llm_status": "SUCCESS",
+      "llm_event_summary": "Settlers raided Khirbet Humsa in northern Jordan Valley over the weekend (March 14-15), severely sexually assaulting a man and committing other violence.",
+      "source_urls": [
+        "https://thefrontierpost.com/iran-war-a-five-star-opportunity-for-west-bank-settlers/",
+        "https://www.longwarjournal.org/archives/2026/03/israel-conducts-7600-strikes-on-iran-in-13-days-iran-fires-hundreds-of-missiles-and-drones-at-israel.php"
+      ]
+    },
+    {
+      "city": "Metula",
+      "risk_level": 1,
+      "risk_label": "YELLOW",
+      "conflict_index": 4.389,
+      "innovation_z": 1.241,
+      "severity_score": 1.241,
+      "events": 14,
+      "lat": 33.2792,
+      "lon": 35.5795,
+      "country_code": "IS",
+      "guide": "모니터링",
+      "llm_status": "SUCCESS",
+      "llm_event_summary": "Hezbollah engaged in direct clashes and targeted Israeli forces and vehicles in Khiam, located across the border from Metula, on Monday and in recent days (since Saturday).",
+      "source_urls": [
+        "https://economictimes.indiatimes.com/news/international/world-news/israel-army-says-begun-limited-targeted-ground-operations-against-hezbollah-in-south-lebanon/articleshow/129606042.cms",
+        "https://www.rnz.co.nz/news/world/589763/israel-army-says-begun-limited-targeted-ground-operations-against-hezbollah-in-south-lebanon"
+      ]
+    },
+    {
+      "city": "Ramat Gan",
+      "risk_level": 1,
+      "risk_label": "YELLOW",
+      "conflict_index": 3.542,
+      "innovation_z": 1.085,
+      "severity_score": 1.085,
+      "events": 7,
+      "lat": 32.0806,
+      "lon": 34.8142,
+      "country_code": "IS",
+      "guide": "모니터링",
+      "llm_status": "SUCCESS",
+      "llm_event_summary": "A man in Ramat Gan sustained blast injuries following a barrage that hit the Tel Aviv area on Sunday morning, within the past 7 days of the target date.",
+      "source_urls": [
+        "https://www.mininggazette.com/news/front-page/2026/03/new-attacks/"
+      ]
+    },
+    {
+      "city": "Gazan",
+      "risk_level": 1,
+      "risk_label": "YELLOW",
+      "conflict_index": 3.367,
+      "innovation_z": 1.02,
+      "severity_score": 1.02,
+      "events": 9,
+      "lat": 31.6424,
+      "lon": 51.4128,
+      "country_code": "IR",
+      "guide": "모니터링",
+      "llm_status": "SUCCESS",
+      "llm_event_summary": "Israeli bombing of schools, hospitals, and religious buildings, and killing of Gazan children, is being conducted in Gazan.",
+      "source_urls": [
+        "https://www.lewrockwell.com/2026/03/phil-giraldi/time-to-pull-the-plug-on-trump-and-netanyahu/",
+        "https://townhall.com/columnists/alanjosephbauer/2026/03/16/weve-seen-this-movie-before-n2672865"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1255 @@
+{
+  "scenario": "tri-mix",
+  "used_llm": true,
+  "date_count": 7,
+  "averages": {
+    "precision": 0.3651,
+    "recall": 0.3714,
+    "f1": 0.3594
+  },
+  "results": [
+    {
+      "date": "20260228",
+      "scenario": "tri-mix",
+      "mode": "backtest",
+      "used_llm": true,
+      "gt_count": 10,
+      "predicted_city_count": 12,
+      "tp": 6,
+      "fp": 6,
+      "fn": 4,
+      "precision": 0.5,
+      "recall": 0.6,
+      "f1": 0.5455,
+      "weather_request_failed": false,
+      "eo_candidates": 111,
+      "eo_shootable": 0,
+      "eo_weather_unknown": 49,
+      "sar_candidates": 1986,
+      "sar_shootable": 1986,
+      "llm_candidate_count": 12,
+      "llm_confirmed_count": 12,
+      "llm_rejected_count": 0,
+      "llm_error_count": 0,
+      "llm_status_counts": {
+        "SUCCESS": 11,
+        "AMBIGUOUS": 1
+      },
+      "matched_pairs": [
+        {
+          "prediction_city": "Tehran",
+          "ground_truth_city": "Tehran",
+          "match_type": "name",
+          "distance_km": 0.0
+        },
+        {
+          "prediction_city": "Tel Aviv",
+          "ground_truth_city": "Tel Aviv",
+          "match_type": "name",
+          "distance_km": 0.0
+        },
+        {
+          "prediction_city": "Minab",
+          "ground_truth_city": "Minab",
+          "match_type": "name",
+          "distance_km": 0.0
+        },
+        {
+          "prediction_city": "Dubai",
+          "ground_truth_city": "Dubai",
+          "match_type": "name",
+          "distance_km": 0.0
+        },
+        {
+          "prediction_city": "Manama",
+          "ground_truth_city": "Manama",
+          "match_type": "name",
+          "distance_km": 0.0
+        },
+        {
+          "prediction_city": "Tabriz",
+          "ground_truth_city": "Tabriz",
+          "match_type": "name",
+          "distance_km": 0.0
+        }
+      ],
+      "unmatched_predictions": [
+        {
+          "city": "Doha",
+          "normalized_city": "doha",
+          "lat": 25.2867,
+          "lon": 51.5333,
+          "satellite": "ICEYE-58288",
+          "sensor_type": "sar",
+          "priority_label": "우선 촬영",
+          "pass_time_utc": "2026-03-05T18:49:00Z"
+        },
+        {
+          "city": "Jerusalem",
+          "normalized_city": "jerusalem",
+          "lat": 31.7667,
+          "lon": 35.2333,
+          "satellite": "ICEYE-62384",
+          "sensor_type": "sar",
+          "priority_label": "정밀 관측",
+          "pass_time_utc": "2026-03-05T02:09:19Z"
+        },
+        {
+          "city": "Kermanshah",
+          "normalized_city": "kermanshah",
+          "lat": 34.3142,
+          "lon": 47.065,
+          "satellite": "ICEYE-43800",
+          "sensor_type": "sar",
+          "priority_label": "주의 관측",
+          "pass_time_utc": "2026-03-04T17:38:14Z"
+        },
+        {
+          "city": "Kharg Island",
+          "normalized_city": "kharg island",
+          "lat": 29.2458,
+          "lon": 50.3158,
+          "satellite": "ICEYE-59100",
+          "sensor_type": "sar",
+          "priority_label": "주의 관측",
+          "pass_time_utc": "2026-03-06T23:10:29Z"
+        },
+        {
+          "city": "Riyadh",
+          "normalized_city": "riyadh",
+          "lat": 24.6408,
+          "lon": 46.7728,
+          "satellite": "ICEYE-60539",
+          "sensor_type": "sar",
+          "priority_label": "주의 관측",
+          "pass_time_utc": "2026-02-28T19:17:19Z"
+        },
+        {
+          "city": "Ben Gurion",
+          "normalized_city": "ben gurion",
+          "lat": 32.0114,
+          "lon": 34.8867,
+          "satellite": "ICEYE-48918",
+          "sensor_type": "sar",
+          "priority_label": "주의 관측",
+          "pass_time_utc": "2026-03-03T03:15:11Z"
+        }
+      ],
+      "unmatched_ground_truth": [
+        {
+          "city": "Ali Al Salem Air Base",
+          "normalized_city": "ali al salem air base",
+          "lat": 29.3759,
+          "lon": 47.9774,
+          "source": "Wiki/ISW",
+          "event_description": "[Wiki/ISW] Iranian drones/missiles struck Kuwait Int'l Airport and heavily damaged Ali al Salem Airbase."
+        },
+        {
+          "city": "Abu Dhabi",
+          "normalized_city": "abu dhabi",
+          "lat": 24.4539,
+          "lon": 54.3773,
+          "source": "Wiki/ISW",
+          "event_description": "[Wiki/ISW] An Iranian airstrike hit Zayed International Airport, killing 1 and wounding 7."
+        },
+        {
+          "city": "Lamerd",
+          "normalized_city": "lamerd",
+          "lat": 27.3317,
+          "lon": 53.1793,
+          "source": "Wiki",
+          "event_description": "[Wiki] A US Precision Strike Missile hit a sports hall in Lamerd, killing 21 people."
+        },
+        {
+          "city": "Jurf al-Nasr",
+          "normalized_city": "jurf al sakhr",
+          "lat": 32.88,
+          "lon": 44.18,
+          "source": "Wiki/ISW",
+          "event_description": "[Wiki/ISW] US/combined airstrikes targeted the PMF headquarters in Jurf al-Nasr (Jurf al Sakhr)."
+        }
+      ],
+      "schedule_summary": {
+        "total_passes": 12066,
+        "swath_passes": 2097,
+        "shootable_passes": 1986,
+        "scheduled_cities": 12,
+        "satellites_used": 9
+      }
+    },
+    {
+      "date": "20260302",
+      "scenario": "tri-mix",
+      "mode": "backtest",
+      "used_llm": true,
+      "gt_count": 10,
+      "predicted_city_count": 16,
+      "tp": 6,
+      "fp": 10,
+      "fn": 4,
+      "precision": 0.375,
+      "recall": 0.6,
+      "f1": 0.4615,
+      "weather_request_failed": false,
+      "eo_candidates": 150,
+      "eo_shootable": 0,
+      "eo_weather_unknown": 68,
+      "sar_candidates": 2657,
+      "sar_shootable": 2657,
+      "llm_candidate_count": 16,
+      "llm_confirmed_count": 16,
+      "llm_rejected_count": 0,
+      "llm_error_count": 0,
+      "llm_status_counts": {
+        "SUCCESS": 15,
+        "AMBIGUOUS": 1
+      },
+      "matched_pairs": [
+        {
+          "prediction_city": "Tehran",
+          "ground_truth_city": "Tehran",
+          "match_type": "name",
+          "distance_km": 0.0
+        },
+        {
+          "prediction_city": "Natanz",
+          "ground_truth_city": "Natanz",
+          "match_type": "name",
+          "distance_km": 0.0
+        },
+        {
+          "prediction_city": "Baghdad",
+          "ground_truth_city": "Baghdad",
+          "match_type": "name",
+          "distance_km": 0.0
+        },
+        {
+          "prediction_city": "Gulf Of Oman",
+          "ground_truth_city": "Gulf of Oman",
+          "match_type": "name",
+          "distance_km": 0.0
+        },
+        {
+          "prediction_city": "Kuwait City",
+          "ground_truth_city": "Kuwait City",
+          "match_type": "name",
+          "distance_km": 0.0
+        },
+        {
+          "prediction_city": "Ras Tanura",
+          "ground_truth_city": "Ras Tanura",
+          "match_type": "name",
+          "distance_km": 0.0
+        }
+      ],
+      "unmatched_predictions": [
+        {
+          "city": "Jerusalem",
+          "normalized_city": "jerusalem",
+          "lat": 31.7667,
+          "lon": 35.2333,
+          "satellite": "ICEYE-43800",
+          "sensor_type": "sar",
+          "priority_label": "즉시 촬영",
+          "pass_time_utc": "2026-03-07T18:28:44Z"
+        },
+        {
+          "city": "Tel Aviv",
+          "normalized_city": "tel aviv",
+          "lat": 32.0667,
+          "lon": 34.7667,
+          "satellite": "ICEYE-44390",
+          "sensor_type": "sar",
+          "priority_label": "즉시 촬영",
+          "pass_time_utc": "2026-03-08T16:35:13Z"
+        },
+        {
+          "city": "Beirut",
+          "normalized_city": "beirut",
+          "lat": 33.8719,
+          "lon": 35.5097,
+          "satellite": "ICEYE-46497",
+          "sensor_type": "sar",
+          "priority_label": "즉시 촬영",
+          "pass_time_utc": "2026-03-06T02:39:57Z"
+        },
+        {
+          "city": "Beit Shemesh",
+          "normalized_city": "beit shemesh",
+          "lat": 31.7496,
+          "lon": 34.9888,
+          "satellite": "ICEYE-48918",
+          "sensor_type": "sar",
+          "priority_label": "즉시 촬영",
+          "pass_time_utc": "2026-03-03T03:15:05Z"
+        },
+        {
+          "city": "Minab",
+          "normalized_city": "minab",
+          "lat": 25.7893,
+          "lon": 61.1025,
+          "satellite": "ICEYE-56947",
+          "sensor_type": "sar",
+          "priority_label": "즉시 촬영",
+          "pass_time_utc": "2026-03-06T23:09:50Z"
+        },
+        {
+          "city": "Hebron",
+          "normalized_city": "hebron",
+          "lat": 31.5333,
+          "lon": 35.1,
+          "satellite": "ICEYE-62384",
+          "sensor_type": "sar",
+          "priority_label": "우선 촬영",
+          "pass_time_utc": "2026-03-05T02:09:15Z"
+        },
+        {
+          "city": "Dubai",
+          "normalized_city": "dubai",
+          "lat": 25.2522,
+          "lon": 55.28,
+          "satellite": "ICEYE-48918",
+          "sensor_type": "sar",
+          "priority_label": "정밀 관측",
+          "pass_time_utc": "2026-03-03T14:27:40Z"
+        },
+        {
+          "city": "Rasht",
+          "normalized_city": "rasht",
+          "lat": 37.2808,
+          "lon": 49.5832,
+          "satellite": "ICEYE-60546",
+          "sensor_type": "sar",
+          "priority_label": "주의 관측",
+          "pass_time_utc": "2026-03-05T18:56:59Z"
+        },
+        {
+          "city": "Kashmir",
+          "normalized_city": "kashmir",
+          "lat": 25.6958,
+          "lon": 58.8789,
+          "satellite": "ICEYE-46497",
+          "sensor_type": "sar",
+          "priority_label": "주의 관측",
+          "pass_time_utc": "2026-03-08T01:00:40Z"
+        },
+        {
+          "city": "Doha",
+          "normalized_city": "doha",
+          "lat": 25.2867,
+          "lon": 51.5333,
+          "satellite": "ICEYE-58288",
+          "sensor_type": "sar",
+          "priority_label": "주의 관측",
+          "pass_time_utc": "2026-03-05T18:48:57Z"
+        }
+      ],
+      "unmatched_ground_truth": [
+        {
+          "city": "Riyadh",
+          "normalized_city": "riyadh",
+          "lat": 24.7136,
+          "lon": 46.6753,
+          "source": "Wiki/ISW",
+          "event_description": "[Wiki/ISW] Two Iranian drones struck the US Embassy in Riyadh, causing a limited fire and minor damage."
+        },
+        {
+          "city": "Khorramabad",
+          "normalized_city": "khorramabad",
+          "lat": 33.4878,
+          "lon": 48.3558,
+          "source": "ISW",
+          "event_description": "[ISW] Commercially available satellite imagery shows bunker buster bomb impacts at the IRGC Aerospace Force Imam Ali Missile Base in Khorramabad."
+        },
+        {
+          "city": "Shahin Shahr",
+          "normalized_city": "shahin shahr",
+          "lat": 32.8667,
+          "lon": 51.5667,
+          "source": "ISW",
+          "event_description": "[ISW] Combined forces targeted the HESA drone manufacturing facility (Shahed drones) in Shahin Shahr."
+        },
+        {
+          "city": "Sanandaj",
+          "normalized_city": "sanandaj",
+          "lat": 35.3115,
+          "lon": 46.996,
+          "source": "ISW",
+          "event_description": "[ISW] Airstrikes targeted the Kurdistan Province Law Enforcement Command (LEC) Headquarters in Sanandaj."
+        }
+      ],
+      "schedule_summary": {
+        "total_passes": 16100,
+        "swath_passes": 2807,
+        "shootable_passes": 2657,
+        "scheduled_cities": 16,
+        "satellites_used": 12
+      }
+    },
+    {
+      "date": "20260305",
+      "scenario": "tri-mix",
+      "mode": "backtest",
+      "used_llm": true,
+      "gt_count": 10,
+      "predicted_city_count": 9,
+      "tp": 2,
+      "fp": 7,
+      "fn": 8,
+      "precision": 0.2222,
+      "recall": 0.2,
+      "f1": 0.2105,
+      "weather_request_failed": false,
+      "eo_candidates": 96,
+      "eo_shootable": 0,
+      "eo_weather_unknown": 47,
+      "sar_candidates": 1558,
+      "sar_shootable": 1558,
+      "llm_candidate_count": 9,
+      "llm_confirmed_count": 9,
+      "llm_rejected_count": 0,
+      "llm_error_count": 0,
+      "llm_status_counts": {
+        "SUCCESS": 9
+      },
+      "matched_pairs": [
+        {
+          "prediction_city": "Tehran",
+          "ground_truth_city": "Tehran",
+          "match_type": "name",
+          "distance_km": 0.0
+        },
+        {
+          "prediction_city": "Tabriz",
+          "ground_truth_city": "Tabriz",
+          "match_type": "name",
+          "distance_km": 0.0
+        }
+      ],
+      "unmatched_predictions": [
+        {
+          "city": "Tel Aviv",
+          "normalized_city": "tel aviv",
+          "lat": 32.0667,
+          "lon": 34.7667,
+          "satellite": "ICEYE-44390",
+          "sensor_type": "sar",
+          "priority_label": "즉시 촬영",
+          "pass_time_utc": "2026-03-08T16:35:07Z"
+        },
+        {
+          "city": "Jerusalem",
+          "normalized_city": "jerusalem",
+          "lat": 31.7667,
+          "lon": 35.2333,
+          "satellite": "ICEYE-43800",
+          "sensor_type": "sar",
+          "priority_label": "즉시 촬영",
+          "pass_time_utc": "2026-03-07T18:28:37Z"
+        },
+        {
+          "city": "Beirut",
+          "normalized_city": "beirut",
+          "lat": 33.8719,
+          "lon": 35.5097,
+          "satellite": "ICEYE-46497",
+          "sensor_type": "sar",
+          "priority_label": "즉시 촬영",
+          "pass_time_utc": "2026-03-06T02:39:56Z"
+        },
+        {
+          "city": "Gulf Of Oman",
+          "normalized_city": "gulf of oman",
+          "lat": 25.4489,
+          "lon": 57.7939,
+          "satellite": "ICEYE-44389",
+          "sensor_type": "sar",
+          "priority_label": "우선 촬영",
+          "pass_time_utc": "2026-03-05T16:18:19Z"
+        },
+        {
+          "city": "Minab",
+          "normalized_city": "minab",
+          "lat": 25.7893,
+          "lon": 61.1025,
+          "satellite": "ICEYE-46497",
+          "sensor_type": "sar",
+          "priority_label": "정밀 관측",
+          "pass_time_utc": "2026-03-11T00:52:05Z"
+        },
+        {
+          "city": "Shakarabad",
+          "normalized_city": "shakarabad",
+          "lat": 33.5901,
+          "lon": 49.0079,
+          "satellite": "ICEYE-60546",
+          "sensor_type": "sar",
+          "priority_label": "주의 관측",
+          "pass_time_utc": "2026-03-09T19:02:36Z"
+        },
+        {
+          "city": "Kfar Kila",
+          "normalized_city": "kfar kila",
+          "lat": 33.2772,
+          "lon": 35.5517,
+          "satellite": "ICEYE-60549",
+          "sensor_type": "sar",
+          "priority_label": "주의 관측",
+          "pass_time_utc": "2026-03-08T19:55:09Z"
+        }
+      ],
+      "unmatched_ground_truth": [
+        {
+          "city": "Manzariyeh",
+          "normalized_city": "manzariyeh",
+          "lat": 34.798,
+          "lon": 50.806,
+          "source": "ISW",
+          "event_description": "[ISW] The IDF struck hangars and bunkers in a restricted area of the Artesh Shahid Farashahi ammunition depot in Manzariyeh."
+        },
+        {
+          "city": "Ma'ameer",
+          "normalized_city": "ma'ameer",
+          "lat": 26.1264,
+          "lon": 50.6061,
+          "source": "Wiki/ISW",
+          "event_description": "[Wiki/ISW] Iranian ballistic missiles struck the BAPCO refinery near Ma'ameer, starting a fire at the facility."
+        },
+        {
+          "city": "Persian Gulf (off Kuwait)",
+          "normalized_city": "persian gulf (off kuwait)",
+          "lat": 29.5,
+          "lon": 48.5,
+          "source": "ISW",
+          "event_description": "[ISW] The oil tanker Sonangol Namibe experienced a large explosion caused by an Iranian USV southeast of Mubarak al Kabeer, Kuwait."
+        },
+        {
+          "city": "Kermanshah",
+          "normalized_city": "kermanshah",
+          "lat": 34.3142,
+          "lon": 47.065,
+          "source": "ISW",
+          "event_description": "[ISW] Combined force conducted airstrikes targeting an IRGC Intelligence Building and IRGC Ground Forces Nabi Akram Operational Division in Kermanshah City."
+        },
+        {
+          "city": "Erbil",
+          "normalized_city": "erbil",
+          "lat": 36.2366,
+          "lon": 43.9636,
+          "source": "ISW",
+          "event_description": "[ISW] The Iranian Artesh launched drone strikes targeting the US base at Erbil International Airport in Iraq."
+        },
+        {
+          "city": "Camp Buehring",
+          "normalized_city": "camp buehring",
+          "lat": 29.695,
+          "lon": 47.438,
+          "source": "ISW",
+          "event_description": "[ISW] Iranian forces carried out drone strikes against US forces at Camp Buehring."
+        },
+        {
+          "city": "Ahvaz",
+          "normalized_city": "ahvaz",
+          "lat": 31.3183,
+          "lon": 48.6706,
+          "source": "ISW",
+          "event_description": "[ISW] Airstrike damage was observed at the IRGC 3rd Hazrat-e Mehdi Ranger Brigade base in Khuzestan Province."
+        },
+        {
+          "city": "Sarsang",
+          "normalized_city": "sarsang",
+          "lat": 37.0333,
+          "lon": 43.3333,
+          "source": "ISW",
+          "event_description": "[ISW] A drone struck a power generator at the US-operated Sarsang oil field in Duhok Province, causing a fire and forcing closure."
+        }
+      ],
+      "schedule_summary": {
+        "total_passes": 9329,
+        "swath_passes": 1654,
+        "shootable_passes": 1558,
+        "scheduled_cities": 9,
+        "satellites_used": 8
+      }
+    },
+    {
+      "date": "20260317",
+      "scenario": "tri-mix",
+      "mode": "backtest",
+      "used_llm": true,
+      "gt_count": 10,
+      "predicted_city_count": 7,
+      "tp": 4,
+      "fp": 3,
+      "fn": 6,
+      "precision": 0.5714,
+      "recall": 0.4,
+      "f1": 0.4706,
+      "weather_request_failed": false,
+      "eo_candidates": 58,
+      "eo_shootable": 0,
+      "eo_weather_unknown": 28,
+      "sar_candidates": 1218,
+      "sar_shootable": 1218,
+      "llm_candidate_count": 7,
+      "llm_confirmed_count": 7,
+      "llm_rejected_count": 0,
+      "llm_error_count": 0,
+      "llm_status_counts": {
+        "SUCCESS": 7
+      },
+      "matched_pairs": [
+        {
+          "prediction_city": "Tehran",
+          "ground_truth_city": "Tehran",
+          "match_type": "name",
+          "distance_km": 0.0
+        },
+        {
+          "prediction_city": "Baghdad",
+          "ground_truth_city": "Baghdad",
+          "match_type": "name",
+          "distance_km": 0.0
+        },
+        {
+          "prediction_city": "Fujairah",
+          "ground_truth_city": "Fujairah",
+          "match_type": "name",
+          "distance_km": 0.0
+        },
+        {
+          "prediction_city": "Tel Aviv",
+          "ground_truth_city": "Ramat Gan",
+          "match_type": "geo",
+          "distance_km": 4.49
+        }
+      ],
+      "unmatched_predictions": [
+        {
+          "city": "Jerusalem",
+          "normalized_city": "jerusalem",
+          "lat": 31.7667,
+          "lon": 35.2333,
+          "satellite": "ICEYE-44389",
+          "sensor_type": "sar",
+          "priority_label": "즉시 촬영",
+          "pass_time_utc": "2026-03-20T17:50:35Z"
+        },
+        {
+          "city": "Beirut",
+          "normalized_city": "beirut",
+          "lat": 33.8719,
+          "lon": 35.5097,
+          "satellite": "ICEYE-48918",
+          "sensor_type": "sar",
+          "priority_label": "정밀 관측",
+          "pass_time_utc": "2026-03-22T03:20:01Z"
+        },
+        {
+          "city": "Dubai",
+          "normalized_city": "dubai",
+          "lat": 25.2522,
+          "lon": 55.28,
+          "satellite": "ICEYE-56947",
+          "sensor_type": "sar",
+          "priority_label": "주의 관측",
+          "pass_time_utc": "2026-03-18T23:38:18Z"
+        }
+      ],
+      "unmatched_ground_truth": [
+        {
+          "city": "Shiraz",
+          "normalized_city": "shiraz",
+          "lat": 29.5918,
+          "lon": 52.5836,
+          "source": "ISW",
+          "event_description": "[ISW] Combined forces struck an underground missile base south of Shiraz and the 7th Artesh Air Force Tactical Airbase."
+        },
+        {
+          "city": "Yazd",
+          "normalized_city": "yazd",
+          "lat": 31.8974,
+          "lon": 54.3569,
+          "source": "ISW",
+          "event_description": "[ISW] Combined forces struck the Imam Hussein Strategic Missile base south of Yazd City."
+        },
+        {
+          "city": "Tabriz",
+          "normalized_city": "tabriz",
+          "lat": 38.0736,
+          "lon": 46.2961,
+          "source": "ISW",
+          "event_description": "[ISW] IDF struck a missile production defense site in Tabriz."
+        },
+        {
+          "city": "Sirjan",
+          "normalized_city": "sirjan",
+          "lat": 29.4519,
+          "lon": 55.6814,
+          "source": "ISW",
+          "event_description": "[ISW] The combined force struck an ammunition depot in Sirjan, Kerman Province."
+        },
+        {
+          "city": "Erbil",
+          "normalized_city": "erbil",
+          "lat": 36.1901,
+          "lon": 44.009,
+          "source": "ISW",
+          "event_description": "[ISW] More than 10 drones targeted the US Consulate and Erbil International Airport."
+        },
+        {
+          "city": "Kirkuk",
+          "normalized_city": "kirkuk",
+          "lat": 35.467,
+          "lon": 44.3933,
+          "source": "ISW",
+          "event_description": "[ISW] A drone strike targeted the 40th PMF Brigade site in Kirkuk Province."
+        }
+      ],
+      "schedule_summary": {
+        "total_passes": 7037,
+        "swath_passes": 1276,
+        "shootable_passes": 1218,
+        "scheduled_cities": 7,
+        "satellites_used": 7
+      }
+    },
+    {
+      "date": "20260322",
+      "scenario": "tri-mix",
+      "mode": "backtest",
+      "used_llm": true,
+      "gt_count": 10,
+      "predicted_city_count": 12,
+      "tp": 4,
+      "fp": 8,
+      "fn": 6,
+      "precision": 0.3333,
+      "recall": 0.4,
+      "f1": 0.3636,
+      "weather_request_failed": false,
+      "eo_candidates": 104,
+      "eo_shootable": 0,
+      "eo_weather_unknown": 48,
+      "sar_candidates": 2108,
+      "sar_shootable": 2108,
+      "llm_candidate_count": 12,
+      "llm_confirmed_count": 12,
+      "llm_rejected_count": 0,
+      "llm_error_count": 0,
+      "llm_status_counts": {
+        "SUCCESS": 11,
+        "AMBIGUOUS": 1
+      },
+      "matched_pairs": [
+        {
+          "prediction_city": "Tehran",
+          "ground_truth_city": "Tehran",
+          "match_type": "name",
+          "distance_km": 0.0
+        },
+        {
+          "prediction_city": "Tel Aviv",
+          "ground_truth_city": "Tel Aviv",
+          "match_type": "name",
+          "distance_km": 0.0
+        },
+        {
+          "prediction_city": "Isfahan",
+          "ground_truth_city": "Esfahan",
+          "match_type": "name",
+          "distance_km": 0.0
+        },
+        {
+          "prediction_city": "Misgav Am",
+          "ground_truth_city": "Qasmiyeh",
+          "match_type": "geo",
+          "distance_km": 29.38
+        }
+      ],
+      "unmatched_predictions": [
+        {
+          "city": "Dimona",
+          "normalized_city": "dimona",
+          "lat": 31.0667,
+          "lon": 35.0333,
+          "satellite": "ICEYE-59102",
+          "sensor_type": "sar",
+          "priority_label": "즉시 촬영",
+          "pass_time_utc": "2026-03-23T23:50:00Z"
+        },
+        {
+          "city": "Hebron",
+          "normalized_city": "hebron",
+          "lat": 31.5333,
+          "lon": 35.1,
+          "satellite": "ICEYE-60539",
+          "sensor_type": "sar",
+          "priority_label": "즉시 촬영",
+          "pass_time_utc": "2026-03-27T19:59:47Z"
+        },
+        {
+          "city": "Jerusalem",
+          "normalized_city": "jerusalem",
+          "lat": 31.7667,
+          "lon": 35.2333,
+          "satellite": "ICEYE-60539",
+          "sensor_type": "sar",
+          "priority_label": "우선 촬영",
+          "pass_time_utc": "2026-03-26T19:58:27Z"
+        },
+        {
+          "city": "Andimeshk",
+          "normalized_city": "andimeshk",
+          "lat": 32.4628,
+          "lon": 48.3549,
+          "satellite": "ICEYE-46497",
+          "sensor_type": "sar",
+          "priority_label": "우선 촬영",
+          "pass_time_utc": "2026-03-23T01:51:25Z"
+        },
+        {
+          "city": "Natanz",
+          "normalized_city": "natanz",
+          "lat": 33.4964,
+          "lon": 51.9266,
+          "satellite": "ICEYE-46497",
+          "sensor_type": "sar",
+          "priority_label": "정밀 관측",
+          "pass_time_utc": "2026-03-27T01:39:20Z"
+        },
+        {
+          "city": "Maalot-Tarshiha",
+          "normalized_city": "maalot-tarshiha",
+          "lat": 33.0134,
+          "lon": 35.2837,
+          "satellite": "ICEYE-60539",
+          "sensor_type": "sar",
+          "priority_label": "주의 관측",
+          "pass_time_utc": "2026-03-25T19:57:22Z"
+        },
+        {
+          "city": "Bushehr",
+          "normalized_city": "bushehr",
+          "lat": 28.9684,
+          "lon": 50.8385,
+          "satellite": "ICEYE-62707",
+          "sensor_type": "sar",
+          "priority_label": "주의 관측",
+          "pass_time_utc": "2026-03-23T19:07:30Z"
+        },
+        {
+          "city": "Beirut",
+          "normalized_city": "beirut",
+          "lat": 33.8719,
+          "lon": 35.5097,
+          "satellite": "ICEYE-48918",
+          "sensor_type": "sar",
+          "priority_label": "주의 관측",
+          "pass_time_utc": "2026-03-22T03:19:58Z"
+        }
+      ],
+      "unmatched_ground_truth": [
+        {
+          "city": "Abu Dhabi",
+          "normalized_city": "abu dhabi",
+          "lat": 24.4539,
+          "lon": 54.3773,
+          "source": "ISW",
+          "event_description": "[ISW] UAE intercepted 25 drones and 4 ballistic missiles; data centers near Abu Dhabi were struck."
+        },
+        {
+          "city": "Manama",
+          "normalized_city": "manama",
+          "lat": 26.2235,
+          "lon": 50.5822,
+          "source": "ISW",
+          "event_description": "[ISW] IRGC claimed to target the US Fifth Fleet base in Manama, Bahrain."
+        },
+        {
+          "city": "Baghdad",
+          "normalized_city": "baghdad",
+          "lat": 33.2541,
+          "lon": 44.2259,
+          "source": "ISW",
+          "event_description": "[ISW] Iranian-backed militias' rocket fire injured five Iraqi Counter Terrorism Service members at Baghdad Int'l Airport."
+        },
+        {
+          "city": "Jurf al Sakhr",
+          "normalized_city": "jurf al sakhr",
+          "lat": 32.88,
+          "lon": 44.18,
+          "source": "ISW",
+          "event_description": "[ISW] Combined force conducted three drone strikes on PMF positions in Jurf al Sakhr."
+        },
+        {
+          "city": "Lar",
+          "normalized_city": "lar",
+          "lat": 27.6833,
+          "lon": 54.3167,
+          "source": "ISW",
+          "event_description": "[ISW] Combined force airstrikes damaged an underground missile base between Gerash and Lar."
+        },
+        {
+          "city": "Yazd",
+          "normalized_city": "yazd",
+          "lat": 31.8974,
+          "lon": 54.3569,
+          "source": "ISW",
+          "event_description": "[ISW] Combined force struck the Imam Hossein strategic ballistic missile base south of Yazd City."
+        }
+      ],
+      "schedule_summary": {
+        "total_passes": 12215,
+        "swath_passes": 2212,
+        "shootable_passes": 2108,
+        "scheduled_cities": 12,
+        "satellites_used": 8
+      }
+    },
+    {
+      "date": "20260326",
+      "scenario": "tri-mix",
+      "mode": "backtest",
+      "used_llm": true,
+      "gt_count": 10,
+      "predicted_city_count": 7,
+      "tp": 3,
+      "fp": 4,
+      "fn": 7,
+      "precision": 0.4286,
+      "recall": 0.3,
+      "f1": 0.3529,
+      "weather_request_failed": false,
+      "eo_candidates": 62,
+      "eo_shootable": 0,
+      "eo_weather_unknown": 27,
+      "sar_candidates": 1208,
+      "sar_shootable": 1208,
+      "llm_candidate_count": 7,
+      "llm_confirmed_count": 7,
+      "llm_rejected_count": 0,
+      "llm_error_count": 0,
+      "llm_status_counts": {
+        "SUCCESS": 5,
+        "AMBIGUOUS": 2
+      },
+      "matched_pairs": [
+        {
+          "prediction_city": "Tel Aviv",
+          "ground_truth_city": "Tel Aviv",
+          "match_type": "name",
+          "distance_km": 0.0
+        },
+        {
+          "prediction_city": "Isfahan",
+          "ground_truth_city": "Esfahan",
+          "match_type": "name",
+          "distance_km": 0.0
+        },
+        {
+          "prediction_city": "Abu Dhabi",
+          "ground_truth_city": "Abu Dhabi",
+          "match_type": "name",
+          "distance_km": 0.0
+        }
+      ],
+      "unmatched_predictions": [
+        {
+          "city": "Kharg Island",
+          "normalized_city": "kharg island",
+          "lat": 29.2458,
+          "lon": 50.3158,
+          "satellite": "ICEYE-48918",
+          "sensor_type": "sar",
+          "priority_label": "정밀 관측",
+          "pass_time_utc": "2026-04-01T15:03:51Z"
+        },
+        {
+          "city": "Bandar Abbas",
+          "normalized_city": "bandar abbas",
+          "lat": 27.1865,
+          "lon": 56.2808,
+          "satellite": "ICEYE-62384",
+          "sensor_type": "sar",
+          "priority_label": "정밀 관측",
+          "pass_time_utc": "2026-03-27T14:47:54Z"
+        },
+        {
+          "city": "Hebron",
+          "normalized_city": "hebron",
+          "lat": 31.5333,
+          "lon": 35.1,
+          "satellite": "ICEYE-60539",
+          "sensor_type": "sar",
+          "priority_label": "정밀 관측",
+          "pass_time_utc": "2026-03-27T19:59:47Z"
+        },
+        {
+          "city": "Jerusalem",
+          "normalized_city": "jerusalem",
+          "lat": 31.7667,
+          "lon": 35.2333,
+          "satellite": "ICEYE-60539",
+          "sensor_type": "sar",
+          "priority_label": "주의 관측",
+          "pass_time_utc": "2026-03-26T19:58:27Z"
+        }
+      ],
+      "unmatched_ground_truth": [
+        {
+          "city": "Tehran",
+          "normalized_city": "tehran",
+          "lat": 35.6892,
+          "lon": 51.389,
+          "source": "ISW",
+          "event_description": "[ISW] IDF conducted massive airstrikes using 60+ jets against weapons production infrastructure at the Parchin military complex."
+        },
+        {
+          "city": "Mashhad",
+          "normalized_city": "mashhad",
+          "lat": 36.2605,
+          "lon": 59.6168,
+          "source": "ISW",
+          "event_description": "[ISW] Combined force conducted northeastern-most strikes around Mashhad International Airport and industrial areas."
+        },
+        {
+          "city": "Hamedan",
+          "normalized_city": "hamedan",
+          "lat": 34.7982,
+          "lon": 48.5146,
+          "source": "ISW",
+          "event_description": "[ISW] Combined force struck the IRGC Ground Forces Ansar ol Hossein Provincial Unit in Hamedan City."
+        },
+        {
+          "city": "Amerli",
+          "normalized_city": "amerli",
+          "lat": 34.6272,
+          "lon": 44.5956,
+          "source": "ISW",
+          "event_description": "[ISW] Combined force struck the 63rd Popular Mobilization Forces (PMF) base in Amerli District, Iraq."
+        },
+        {
+          "city": "Nahariya",
+          "normalized_city": "nahariya",
+          "lat": 33.0058,
+          "lon": 35.0935,
+          "source": "ISW",
+          "event_description": "[ISW] Hezbollah rocket fire killed an Israeli man in the northern Israeli city of Nahariya."
+        },
+        {
+          "city": "Neyshabour",
+          "normalized_city": "neyshabour",
+          "lat": 36.2133,
+          "lon": 58.7958,
+          "source": "ISW",
+          "event_description": "[ISW] Combined forces conducted strikes targeting an industrial town around Neyshabour, Khorasan Razavi Province."
+        },
+        {
+          "city": "Bonab",
+          "normalized_city": "bonab",
+          "lat": 37.3404,
+          "lon": 46.0561,
+          "source": "ISW",
+          "event_description": "[ISW] The IDF struck an IRGC headquarters around Bonab, East Azerbaijan Province."
+        }
+      ],
+      "schedule_summary": {
+        "total_passes": 6894,
+        "swath_passes": 1270,
+        "shootable_passes": 1208,
+        "scheduled_cities": 7,
+        "satellites_used": 5
+      }
+    },
+    {
+      "date": "20260328",
+      "scenario": "tri-mix",
+      "mode": "backtest",
+      "used_llm": true,
+      "gt_count": 10,
+      "predicted_city_count": 8,
+      "tp": 1,
+      "fp": 7,
+      "fn": 9,
+      "precision": 0.125,
+      "recall": 0.1,
+      "f1": 0.1111,
+      "weather_request_failed": false,
+      "eo_candidates": 67,
+      "eo_shootable": 0,
+      "eo_weather_unknown": 30,
+      "sar_candidates": 1419,
+      "sar_shootable": 1419,
+      "llm_candidate_count": 8,
+      "llm_confirmed_count": 8,
+      "llm_rejected_count": 0,
+      "llm_error_count": 0,
+      "llm_status_counts": {
+        "SUCCESS": 7,
+        "AMBIGUOUS": 1
+      },
+      "matched_pairs": [
+        {
+          "prediction_city": "Tehran",
+          "ground_truth_city": "Tehran",
+          "match_type": "name",
+          "distance_km": 0.0
+        }
+      ],
+      "unmatched_predictions": [
+        {
+          "city": "Beirut",
+          "normalized_city": "beirut",
+          "lat": 33.8719,
+          "lon": 35.5097,
+          "satellite": "ICEYE-62707",
+          "sensor_type": "sar",
+          "priority_label": "우선 촬영",
+          "pass_time_utc": "2026-04-03T20:06:06Z"
+        },
+        {
+          "city": "Jerusalem",
+          "normalized_city": "jerusalem",
+          "lat": 31.7667,
+          "lon": 35.2333,
+          "satellite": "ICEYE-62389",
+          "sensor_type": "sar",
+          "priority_label": "우선 촬영",
+          "pass_time_utc": "2026-03-30T22:13:37Z"
+        },
+        {
+          "city": "Eshtaol",
+          "normalized_city": "eshtaol",
+          "lat": 31.7807,
+          "lon": 35.0099,
+          "satellite": "ICEYE-62389",
+          "sensor_type": "sar",
+          "priority_label": "주의 관측",
+          "pass_time_utc": "2026-03-30T22:13:34Z"
+        },
+        {
+          "city": "Beersheba",
+          "normalized_city": "beersheba",
+          "lat": 31.2516,
+          "lon": 34.7863,
+          "satellite": "ICEYE-55049",
+          "sensor_type": "sar",
+          "priority_label": "주의 관측",
+          "pass_time_utc": "2026-03-30T20:10:13Z"
+        },
+        {
+          "city": "Jezzine",
+          "normalized_city": "jezzine",
+          "lat": 33.5417,
+          "lon": 35.5844,
+          "satellite": "ICEYE-62707",
+          "sensor_type": "sar",
+          "priority_label": "주의 관측",
+          "pass_time_utc": "2026-04-03T20:06:01Z"
+        },
+        {
+          "city": "Al Manar",
+          "normalized_city": "al manar",
+          "lat": 14.9598,
+          "lon": 43.4903,
+          "satellite": "ICEYE-60546",
+          "sensor_type": "sar",
+          "priority_label": "주의 관측",
+          "pass_time_utc": "2026-04-03T19:36:41Z"
+        },
+        {
+          "city": "Hebron",
+          "normalized_city": "hebron",
+          "lat": 31.5333,
+          "lon": 35.1,
+          "satellite": "ICEYE-62384",
+          "sensor_type": "sar",
+          "priority_label": "주의 관측",
+          "pass_time_utc": "2026-03-29T22:41:44Z"
+        }
+      ],
+      "unmatched_ground_truth": [
+        {
+          "city": "Askar",
+          "normalized_city": "askar",
+          "lat": 26.0592,
+          "lon": 50.6167,
+          "source": "Wiki",
+          "event_description": "[Wiki] Iranian attacks targeted the major smelter facility of Aluminium Bahrain in Askar, Southern Governorate."
+        },
+        {
+          "city": "Abu Dhabi",
+          "normalized_city": "abu dhabi",
+          "lat": 24.4539,
+          "lon": 54.3773,
+          "source": "Wiki",
+          "event_description": "[Wiki] Emirates Global Aluminium facility in Abu Dhabi sustained significant damage from Iranian drone/missile strikes."
+        },
+        {
+          "city": "Yazd",
+          "normalized_city": "yazd",
+          "lat": 31.8974,
+          "lon": 54.3569,
+          "source": "ISW",
+          "event_description": "[ISW] Combined force struck the deeply buried Yazd Missile Base and a MODAFL explosives manufacturing site."
+        },
+        {
+          "city": "Bushehr",
+          "normalized_city": "bushehr",
+          "lat": 28.9234,
+          "lon": 50.8203,
+          "source": "ISW",
+          "event_description": "[ISW] Combined force struck the 6th Tactical Airbase, Bushehr Airport, and the SADRA marine industrial company."
+        },
+        {
+          "city": "Salalah",
+          "normalized_city": "salalah",
+          "lat": 17.0151,
+          "lon": 54.0924,
+          "source": "ISW",
+          "event_description": "[ISW] Two Iranian drones struck the Port of Salalah, damaging port infrastructure and causing Maersk to halt operations."
+        },
+        {
+          "city": "Kuwait City",
+          "normalized_city": "kuwait city",
+          "lat": 29.3759,
+          "lon": 47.9774,
+          "source": "ISW",
+          "event_description": "[ISW] Iranian drones struck Kuwait International Airport, destroying a radar system and setting fuel tanks on fire."
+        },
+        {
+          "city": "Kirkuk",
+          "normalized_city": "kirkuk",
+          "lat": 35.467,
+          "lon": 44.3933,
+          "source": "Wiki/ISW",
+          "event_description": "[Wiki/ISW] Airstrikes targeted the PMF Northern and East Tigris Operations Command headquarters in Kirkuk."
+        },
+        {
+          "city": "Arak",
+          "normalized_city": "arak",
+          "lat": 34.0917,
+          "lon": 49.6892,
+          "source": "ISW",
+          "event_description": "[ISW] IDF struck a site involved in producing air defense system components in Arak, Markazi Province."
+        },
+        {
+          "city": "Kashan",
+          "normalized_city": "kashan",
+          "lat": 33.9831,
+          "lon": 51.4364,
+          "source": "ISW",
+          "event_description": "[ISW] Combined force struck the Kavir Steel Company, a major steel plant supporting the defense industrial base."
+        }
+      ],
+      "schedule_summary": {
+        "total_passes": 7997,
+        "swath_passes": 1486,
+        "shootable_passes": 1419,
+        "scheduled_cities": 8,
+        "satellites_used": 6
+      }
+    }
+  ]
+}

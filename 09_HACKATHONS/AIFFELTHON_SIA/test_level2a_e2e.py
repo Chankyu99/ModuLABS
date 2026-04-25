@@ -190,7 +190,7 @@ def main():
                   f"시각: {sar['pass_time_utc']}")
     else:
         print(f"\n  ⚠️ 48시간 내 Swath 범위 촬영 가능 이벤트 없음.")
-        print(f"  💡 권고: Off-Nadir 틸팅(Phase 2) 반영 또는 예측 범위를 72시간으로 확대")
+        print(f"  💡 권고: Off-Nadir 틸팅(Phase 2) 반영 또는 예측 범위를 7일(168시간)로 확대")
 
     print("\n" + "━" * 85 + "\n")
 

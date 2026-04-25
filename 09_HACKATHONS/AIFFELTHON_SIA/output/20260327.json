@@ -1,0 +1,178 @@
+{
+  "date": "20260327",
+  "generated_at": "2026-04-24T07:38:06Z",
+  "alert_count": 9,
+  "alerts": [
+    {
+      "city": "Isfahan",
+      "risk_level": 3,
+      "risk_label": "RED",
+      "conflict_index": 22.526,
+      "innovation_z": 6.138,
+      "severity_score": 6.138,
+      "events": 45,
+      "lat": 32.6597,
+      "lon": 51.6714,
+      "country_code": "IR",
+      "guide": "즉시 대응",
+      "llm_status": "SUCCESS",
+      "llm_event_summary": "Israel launched strikes targeting Iranian infrastructure and steel production plants in Isfahan on March 26-27, causing damage.",
+      "source_urls": [
+        "https://www.wcsufm.org/latest-from-npr/2026-03-26/trump-grants-iran-another-extension-on-a-deadline-to-reopen-the-strait-of-hormuz",
+        "http://www.northkoreatimes.com/news/278948469/g7-calls-for-halt-to-attacks-on-civilian-infrastructure"
+      ]
+    },
+    {
+      "city": "Kharg Island",
+      "risk_level": 3,
+      "risk_label": "RED",
+      "conflict_index": 19.712,
+      "innovation_z": 4.272,
+      "severity_score": 4.272,
+      "events": 44,
+      "lat": 29.2458,
+      "lon": 50.3158,
+      "country_code": "IR",
+      "guide": "즉시 대응",
+      "llm_status": "SUCCESS",
+      "llm_event_summary": "Iranian forces fired missiles at oil facilities in the Persian Gulf, which includes Kharg Island, around March 27, 2026.",
+      "source_urls": [
+        "https://www.wcsufm.org/latest-from-npr/2026-03-26/trump-grants-iran-another-extension-on-a-deadline-to-reopen-the-strait-of-hormuz",
+        "https://www.insurancejournal.com/news/international/2026/03/27/863715.htm"
+      ]
+    },
+    {
+      "city": "Tel Aviv",
+      "risk_level": 2,
+      "risk_label": "ORANGE",
+      "conflict_index": 26.498,
+      "innovation_z": 2.847,
+      "severity_score": 2.847,
+      "events": 66,
+      "lat": 32.0667,
+      "lon": 34.7667,
+      "country_code": "IS",
+      "guide": "정밀 분석",
+      "llm_status": "SUCCESS",
+      "llm_event_summary": "Iran launched missiles at Tel Aviv on Friday, killing one person.",
+      "source_urls": [
+        "https://www.wcsufm.org/latest-from-npr/2026-03-26/trump-grants-iran-another-extension-on-a-deadline-to-reopen-the-strait-of-hormuz",
+        "https://www.clickondetroit.com/news/world/2026/03/27/israel-launches-new-wave-of-strikes-on-iran-with-no-sign-of-diplomatic-breakthrough/"
+      ]
+    },
+    {
+      "city": "Bandar Abbas",
+      "risk_level": 2,
+      "risk_label": "ORANGE",
+      "conflict_index": 9.729,
+      "innovation_z": 2.721,
+      "severity_score": 2.721,
+      "events": 21,
+      "lat": 27.1865,
+      "lon": 56.2808,
+      "country_code": "IR",
+      "guide": "정밀 분석",
+      "llm_status": "SUCCESS",
+      "llm_event_summary": "IDF/Israeli Air Force airstrike eliminated IRGC Navy commander Alireza Tangsiri and senior officers in Bandar Abbas.",
+      "source_urls": [
+        "http://www.mexicostar.com/news/278946515/eus-kallas-urges-us-to-pressure-russia-not-to-help-iran",
+        "https://news.webindia123.com/news/Articles/World/20260327/4431944.html"
+      ]
+    },
+    {
+      "city": "Hebron",
+      "risk_level": 2,
+      "risk_label": "ORANGE",
+      "conflict_index": -15.623,
+      "innovation_z": 2.243,
+      "severity_score": 2.243,
+      "events": 25,
+      "lat": 31.5333,
+      "lon": 35.1,
+      "country_code": "IS",
+      "guide": "정밀 분석",
+      "llm_status": "AMBIGUOUS",
+      "llm_event_summary": "Israeli soldiers detained six Palestinians and set up checkpoints around Hebron and surrounding villages, closing roads with gates, blocks, and mounds.",
+      "source_urls": [
+        "https://consortiumnews.com/2026/03/26/this-is-our-land-says-the-israeli-settler/",
+        "https://www.jpost.com/middle-east/article-891431"
+      ]
+    },
+    {
+      "city": "Ahvaz",
+      "risk_level": 1,
+      "risk_label": "YELLOW",
+      "conflict_index": 4.309,
+      "innovation_z": 1.414,
+      "severity_score": 1.414,
+      "events": 7,
+      "lat": 31.3203,
+      "lon": 48.6693,
+      "country_code": "IR",
+      "guide": "모니터링",
+      "llm_status": "SUCCESS",
+      "llm_event_summary": "Israeli military attacked steel production plants in Ahvaz, hitting storage facilities, on March 27, 2026.",
+      "source_urls": [
+        "http://www.northkoreatimes.com/news/278948469/g7-calls-for-halt-to-attacks-on-civilian-infrastructure",
+        "http://www.shanghainews.net/news/278948341/rubio-meets-with-g7-leaders-in-france-to-discuss-iran"
+      ]
+    },
+    {
+      "city": "Qeshm",
+      "risk_level": 1,
+      "risk_label": "YELLOW",
+      "conflict_index": 4.627,
+      "innovation_z": 1.276,
+      "severity_score": 1.276,
+      "events": 9,
+      "lat": 35.4421,
+      "lon": 47.3506,
+      "country_code": "IR",
+      "guide": "모니터링",
+      "llm_status": "SUCCESS",
+      "llm_event_summary": "Israeli strikes hit Bandar Abbas, very near Qeshm, on Thursday (2026-03-26).",
+      "source_urls": [
+        "https://yourdemocracy.net/drupal/node/59208",
+        "https://www.naharnet.com:443/stories/en/319187-trump-denies-he-s-desperate-for-iran-deal"
+      ]
+    },
+    {
+      "city": "Dimona",
+      "risk_level": 1,
+      "risk_label": "YELLOW",
+      "conflict_index": 6.112,
+      "innovation_z": 1.198,
+      "severity_score": 1.198,
+      "events": 14,
+      "lat": 31.0667,
+      "lon": 35.0333,
+      "country_code": "IS",
+      "guide": "모니터링",
+      "llm_status": "SUCCESS",
+      "llm_event_summary": "Iranian missiles directly hit Dimona and Arad on Saturday, wounding dozens.",
+      "source_urls": [
+        "https://www.ynetnews.com/article/sysriaxsze",
+        "https://www.thenationalnews.com/news/mena/2026/03/27/us-troops-drill-on-deck-for-contamination-warfare-in-iran/"
+      ]
+    },
+    {
+      "city": "Khondab",
+      "risk_level": 1,
+      "risk_label": "YELLOW",
+      "conflict_index": 3.635,
+      "innovation_z": 1.14,
+      "severity_score": 1.14,
+      "events": 7,
+      "lat": 35.903,
+      "lon": 49.3831,
+      "country_code": "IR",
+      "guide": "모니터링",
+      "llm_status": "SUCCESS",
+      "llm_event_summary": "Israeli and U.S. airstrikes hit the Khondab heavy-water plant/reactor on March 27, 2026.",
+      "source_urls": [
+        "https://www.yahoo.com/news/articles/iran-says-israeli-attacks-plants-230025740.html",
+        "https://english.news.cn/20260328/9d0d05b6c5224fe2b8f291ecbed74b6c/c.html"
+      ]
+    }
+  ]
+}
