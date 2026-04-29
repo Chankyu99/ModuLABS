@@ -5,7 +5,7 @@ Build backtest TLE cache files from pasted historical TLE text.
 Usage:
   python3 build_historical_tle_cache.py --input data/tle/history_default.txt
   python3 build_historical_tle_cache.py --input data/tle/history_default.txt --dates 20260228 20260302
-  python3 build_historical_tle_cache.py --input data/tle/history_default.txt --scenario default
+  python3 build_historical_tle_cache.py --input data/tle/history_default.txt --scenario coverage
 """
 
 from __future__ import annotations
@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from pipeline.config import TLE_CACHE_DIR
+from pipeline.config import TLE_CACHE_DIR, OPERATIONAL_SATELLITE_SCENARIO
 from pipeline.Level2a.satellite_catalog import load_satellite_catalog
 
 
@@ -38,7 +38,11 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Historical TLE text -> Level2a cache JSON")
     parser.add_argument("--input", required=True, help="Path to raw pasted TLE text file")
     parser.add_argument("--dates", nargs="*", help="Target cache dates (YYYYMMDD). Default: all ground-truth dates")
-    parser.add_argument("--scenario", default="default", help="Satellite catalog scenario")
+    parser.add_argument(
+        "--scenario",
+        default=OPERATIONAL_SATELLITE_SCENARIO,
+        help="Satellite catalog scenario",
+    )
     parser.add_argument("--allow-partial", action="store_true", help="Write cache even if some NORADs are missing")
     return parser.parse_args()
 

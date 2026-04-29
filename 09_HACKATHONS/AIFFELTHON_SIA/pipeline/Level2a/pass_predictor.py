@@ -16,8 +16,55 @@ from geopy.distance import geodesic
 
 from pipeline.config import (
     SATELLITES, ROI_CITIES, MIN_ELEVATION_DEG, PREDICTION_HOURS,
+    MAX_OPERATIONAL_OFF_NADIR_DEG,
 )
 from pipeline.tle_fetcher import load_all_tle
+
+EARTH_MEAN_RADIUS_KM = 6371.0088
+
+
+def _initial_bearing_deg(start_lat: float, start_lon: float, end_lat: float, end_lon: float) -> float:
+    """두 지점 사이의 초기 방위각을 계산한다."""
+    lat1 = math.radians(start_lat)
+    lat2 = math.radians(end_lat)
+    delta_lon = math.radians(end_lon - start_lon)
+
+    x = math.sin(delta_lon) * math.cos(lat2)
+    y = (
+        math.cos(lat1) * math.sin(lat2)
+        - math.sin(lat1) * math.cos(lat2) * math.cos(delta_lon)
+    )
+    return (math.degrees(math.atan2(x, y)) + 360.0) % 360.0
+
+
+def _signed_bearing_delta_deg(track_bearing: float, target_bearing: float) -> float:
+    """진행 방향 기준 타깃 방위 차이를 -180~180도로 정규화한다."""
+    return (target_bearing - track_bearing + 540.0) % 360.0 - 180.0
+
+
+def _required_off_nadir_deg(distance_km: float, altitude_km: float) -> float:
+    """직하점-타깃 지상거리로 필요한 off-nadir 각도 크기를 계산한다."""
+    if distance_km <= 0 or altitude_km <= 0:
+        return 0.0
+
+    central_angle_rad = distance_km / EARTH_MEAN_RADIUS_KM
+    satellite_radius_km = EARTH_MEAN_RADIUS_KM + altitude_km
+    numerator = EARTH_MEAN_RADIUS_KM * math.sin(central_angle_rad)
+    denominator = satellite_radius_km - EARTH_MEAN_RADIUS_KM * math.cos(central_angle_rad)
+    return math.degrees(math.atan2(numerator, denominator))
+
+
+def _ground_range_for_off_nadir_km(off_nadir_deg: float, altitude_km: float) -> float:
+    """off-nadir 각도 상한을 지상 cross-track 거리로 변환한다."""
+    if off_nadir_deg <= 0 or altitude_km <= 0:
+        return 0.0
+
+    theta = math.radians(off_nadir_deg)
+    satellite_radius_km = EARTH_MEAN_RADIUS_KM + altitude_km
+    ratio = (satellite_radius_km / EARTH_MEAN_RADIUS_KM) * math.sin(theta)
+    ratio = max(min(ratio, 1.0), -1.0)
+    central_angle_rad = math.asin(ratio) - theta
+    return EARTH_MEAN_RADIUS_KM * max(central_angle_rad, 0.0)
 
 
 def _build_satellite(tle_entry: dict, ts) -> EarthSatellite:
@@ -71,6 +118,9 @@ def _predict_single_pass(
             subpoint = wgs84.subpoint(geocentric)
             sub_lat = subpoint.latitude.degrees
             sub_lon = subpoint.longitude.degrees
+            next_subpoint = wgs84.subpoint(satellite.at(t_culm + (1.0 / 86400.0)))
+            next_sub_lat = next_subpoint.latitude.degrees
+            next_sub_lon = next_subpoint.longitude.degrees
 
             distance_km = geodesic(
                 (sub_lat, sub_lon),
@@ -80,13 +130,28 @@ def _predict_single_pass(
             nadir_range = swath_km / 2.0
             within_nadir = distance_km <= nadir_range
 
+            required_off_nadir_abs = _required_off_nadir_deg(distance_km, altitude_km)
+            track_bearing = _initial_bearing_deg(sub_lat, sub_lon, next_sub_lat, next_sub_lon)
+            target_bearing = _initial_bearing_deg(sub_lat, sub_lon, coord["lat"], coord["lon"])
+            side_sign = 0 if distance_km <= nadir_range else (
+                1 if _signed_bearing_delta_deg(track_bearing, target_bearing) >= 0 else -1
+            )
+            required_off_nadir_signed = required_off_nadir_abs * side_sign
+
             within_offnadir = False
             extended_range_km = nadir_range
+            configured_off_nadir_deg = off_nadir_deg
+            off_nadir_limit_deg = 0.0
             if off_nadir_deg is not None and off_nadir_deg > 0:
-                extended_range_km = altitude_km * math.tan(
-                    math.radians(off_nadir_deg)
+                off_nadir_limit_deg = min(
+                    float(off_nadir_deg),
+                    MAX_OPERATIONAL_OFF_NADIR_DEG,
                 )
-                within_offnadir = distance_km <= extended_range_km
+                extended_range_km = _ground_range_for_off_nadir_km(
+                    off_nadir_limit_deg,
+                    altitude_km,
+                )
+                within_offnadir = required_off_nadir_abs <= off_nadir_limit_deg
 
             within_swath = within_nadir or within_offnadir
 
@@ -106,6 +171,16 @@ def _predict_single_pass(
                 "distance_km": round(distance_km, 1),
                 "nadir_range_km": round(nadir_range, 1),
                 "extended_range_km": round(extended_range_km, 1),
+                "elevation_deg": round(max_elev, 1),
+                "off_nadir_deg": round(required_off_nadir_signed, 1),
+                "required_off_nadir_deg": round(required_off_nadir_signed, 1),
+                "required_off_nadir_abs_deg": round(required_off_nadir_abs, 1),
+                "off_nadir_limit_deg": round(off_nadir_limit_deg, 1),
+                "configured_off_nadir_deg": configured_off_nadir_deg,
+                "off_nadir_margin_deg": round(
+                    off_nadir_limit_deg - required_off_nadir_abs,
+                    1,
+                ),
                 "within_swath": within_swath,
                 "swath_phase": "nadir" if within_nadir else (
                     "off-nadir" if within_offnadir else "out-of-range"

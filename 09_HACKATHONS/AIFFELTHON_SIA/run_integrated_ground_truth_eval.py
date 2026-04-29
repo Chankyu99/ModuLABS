@@ -494,7 +494,7 @@ def available_gt_dates() -> list[str]:
 
 def evaluate_single_date(
     date: str,
-    scenario: str = "tri-mix",
+    scenario: str = "coverage",
     hours: int = 168,
     top_k: int = 20,
     radius_km: float = 50.0,
@@ -731,7 +731,7 @@ def print_windowed_summary(windowed_metrics: dict[str, Any], mentions_threshold:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Integrated pipeline Ground Truth evaluator")
-    parser.add_argument("--scenario", default="tri-mix", help="Satellite scenario")
+    parser.add_argument("--scenario", default="coverage", help="Satellite scenario")
     parser.add_argument("--dates", nargs="*", help="Target dates (YYYYMMDD). Default: all ground-truth dates")
     parser.add_argument("--hours", type=int, default=168, help="Prediction window hours")
     parser.add_argument("--top-k", type=int, default=20, help="Level1 candidate upper bound")

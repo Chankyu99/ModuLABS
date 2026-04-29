@@ -10,6 +10,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 OUTPUT_DIR = PROJECT_ROOT / "output"
 TLE_CACHE_DIR = PROJECT_ROOT / "data" / "tle"
+OPERATIONAL_SATELLITE_SCENARIO = "coverage"
 
 
 SATELLITES = [
@@ -74,6 +75,7 @@ SATELLITES = [
 CLOUD_THRESHOLD = 50
 PREDICTION_HOURS = 168
 MIN_ELEVATION_DEG = 20.0
+MAX_OPERATIONAL_OFF_NADIR_DEG = 30.0
 
 
 ROI_CITIES = {

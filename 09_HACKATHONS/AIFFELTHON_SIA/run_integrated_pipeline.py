@@ -13,7 +13,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from pipeline.config import PREDICTION_HOURS
+from pipeline.config import PREDICTION_HOURS, OPERATIONAL_SATELLITE_SCENARIO
 from pipeline.integrated_pipeline import run_integrated_pipeline
 from pipeline.live_data_preparer import prepare_live_prediction_inputs
 
@@ -26,7 +26,11 @@ def main() -> None:
     parser.add_argument("--top-k", type=int, default=20, help="LLM 검증 및 최종 후보 도시 상한")
     parser.add_argument("--mode", choices=["auto", "operational", "backtest"], default="auto", help="Level2a 실행 모드")
     parser.add_argument("--tle-date", type=str, help="TLE 기준 날짜 (YYYYMMDD)")
-    parser.add_argument("--scenario", default="default", help="위성 카탈로그 시나리오")
+    parser.add_argument(
+        "--scenario",
+        default=OPERATIONAL_SATELLITE_SCENARIO,
+        help="위성 카탈로그 시나리오",
+    )
     parser.add_argument("--refresh", action="store_true", help="TLE 캐시를 무시하고 재수집")
     parser.add_argument("--fetch-gdelt", action="store_true", help="누락된 GDELT 일별 데이터를 받아 merged parquet를 자동 준비")
     parser.add_argument("--main-path", type=str, help="GDELT 메인 parquet 경로 override")

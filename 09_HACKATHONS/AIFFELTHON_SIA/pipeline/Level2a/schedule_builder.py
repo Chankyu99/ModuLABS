@@ -10,7 +10,13 @@ import json
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from pipeline.config import SATELLITES, ROI_CITIES, OUTPUT_DIR, PREDICTION_HOURS
+from pipeline.config import (
+    SATELLITES,
+    ROI_CITIES,
+    OUTPUT_DIR,
+    PREDICTION_HOURS,
+    OPERATIONAL_SATELLITE_SCENARIO,
+)
 from pipeline.tle_fetcher import load_all_tle
 from pipeline.satellite_catalog import load_satellite_catalog
 from pipeline.pass_predictor import predict_passes, filter_shootable
@@ -83,18 +89,21 @@ def classify_priority_band(event: dict) -> int:
 
 
 def compute_quality_score(event: dict) -> float:
-    """동일 등급 내에서 촬영 품질(구름, 앙각 등)에 따른 세부 순서를 조정합니다."""
+    """동일 등급 내에서 촬영 품질(구름, off-nadir 등)에 따른 세부 순서를 조정합니다."""
     sensor = normalize_sensor_type(event.get("sensor_type", "optical"))
     elev = max(min(event.get("max_elevation_deg", 10), 90), 1)
+    off_nadir_limit = max(float(event.get("off_nadir_limit_deg", 30) or 30), 1)
+    off_nadir_abs = max(float(event.get("required_off_nadir_abs_deg", 0) or 0), 0)
+    geometry_score = max(0.0, 1.0 - off_nadir_abs / off_nadir_limit)
 
     if sensor == "sar":
-        # SAR은 구름 영향을 거의 받지 않으므로 앙각 중심으로 평가한다.
-        return round(elev / 90, 4)
+        # SAR은 구름 영향을 거의 받지 않으므로 관측 기하 중심으로 평가한다.
+        return round(0.5 * (elev / 90) + 0.5 * geometry_score, 4)
 
     cloud = max(min(event.get("cloud_cover_pct", 50), 100), 0)
 
-    # EO는 구름과 앙각을 함께 반영한다.
-    return round((1 - cloud / 100) * (elev / 90), 4)
+    # EO는 구름, 고도각, off-nadir 여유를 함께 반영한다.
+    return round((1 - cloud / 100) * (0.4 * (elev / 90) + 0.6 * geometry_score), 4)
 
 
 def compute_policy_preference(event: dict) -> float:
@@ -114,7 +123,9 @@ def compute_policy_preference(event: dict) -> float:
     eo_impossible = (not daylight) or cloud > 50
 
     if satellite == "SpaceEye-T" and sensor == "optical" and eo_favorable:
-        return 3.0
+        return 4.0
+    if satellite.startswith("PlanetScope-") and sensor == "optical" and eo_favorable:
+        return 3.2
     if sensor == "optical" and eo_favorable:
         return 2.0
     if sensor == "sar" and eo_impossible:
@@ -122,6 +133,16 @@ def compute_policy_preference(event: dict) -> float:
     if sensor == "sar":
         return 1.0
     return 0.0
+
+
+def compute_priority_score(event: dict) -> float:
+    """레거시 E2E 스크립트용 단일 우선순위 점수."""
+    return round(
+        classify_priority_band(event)
+        + compute_policy_preference(event) * 0.1
+        + compute_quality_score(event),
+        4,
+    )
 
 
 def _recommendation_sort_key(event: dict) -> tuple:
@@ -168,8 +189,12 @@ def get_capture_condition_label(event: dict) -> str:
     """센서와 기상 조건을 종합해 촬영 여건 라벨을 만든다."""
     sensor = normalize_sensor_type(event.get("sensor_type", "optical"))
     elev = max(min(event.get("max_elevation_deg", 10), 90), 1)
+    off_nadir_abs = max(float(event.get("required_off_nadir_abs_deg", 0) or 0), 0)
     cloud = max(min(event.get("cloud_cover_pct", 50), 100), 0)
     daylight = bool(event.get("daylight", True))
+
+    if off_nadir_abs > 30:
+        return "Off-Nadir 제한 초과"
 
     if sensor == "sar":
         if elev >= 75:
@@ -501,7 +526,7 @@ def build_schedule(
     tle_mode: str = "operational",
     tle_reference_date: str | None = None,
     prediction_start_utc: datetime | None = None,
-    satellite_scenario: str = "default",
+    satellite_scenario: str = OPERATIONAL_SATELLITE_SCENARIO,
 ) -> dict:
     """촬영 스케줄을 생성한다.
 

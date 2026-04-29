@@ -21,6 +21,13 @@ def _default_spaceeye_entry() -> dict:
     raise ValueError("기본 SATELLITES에서 SpaceEye-T를 찾을 수 없습니다.")
 
 
+def _default_satellite_entry(name: str) -> dict:
+    for sat in DEFAULT_SATELLITES:
+        if sat["name"] == name:
+            return sat.copy()
+    raise ValueError(f"기본 SATELLITES에서 {name}를 찾을 수 없습니다.")
+
+
 def _load_eo_constellation(filename: str) -> list[dict]:
     file_path = EO_PREDICTOR_SAT_DIR / filename
     if not file_path.exists():
@@ -52,6 +59,33 @@ def load_satellite_catalog(scenario: str = "default") -> list[dict]:
     """실행 시나리오에 맞는 위성 목록을 반환한다."""
     if scenario == "default":
         return [sat.copy() for sat in DEFAULT_SATELLITES]
+
+    if scenario == "coverage":
+        satellites = [
+            _default_satellite_entry("SpaceEye-T"),
+            _default_satellite_entry("KOMPSAT-7"),
+        ]
+        priority_by_family = {
+            "PlanetScope": 2,
+            "ICEYE": 5,
+            "Sentinel-1": 6,
+            "Sentinel-2": 6,
+            "Sentinel-3": 6,
+        }
+        for filename in (
+            "planetscope.json",
+            "iceye.json",
+            "sentinel-1.json",
+            "sentinel-2.json",
+            "sentinel-3.json",
+        ):
+            for satellite in _load_eo_constellation(filename):
+                satellite["priority"] = priority_by_family.get(
+                    satellite.get("constellation"),
+                    satellite["priority"],
+                )
+                satellites.append(satellite)
+        return satellites
 
     if scenario == "tri-mix":
         satellites = []

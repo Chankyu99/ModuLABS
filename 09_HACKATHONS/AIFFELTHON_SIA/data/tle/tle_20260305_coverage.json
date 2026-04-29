@@ -1,0 +1,1136 @@
+{
+  "43800": {
+    "name": "ICEYE-43800",
+    "line1": "1 43800U 18099AU  26064.98234185  .00004760  00000-0  24852-3 0  9991",
+    "line2": "2 43800  97.4495 120.6751 0009054 306.0264  54.0130 15.16361078397174",
+    "meta": {
+      "display_name": "ICEYE-43800",
+      "type": "sar",
+      "swath_km": 5.0,
+      "resolution_m": 1.0,
+      "off_nadir_deg": 40,
+      "altitude_km": 580.0,
+      "priority": 10
+    }
+  },
+  "44389": {
+    "name": "ICEYE-44389",
+    "line1": "1 44389U 19038C   26064.93348704  .00040175  00000-0  78779-3 0  9993",
+    "line2": "2 44389  97.8846 109.8885 0005851 258.2075 101.8517 15.47238636366956",
+    "meta": {
+      "display_name": "ICEYE-44389",
+      "type": "sar",
+      "swath_km": 5.0,
+      "resolution_m": 1.0,
+      "off_nadir_deg": 40,
+      "altitude_km": 580.0,
+      "priority": 10
+    }
+  },
+  "44390": {
+    "name": "ICEYE-44390",
+    "line1": "1 44390U 19038D   26064.99831685  .00015456  00000-0  58687-3 0  9996",
+    "line2": "2 44390  97.8885  91.9686 0012511 309.8123  50.2013 15.26859474366043",
+    "meta": {
+      "display_name": "ICEYE-44390",
+      "type": "sar",
+      "swath_km": 5.0,
+      "resolution_m": 1.0,
+      "off_nadir_deg": 40,
+      "altitude_km": 580.0,
+      "priority": 10
+    }
+  },
+  "46496": {
+    "name": "ICEYE-46496",
+    "line1": "1 46496U 20068L   26064.96123660  .00015351  00000-0  54687-3 0  9994",
+    "line2": "2 46496  97.7410  27.0554 0007475 347.8073  12.2984 15.29005630299004",
+    "meta": {
+      "display_name": "ICEYE-46496",
+      "type": "sar",
+      "swath_km": 5.0,
+      "resolution_m": 1.0,
+      "off_nadir_deg": 40,
+      "altitude_km": 580.0,
+      "priority": 10
+    }
+  },
+  "46497": {
+    "name": "ICEYE-46497",
+    "line1": "1 46497U 20068M   26064.95111188  .00004602  00000-0  33871-3 0  9995",
+    "line2": "2 46497  98.0945  53.7634 0009409  79.3052 280.9231 15.03874798297716",
+    "meta": {
+      "display_name": "ICEYE-46497",
+      "type": "sar",
+      "swath_km": 5.0,
+      "resolution_m": 1.0,
+      "off_nadir_deg": 40,
+      "altitude_km": 580.0,
+      "priority": 10
+    }
+  },
+  "48918": {
+    "name": "ICEYE-48918",
+    "line1": "1 48918U 21059AR  26064.99271803  .00091251  00000-0  66010-3 0  9998",
+    "line2": "2 48918  97.6453 252.5652 0004709 348.7267  11.3890 15.73185584261659",
+    "meta": {
+      "display_name": "ICEYE-48918",
+      "type": "sar",
+      "swath_km": 5.0,
+      "resolution_m": 1.0,
+      "off_nadir_deg": 40,
+      "altitude_km": 580.0,
+      "priority": 10
+    }
+  },
+  "55049": {
+    "name": "ICEYE-55049",
+    "line1": "1 55049U 23001AS  26064.91682890  .00089353  00000-0  57384-3 0  9998",
+    "line2": "2 55049  97.3395 143.5795 0004357  88.9276 271.2489 15.75963022177226",
+    "meta": {
+      "display_name": "ICEYE-55049",
+      "type": "sar",
+      "swath_km": 5.0,
+      "resolution_m": 1.0,
+      "off_nadir_deg": 40,
+      "altitude_km": 580.0,
+      "priority": 10
+    }
+  },
+  "56947": {
+    "name": "ICEYE-56947",
+    "line1": "1 56947U 23084R   26064.94186713  .00108310  00000-0  83145-3 0  9992",
+    "line2": "2 56947  97.5713 215.8890 0004449 293.1654  66.9140 15.71725151152637",
+    "meta": {
+      "display_name": "ICEYE-56947",
+      "type": "sar",
+      "swath_km": 5.0,
+      "resolution_m": 1.0,
+      "off_nadir_deg": 40,
+      "altitude_km": 580.0,
+      "priority": 10
+    }
+  },
+  "56961": {
+    "name": "ICEYE-56961",
+    "line1": "1 56961U 23084AF  26064.99794639  .00062601  00000-0  46527-3 0  9990",
+    "line2": "2 56961  97.5769 220.2802 0000843 257.2880 102.8289 15.72655055152925",
+    "meta": {
+      "display_name": "ICEYE-56961",
+      "type": "sar",
+      "swath_km": 5.0,
+      "resolution_m": 1.0,
+      "off_nadir_deg": 40,
+      "altitude_km": 580.0,
+      "priority": 10
+    }
+  },
+  "56963": {
+    "name": "ICEYE-56963",
+    "line1": "1 56963U 23084AH  26064.97234486  .00052741  00000-0  89769-3 0  9998",
+    "line2": "2 56963  97.5764 204.8853 0003980 295.0900  64.9939 15.51235095151928",
+    "meta": {
+      "display_name": "ICEYE-56963",
+      "type": "sar",
+      "swath_km": 5.0,
+      "resolution_m": 1.0,
+      "off_nadir_deg": 40,
+      "altitude_km": 580.0,
+      "priority": 10
+    }
+  },
+  "58270": {
+    "name": "PlanetScope-58270",
+    "line1": "1 58270U 23174Q   26064.74367693  .00078386  00000-0  86424-3 0  9991",
+    "line2": "2 58270  97.3820 153.7789 0006920 174.0065 186.1278 15.62824635129752",
+    "meta": {
+      "display_name": "PlanetScope-58270",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "58271": {
+    "name": "PlanetScope-58271",
+    "line1": "1 58271U 23174R   26064.73911358  .00026228  00000-0  56541-3 0  9999",
+    "line2": "2 58271  97.3873 150.8025 0007942 171.1277 189.0113 15.44529443129580",
+    "meta": {
+      "display_name": "PlanetScope-58271",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "58273": {
+    "name": "PlanetScope-58273",
+    "line1": "1 58273U 23174T   26064.68259547  .00028148  00000-0  59897-3 0  9990",
+    "line2": "2 58273  97.3909 151.2212 0007628 168.9787 191.1630 15.44901715129580",
+    "meta": {
+      "display_name": "PlanetScope-58273",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "58274": {
+    "name": "PlanetScope-58274",
+    "line1": "1 58274U 23174U   26064.73877009  .00032615  00000-0  56319-3 0  9996",
+    "line2": "2 58274  97.3896 153.9032 0007777 158.7505 201.4072 15.50905938129768",
+    "meta": {
+      "display_name": "PlanetScope-58274",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "58275": {
+    "name": "PlanetScope-58275",
+    "line1": "1 58275U 23174V   26064.74868063  .00086124  00000-0  14555-2 0  9997",
+    "line2": "2 58275  97.3886 153.7969 0005842 166.0649 194.0765 15.51287596129789",
+    "meta": {
+      "display_name": "PlanetScope-58275",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "58280": {
+    "name": "PlanetScope-58280",
+    "line1": "1 58280U 23174AA  26064.69028634  .00033668  00000-0  62710-3 0  9991",
+    "line2": "2 58280  97.3914 152.9765 0007229 165.0642 195.0824 15.48746700129695",
+    "meta": {
+      "display_name": "PlanetScope-58280",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "58282": {
+    "name": "PlanetScope-58282",
+    "line1": "1 58282U 23174AC  26064.75070616  .00035090  00000-0  65377-3 0  9990",
+    "line2": "2 58282  97.3860 152.5809 0006659 161.0008 199.1492 15.48734723129711",
+    "meta": {
+      "display_name": "PlanetScope-58282",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "58283": {
+    "name": "PlanetScope-58283",
+    "line1": "1 58283U 23174AD  26064.70669549  .00200312  00000-0  19651-2 0  9999",
+    "line2": "2 58283  97.3831 156.1015 0003801 203.4795 156.6292 15.65423684129940",
+    "meta": {
+      "display_name": "PlanetScope-58283",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "58284": {
+    "name": "PlanetScope-58284",
+    "line1": "1 58284U 23174AE  26064.72968635  .00038999  00000-0  68138-3 0  9995",
+    "line2": "2 58284  97.3909 153.9805 0007252 162.9987 197.1509 15.50542013129768",
+    "meta": {
+      "display_name": "PlanetScope-58284",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "58285": {
+    "name": "PlanetScope-58285",
+    "line1": "1 58285U 23174AF  26064.69513374  .00040991  00000-0  72825-3 0  9991",
+    "line2": "2 58285  97.3954 153.5875 0007788 164.7162 195.4326 15.50052556129712",
+    "meta": {
+      "display_name": "PlanetScope-58285",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "58286": {
+    "name": "PlanetScope-58286",
+    "line1": "1 58286U 23174AG  26064.74821644  .00040321  00000-0  71078-3 0  9996",
+    "line2": "2 58286  97.3953 153.8223 0007539 161.6595 198.4930 15.50280020129737",
+    "meta": {
+      "display_name": "PlanetScope-58286",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "58288": {
+    "name": "ICEYE-58288",
+    "line1": "1 58288U 23174AJ  26064.97548672  .00017964  00000-0  60576-3 0  9998",
+    "line2": "2 58288  97.3861 140.9832 0001727 352.8033   7.3183 15.30775552128941",
+    "meta": {
+      "display_name": "ICEYE-58288",
+      "type": "sar",
+      "swath_km": 5.0,
+      "resolution_m": 1.0,
+      "off_nadir_deg": 40,
+      "altitude_km": 580.0,
+      "priority": 10
+    }
+  },
+  "58294": {
+    "name": "ICEYE-58294",
+    "line1": "1 58294U 23174AQ  26064.70499309  .00061553  00000-0  10329-2 0  9991",
+    "line2": "2 58294  97.3929 152.0187 0004985 175.2373 184.8928 15.51590400129638",
+    "meta": {
+      "display_name": "ICEYE-58294",
+      "type": "sar",
+      "swath_km": 5.0,
+      "resolution_m": 1.0,
+      "off_nadir_deg": 40,
+      "altitude_km": 580.0,
+      "priority": 10
+    }
+  },
+  "58302": {
+    "name": "ICEYE-58302",
+    "line1": "1 58302U 23174AY  26064.95721182  .00039738  00000-0  86602-3 0  9993",
+    "line2": "2 58302  97.3861 147.3215 0010754 206.2104 153.8601 15.44094969129376",
+    "meta": {
+      "display_name": "ICEYE-58302",
+      "type": "sar",
+      "swath_km": 5.0,
+      "resolution_m": 1.0,
+      "off_nadir_deg": 40,
+      "altitude_km": 580.0,
+      "priority": 10
+    }
+  },
+  "58303": {
+    "name": "PlanetScope-58303",
+    "line1": "1 58303U 23174AZ  26064.73709435  .00053593  00000-0  76480-3 0  9995",
+    "line2": "2 58303  97.3869 154.6648 0005227 147.4384 212.7194 15.56104669129858",
+    "meta": {
+      "display_name": "PlanetScope-58303",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "58304": {
+    "name": "PlanetScope-58304",
+    "line1": "1 58304U 23174BA  26064.96842021  .00034656  00000-0  63442-3 0  9993",
+    "line2": "2 58304  97.3940 153.6481 0007840 152.6223 207.5442 15.49232715129748",
+    "meta": {
+      "display_name": "PlanetScope-58304",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "58306": {
+    "name": "PlanetScope-58306",
+    "line1": "1 58306U 23174BC  26064.74154039  .00041256  00000-0  68908-3 0  9992",
+    "line2": "2 58306  97.3856 153.5870 0006608 157.2613 202.8933 15.51805317129786",
+    "meta": {
+      "display_name": "PlanetScope-58306",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "58307": {
+    "name": "PlanetScope-58307",
+    "line1": "1 58307U 23174BD  26064.96386549  .00048702  00000-0  72566-3 0  9998",
+    "line2": "2 58307  97.3969 155.3559 0006899 152.7575 207.4042 15.54936304129859",
+    "meta": {
+      "display_name": "PlanetScope-58307",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "58308": {
+    "name": "PlanetScope-58308",
+    "line1": "1 58308U 23174BE  26064.72554053  .00042129  00000-0  72648-3 0  9998",
+    "line2": "2 58308  97.3885 153.5101 0007525 147.0012 213.1711 15.50894501129765",
+    "meta": {
+      "display_name": "PlanetScope-58308",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "58309": {
+    "name": "PlanetScope-58309",
+    "line1": "1 58309U 23174BF  26064.70977629  .00036696  00000-0  65664-3 0  9997",
+    "line2": "2 58309  97.3904 153.6644 0008202 159.7517 200.4061 15.49867066129743",
+    "meta": {
+      "display_name": "PlanetScope-58309",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "58313": {
+    "name": "PlanetScope-58313",
+    "line1": "1 58313U 23174BK  26064.72928367  .00054951  00000-0  70330-3 0  9999",
+    "line2": "2 58313  97.3944 156.8786 0006597 148.0986 212.0671 15.59015442129942",
+    "meta": {
+      "display_name": "PlanetScope-58313",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "58316": {
+    "name": "PlanetScope-58316",
+    "line1": "1 58316U 23174BN  26064.71804697  .00059492  00000-0  87915-3 0  9992",
+    "line2": "2 58316  97.3866 154.5044 0006670 154.1646 205.9943 15.55117162129821",
+    "meta": {
+      "display_name": "PlanetScope-58316",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "58318": {
+    "name": "PlanetScope-58318",
+    "line1": "1 58318U 23174BQ  26064.74330719  .00036796  00000-0  68104-3 0  9997",
+    "line2": "2 58318  97.3939 153.2281 0007989 151.7556 208.4129 15.48903557129704",
+    "meta": {
+      "display_name": "PlanetScope-58318",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "58319": {
+    "name": "PlanetScope-58319",
+    "line1": "1 58319U 23174BR  26064.73584566  .00134454  00000-0  16905-2 0  9999",
+    "line2": "2 58319  97.3912 155.4601 0004833 162.8349 197.3071 15.59209866129856",
+    "meta": {
+      "display_name": "PlanetScope-58319",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "58320": {
+    "name": "PlanetScope-58320",
+    "line1": "1 58320U 23174BS  26064.91956098  .00029496  00000-0  63012-3 0  9995",
+    "line2": "2 58320  97.3868 151.2641 0008053 150.2947 209.8761 15.44773235129630",
+    "meta": {
+      "display_name": "PlanetScope-58320",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "58322": {
+    "name": "PlanetScope-58322",
+    "line1": "1 58322U 23174BU  26064.74330635  .00028636  00000-0  61913-3 0  9994",
+    "line2": "2 58322  97.3905 151.1286 0008101 152.0904 208.0780 15.44424995129598",
+    "meta": {
+      "display_name": "PlanetScope-58322",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "58327": {
+    "name": "PlanetScope-58327",
+    "line1": "1 58327U 23174BZ  26064.74389911  .00026578  00000-0  58244-3 0  9996",
+    "line2": "2 58327  97.3861 150.5071 0007514 169.2622 190.8788 15.44044280129572",
+    "meta": {
+      "display_name": "PlanetScope-58327",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "58328": {
+    "name": "PlanetScope-58328",
+    "line1": "1 58328U 23174CA  26064.72038864  .00034333  00000-0  68621-3 0  9991",
+    "line2": "2 58328  97.4024 152.8771 0007527 164.2081 195.9405 15.46700908129654",
+    "meta": {
+      "display_name": "PlanetScope-58328",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "58329": {
+    "name": "PlanetScope-58329",
+    "line1": "1 58329U 23174CB  26064.72006878  .00060786  00000-0  83983-3 0  9991",
+    "line2": "2 58329  97.3938 155.9013 0005782 169.4633 190.6745 15.56947704129873",
+    "meta": {
+      "display_name": "PlanetScope-58329",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "59100": {
+    "name": "ICEYE-59100",
+    "line1": "1 59100U 24043C   26064.96732354  .00008898  00000-0  52633-3 0  9990",
+    "line2": "2 59100  97.8235 206.0533 0003694  87.5544 272.6108 15.11691368 96074",
+    "meta": {
+      "display_name": "ICEYE-59100",
+      "type": "sar",
+      "swath_km": 5.0,
+      "resolution_m": 1.0,
+      "off_nadir_deg": 40,
+      "altitude_km": 580.0,
+      "priority": 10
+    }
+  },
+  "59102": {
+    "name": "ICEYE-59102",
+    "line1": "1 59102U 24043E   26064.97252643  .00006104  00000-0  43179-3 0  9994",
+    "line2": "2 59102  97.8145 200.5218 0015156   3.9214 356.2127 15.05148209109559",
+    "meta": {
+      "display_name": "ICEYE-59102",
+      "type": "sar",
+      "swath_km": 5.0,
+      "resolution_m": 1.0,
+      "off_nadir_deg": 40,
+      "altitude_km": 580.0,
+      "priority": 10
+    }
+  },
+  "59103": {
+    "name": "ICEYE-59103",
+    "line1": "1 59103U 24043F   26064.89588245  .00006446  00000-0  44777-3 0  9990",
+    "line2": "2 59103  97.8203 201.3139 0004763 317.9081  42.1779 15.05892317109592",
+    "meta": {
+      "display_name": "ICEYE-59103",
+      "type": "sar",
+      "swath_km": 5.0,
+      "resolution_m": 1.0,
+      "off_nadir_deg": 40,
+      "altitude_km": 580.0,
+      "priority": 10
+    }
+  },
+  "60480": {
+    "name": "PlanetScope-60480",
+    "line1": "1 60480U 24149N   26064.70919968  .00024385  00000-0  65139-3 0  9994",
+    "line2": "2 60480  97.3781 147.6162 0003144 257.6021 102.4873 15.38084946 86385",
+    "meta": {
+      "display_name": "PlanetScope-60480",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "60481": {
+    "name": "PlanetScope-60481",
+    "line1": "1 60481U 24149P   26064.65333187  .00018885  00000-0  53847-3 0  9993",
+    "line2": "2 60481  97.3811 147.1581 0002101 247.7630 112.3391 15.36109334 86335",
+    "meta": {
+      "display_name": "PlanetScope-60481",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "60483": {
+    "name": "PlanetScope-60483",
+    "line1": "1 60483U 24149R   26064.67358061  .00185826  00000-0  16734-2 0  9998",
+    "line2": "2 60483  97.3727 150.0673 0006658 241.1299 118.9294 15.67593107 86533",
+    "meta": {
+      "display_name": "PlanetScope-60483",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "60484": {
+    "name": "PlanetScope-60484",
+    "line1": "1 60484U 24149S   26064.73751091  .00101168  00000-0  22396-2 0  9994",
+    "line2": "2 60484  97.3770 147.5355 0005798 253.0413 107.0200 15.43399307 86383",
+    "meta": {
+      "display_name": "PlanetScope-60484",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "60486": {
+    "name": "PlanetScope-60486",
+    "line1": "1 60486U 24149U   26064.74052120  .00024788  00000-0  64379-3 0  9994",
+    "line2": "2 60486  97.3791 148.1884 0002800 271.2842  88.8082 15.38950356 86421",
+    "meta": {
+      "display_name": "PlanetScope-60486",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "60487": {
+    "name": "PlanetScope-60487",
+    "line1": "1 60487U 24149V   26064.73166170  .00018395  00000-0  52909-3 0  9998",
+    "line2": "2 60487  97.3847 147.3860 0001316 236.3898 123.7221 15.35843948 86343",
+    "meta": {
+      "display_name": "PlanetScope-60487",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "60488": {
+    "name": "PlanetScope-60488",
+    "line1": "1 60488U 24149W   26064.71150648  .00027387  00000-0  69294-3 0  9996",
+    "line2": "2 60488  97.3846 148.7741 0001753 264.0349  96.0697 15.39733608 86434",
+    "meta": {
+      "display_name": "PlanetScope-60488",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "60489": {
+    "name": "PlanetScope-60489",
+    "line1": "1 60489U 24149X   26064.70800780  .00017814  00000-0  52428-3 0  9990",
+    "line2": "2 60489  97.3753 146.5007 0002474 263.9759  96.1202 15.35124698 86327",
+    "meta": {
+      "display_name": "PlanetScope-60489",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "60490": {
+    "name": "PlanetScope-60490",
+    "line1": "1 60490U 24149Y   26064.73897760  .00016924  00000-0  50399-3 0  9995",
+    "line2": "2 60490  97.3831 146.8510 0002093 275.2827  84.8177 15.34765528 86313",
+    "meta": {
+      "display_name": "PlanetScope-60490",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "60491": {
+    "name": "PlanetScope-60491",
+    "line1": "1 60491U 24149Z   26064.81150122  .00079910  00000-0  20084-2 0  9990",
+    "line2": "2 60491  97.3768 147.9503 0003066 321.9008  38.2021 15.39666704 86422",
+    "meta": {
+      "display_name": "PlanetScope-60491",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "60492": {
+    "name": "PlanetScope-60492",
+    "line1": "1 60492U 24149AA  26064.72220648  .00020267  00000-0  57085-3 0  9995",
+    "line2": "2 60492  97.3824 147.5037 0002143 253.1805 106.9205 15.36477664 86351",
+    "meta": {
+      "display_name": "PlanetScope-60492",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "60494": {
+    "name": "PlanetScope-60494",
+    "line1": "1 60494U 24149AC  26064.72510035  .00022910  00000-0  62316-3 0  9999",
+    "line2": "2 60494  97.3783 147.5546 0002738 277.9396  82.1538 15.37538149 86385",
+    "meta": {
+      "display_name": "PlanetScope-60494",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "60495": {
+    "name": "PlanetScope-60495",
+    "line1": "1 60495U 24149AD  26064.94304885  .00017008  00000-0  45938-3 0  9991",
+    "line2": "2 60495  97.3825 148.5188 0002303 280.1837  79.9148 15.37819881 86443",
+    "meta": {
+      "display_name": "PlanetScope-60495",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "60497": {
+    "name": "PlanetScope-60497",
+    "line1": "1 60497U 24149AF  26064.89725409  .00021319  00000-0  56649-3 0  9997",
+    "line2": "2 60497  97.3770 147.9794 0002679 280.3830  79.7113 15.38276372 86433",
+    "meta": {
+      "display_name": "PlanetScope-60497",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "60499": {
+    "name": "PlanetScope-60499",
+    "line1": "1 60499U 24149AH  26064.19233394  .00018897  00000-0  50618-3 0  9996",
+    "line2": "2 60499  97.3851 147.8291 0002014 284.1286  75.9735 15.38054269 85702",
+    "meta": {
+      "display_name": "PlanetScope-60499",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "60501": {
+    "name": "PlanetScope-60501",
+    "line1": "1 60501U 24149AK  26064.16752315  .00025655  00000-0  66365-3 0  9992",
+    "line2": "2 60501  97.3752 147.3717 0003025 284.2425  75.8484 15.39066000 86330",
+    "meta": {
+      "display_name": "PlanetScope-60501",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "60502": {
+    "name": "PlanetScope-60502",
+    "line1": "1 60502U 24149AL  26064.69449161  .00233820  00000-0  23680-2 0  9990",
+    "line2": "2 60502  97.3683 149.0198 0006958 260.1723  99.8751 15.64494727 86486",
+    "meta": {
+      "display_name": "PlanetScope-60502",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "60503": {
+    "name": "PlanetScope-60503",
+    "line1": "1 60503U 24149AM  26064.19338677  .00235792  00000-0  18137-2 0  9996",
+    "line2": "2 60503  97.3753 150.1082 0006142 235.2192 124.8493 15.71292633 86480",
+    "meta": {
+      "display_name": "PlanetScope-60503",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "60505": {
+    "name": "PlanetScope-60505",
+    "line1": "1 60505U 24149AP  26064.47384167  .00024722  00000-0  64214-3 0  9991",
+    "line2": "2 60505  97.3767 147.9262 0002925 293.8468  66.2471 15.38947320 86390",
+    "meta": {
+      "display_name": "PlanetScope-60505",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "60509": {
+    "name": "PlanetScope-60509",
+    "line1": "1 60509U 24149AT  26064.69890216  .00028217  00000-0  70224-3 0  9997",
+    "line2": "2 60509  97.3852 149.2876 0001938 311.5151  48.5929 15.40232206 86467",
+    "meta": {
+      "display_name": "PlanetScope-60509",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "60511": {
+    "name": "PlanetScope-60511",
+    "line1": "1 60511U 24149AV  26064.73840664  .00050106  00000-0  11410-2 0  9990",
+    "line2": "2 60511  97.3855 149.8909 0002775 290.0933  70.0016 15.42789267 86503",
+    "meta": {
+      "display_name": "PlanetScope-60511",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "60512": {
+    "name": "PlanetScope-60512",
+    "line1": "1 60512U 24149AW  26064.80446813  .00020736  00000-0  54452-3 0  9997",
+    "line2": "2 60512  97.3769 148.3617 0003420 283.6673  76.4191 15.38645164 86455",
+    "meta": {
+      "display_name": "PlanetScope-60512",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "60513": {
+    "name": "PlanetScope-60513",
+    "line1": "1 60513U 24149AX  26064.70520051  .00013152  00000-0  42149-3 0  9998",
+    "line2": "2 60513  97.3873 146.6369 0002856 326.0647  34.0412 15.32483669 86283",
+    "meta": {
+      "display_name": "PlanetScope-60513",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "60514": {
+    "name": "PlanetScope-60514",
+    "line1": "1 60514U 24149AY  26064.65664078  .00019631  00000-0  53664-3 0  9993",
+    "line2": "2 60514  97.3835 148.1647 0001585 320.2160  39.8968 15.37417003 86397",
+    "meta": {
+      "display_name": "PlanetScope-60514",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "60515": {
+    "name": "PlanetScope-60515",
+    "line1": "1 60515U 24149AZ  26064.67057105  .00318027  00000-0  19593-2 0  9996",
+    "line2": "2 60515  97.3676 151.2114 0004676 242.0396 118.0396 15.76278527 86621",
+    "meta": {
+      "display_name": "PlanetScope-60515",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "60516": {
+    "name": "PlanetScope-60516",
+    "line1": "1 60516U 24149BA  26064.80803962  .00017399  00000-0  49076-3 0  9990",
+    "line2": "2 60516  97.3839 147.8481 0002348 311.6517  48.4526 15.36465888 86381",
+    "meta": {
+      "display_name": "PlanetScope-60516",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "60517": {
+    "name": "PlanetScope-60517",
+    "line1": "1 60517U 24149BB  26064.80931734  .00018152  00000-0  49491-3 0  9999",
+    "line2": "2 60517  97.3751 147.9199 0003272 307.6210  52.4737 15.37512053 86426",
+    "meta": {
+      "display_name": "PlanetScope-60517",
+      "type": "optical",
+      "swath_km": 8.0,
+      "resolution_m": 4.0,
+      "off_nadir_deg": 0,
+      "altitude_km": 525.0,
+      "priority": 10
+    }
+  },
+  "60539": {
+    "name": "ICEYE-60539",
+    "line1": "1 60539U 24149BZ  26064.73790935  .00004866  00000-0  40320-3 0  9990",
+    "line2": "2 60539  97.6832 143.1057 0002565  63.6329 296.5157 14.99298550 84614",
+    "meta": {
+      "display_name": "ICEYE-60539",
+      "type": "sar",
+      "swath_km": 5.0,
+      "resolution_m": 1.0,
+      "off_nadir_deg": 40,
+      "altitude_km": 580.0,
+      "priority": 10
+    }
+  },
+  "60546": {
+    "name": "ICEYE-60546",
+    "line1": "1 60546U 24149CG  26064.71588664  .00004270  00000-0  35532-3 0  9998",
+    "line2": "2 60546  97.6873 143.1442 0005778  66.1167 294.0661 14.99193754 84615",
+    "meta": {
+      "display_name": "ICEYE-60546",
+      "type": "sar",
+      "swath_km": 5.0,
+      "resolution_m": 1.0,
+      "off_nadir_deg": 40,
+      "altitude_km": 580.0,
+      "priority": 10
+    }
+  },
+  "60548": {
+    "name": "ICEYE-60548",
+    "line1": "1 60548U 24149CJ  26064.71172113  .00006560  00000-0  51709-3 0  9996",
+    "line2": "2 60548  97.7038 144.5851 0006167 133.3189 226.8550 15.01083349 84683",
+    "meta": {
+      "display_name": "ICEYE-60548",
+      "type": "sar",
+      "swath_km": 5.0,
+      "resolution_m": 1.0,
+      "off_nadir_deg": 40,
+      "altitude_km": 580.0,
+      "priority": 10
+    }
+  },
+  "60549": {
+    "name": "ICEYE-60549",
+    "line1": "1 60549U 24149CK  26064.75016109  .00003518  00000-0  30645-3 0  9999",
+    "line2": "2 60549  97.6861 142.9122 0005797  74.1849 286.0012 14.97530983 84599",
+    "meta": {
+      "display_name": "ICEYE-60549",
+      "type": "sar",
+      "swath_km": 5.0,
+      "resolution_m": 1.0,
+      "off_nadir_deg": 40,
+      "altitude_km": 580.0,
+      "priority": 10
+    }
+  },
+  "62384": {
+    "name": "ICEYE-62384",
+    "line1": "1 62384U 24247H   26064.74177572  .00006141  00000-0  36649-3 0  9993",
+    "line2": "2 62384  44.9978 189.2391 0001941 235.9121 124.1572 15.11956731 66516",
+    "meta": {
+      "display_name": "ICEYE-62384",
+      "type": "sar",
+      "swath_km": 5.0,
+      "resolution_m": 1.0,
+      "off_nadir_deg": 40,
+      "altitude_km": 580.0,
+      "priority": 10
+    }
+  },
+  "62389": {
+    "name": "ICEYE-62389",
+    "line1": "1 62389U 24247N   26064.73512856  .00007263  00000-0  42836-3 0  9996",
+    "line2": "2 62389  44.9949 189.1096 0001215 273.6947  86.3791 15.12157507 66516",
+    "meta": {
+      "display_name": "ICEYE-62389",
+      "type": "sar",
+      "swath_km": 5.0,
+      "resolution_m": 1.0,
+      "off_nadir_deg": 40,
+      "altitude_km": 580.0,
+      "priority": 10
+    }
+  },
+  "62698": {
+    "name": "ICEYE-62698",
+    "line1": "1 62698U 25009CT  26064.84816946  .00003215  00000-0  32385-3 0  9996",
+    "line2": "2 62698  97.7375 145.0180 0001355 115.2868 244.8491 14.91850896 61881",
+    "meta": {
+      "display_name": "ICEYE-62698",
+      "type": "sar",
+      "swath_km": 5.0,
+      "resolution_m": 1.0,
+      "off_nadir_deg": 40,
+      "altitude_km": 580.0,
+      "priority": 10
+    }
+  },
+  "62700": {
+    "name": "ICEYE-62700",
+    "line1": "1 62700U 25009CV  26064.69190990  .00005145  00000-0  46330-3 0  9996",
+    "line2": "2 62700  97.7114 145.7618 0001897  55.9396 304.2005 14.96030093 61938",
+    "meta": {
+      "display_name": "ICEYE-62700",
+      "type": "sar",
+      "swath_km": 5.0,
+      "resolution_m": 1.0,
+      "off_nadir_deg": 40,
+      "altitude_km": 580.0,
+      "priority": 10
+    }
+  },
+  "62705": {
+    "name": "ICEYE-62705",
+    "line1": "1 62705U 25009DA  26064.72373100  .00005603  00000-0  44530-3 0  9990",
+    "line2": "2 62705  97.8072 150.8019 0000826  39.1131 321.0152 15.00853737 62161",
+    "meta": {
+      "display_name": "ICEYE-62705",
+      "type": "sar",
+      "swath_km": 5.0,
+      "resolution_m": 1.0,
+      "off_nadir_deg": 40,
+      "altitude_km": 580.0,
+      "priority": 10
+    }
+  },
+  "62707": {
+    "name": "ICEYE-62707",
+    "line1": "1 62707U 25009DC  26064.72512965  .00004093  00000-0  37608-3 0  9996",
+    "line2": "2 62707  97.7115 145.5202 0002639 108.1161 252.0347 14.95351007 84472",
+    "meta": {
+      "display_name": "ICEYE-62707",
+      "type": "sar",
+      "swath_km": 5.0,
+      "resolution_m": 1.0,
+      "off_nadir_deg": 40,
+      "altitude_km": 580.0,
+      "priority": 10
+    }
+  },
+  "63229": {
+    "name": "SpaceEye-T",
+    "line1": "1 63229U 25052V   26064.71403148  .00008160  00000-0  36605-3 0  9990",
+    "line2": "2 63229  97.4074 318.9229 0005861 137.5195 222.6495 15.21443966 54101",
+    "meta": {
+      "display_name": "SpaceEye-T",
+      "type": "optical",
+      "swath_km": 12,
+      "resolution_m": 0.25,
+      "off_nadir_deg": 45,
+      "altitude_km": 510,
+      "priority": 1
+    }
+  },
+  "66820": {
+    "name": "KOMPSAT-7",
+    "line1": "1 66820U 25279A   26064.87228103  .00004623  00000-0  36277-3 0  9999",
+    "line2": "2 66820  97.6730  14.5042 0010228 356.2813   3.8334 15.01388128 14129",
+    "meta": {
+      "display_name": "KOMPSAT-7",
+      "type": "optical",
+      "swath_km": 15,
+      "resolution_m": 0.3,
+      "off_nadir_deg": 30,
+      "altitude_km": 570,
+      "priority": 2
+    }
+  }
+}

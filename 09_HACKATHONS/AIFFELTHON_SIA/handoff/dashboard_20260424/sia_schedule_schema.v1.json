@@ -194,6 +194,10 @@
           "properties": {
             "elevation_deg":  { "type": "number" },
             "off_nadir_deg":  { "type": "number" },
+            "required_off_nadir_deg": { "type": "number", "description": "해당 통과에서 타깃 촬영에 필요한 signed off-nadir 각도. 절대값 30도 이내 자동 추천." },
+            "required_off_nadir_abs_deg": { "type": "number", "minimum": 0 },
+            "off_nadir_limit_deg": { "type": "number", "description": "운영 정책상 적용한 off-nadir 상한. 기본 30도." },
+            "off_nadir_margin_deg": { "type": "number", "description": "off_nadir_limit_deg - required_off_nadir_abs_deg." },
             "azimuth_deg":    { "type": "number" },
             "pass_direction": { "type": "string", "enum": ["ascending", "descending"] },
             "swath_km":       { "type": "number" }

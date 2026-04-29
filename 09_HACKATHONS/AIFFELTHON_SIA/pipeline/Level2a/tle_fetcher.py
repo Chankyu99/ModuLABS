@@ -11,7 +11,7 @@ from datetime import datetime
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-from pipeline.config import SATELLITES, TLE_CACHE_DIR
+from pipeline.config import SATELLITES, TLE_CACHE_DIR, OPERATIONAL_SATELLITE_SCENARIO
 from pipeline.satellite_catalog import load_satellite_catalog
 
 
@@ -216,7 +216,11 @@ if __name__ == "__main__":
     parser.add_argument("--refresh", action="store_true", help="캐시 무시, 재수집")
     parser.add_argument("--date", type=str, help="캐시 기준 날짜 (YYYYMMDD)")
     parser.add_argument("--mode", choices=["operational", "backtest"], default="operational", help="TLE 사용 모드")
-    parser.add_argument("--scenario", default="default", help="위성 카탈로그 시나리오")
+    parser.add_argument(
+        "--scenario",
+        default=OPERATIONAL_SATELLITE_SCENARIO,
+        help="위성 카탈로그 시나리오",
+    )
     args = parser.parse_args()
 
     catalog = load_satellite_catalog(args.scenario)

@@ -14,7 +14,7 @@ from typing import Any
 
 import pandas as pd
 
-from pipeline.config import OUTPUT_DIR, PREDICTION_HOURS
+from pipeline.config import OUTPUT_DIR, PREDICTION_HOURS, OPERATIONAL_SATELLITE_SCENARIO
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -286,7 +286,7 @@ def run_integrated_pipeline(
     mode: str = "auto",
     tle_date: str | None = None,
     refresh: bool = False,
-    scenario: str = "default",
+    scenario: str = OPERATIONAL_SATELLITE_SCENARIO,
     save_level1: bool = True,
     save_schedule_output: bool = True,
     main_path: str | None = None,

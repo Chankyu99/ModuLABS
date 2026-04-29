@@ -29,6 +29,18 @@ SAMPLE_TEXT = """
 
 
 class HistoricalTleCacheBuilderTest(unittest.TestCase):
+    def test_coverage_catalog_includes_all_operational_families(self) -> None:
+        catalog = load_satellite_catalog("coverage")
+        names = [sat["name"] for sat in catalog]
+        norads = [int(sat["norad_id"]) for sat in catalog]
+
+        self.assertIn("SpaceEye-T", names)
+        self.assertIn("KOMPSAT-7", names)
+        self.assertTrue(any(name.startswith("PlanetScope-") for name in names))
+        self.assertTrue(any(name.startswith("ICEYE-") for name in names))
+        self.assertTrue(any(name.startswith("Sentinel-") for name in names))
+        self.assertEqual(len(norads), len(set(norads)))
+
     def test_planetscope_spaceeye_catalog_excludes_missing_norads(self) -> None:
         excluded_norads = {60518, 60519, 60558, 60559, 60560, 60561, 60563}
         catalog = load_satellite_catalog("planetscope-spaceeye")

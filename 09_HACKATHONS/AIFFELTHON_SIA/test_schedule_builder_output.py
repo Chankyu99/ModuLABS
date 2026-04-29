@@ -4,10 +4,31 @@ import contextlib
 import io
 import unittest
 
-from pipeline.Level2a.schedule_builder import build_city_execution_plan, print_schedule
+from pipeline.Level2a.schedule_builder import (
+    build_city_execution_plan,
+    compute_policy_preference,
+    print_schedule,
+)
 
 
 class ScheduleBuilderOutputTest(unittest.TestCase):
+    def test_policy_preference_prioritizes_sia_business_assets(self) -> None:
+        base_event = {
+            "sensor_type": "optical",
+            "daylight": True,
+            "cloud_cover_pct": 10,
+            "max_elevation_deg": 80,
+            "required_off_nadir_abs_deg": 5,
+            "off_nadir_limit_deg": 30,
+        }
+
+        spaceeye = compute_policy_preference({**base_event, "satellite": "SpaceEye-T"})
+        planetscope = compute_policy_preference({**base_event, "satellite": "PlanetScope-58270"})
+        other_optical = compute_policy_preference({**base_event, "satellite": "Sentinel-2-40697"})
+
+        self.assertGreater(spaceeye, planetscope)
+        self.assertGreater(planetscope, other_optical)
+
     def test_build_city_execution_plan_orders_by_city_earliest_time(self) -> None:
         events = [
             {
