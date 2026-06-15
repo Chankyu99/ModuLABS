@@ -1,0 +1,11 @@
+﻿metric,value,count
+departure_correct,0.9333,30
+arrival_correct,1.0,30
+item_correct,0.9667,30
+slot_all_correct,0.9,30
+missing_correct,0.9333,30
+mapping_hit,0.9615,26
+retrieval_hit,0.9231,26
+avg_slot_latency_sec,2.1886,30
+avg_retrieval_latency_sec,0.908,30
+avg_total_latency_sec,3.0967,30

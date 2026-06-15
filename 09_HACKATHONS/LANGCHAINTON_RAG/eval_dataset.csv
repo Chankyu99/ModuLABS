@@ -1,0 +1,31 @@
+id,case_type,user_query,expected_departure,expected_arrival,expected_item,expected_kr_item,expected_us_item,expected_missing
+1,complete_route_food,한국에서 미국 갈 때 고추장 가져가도 돼?,KR,US,고추장,액체·분무·겔류,농산물/식품,False
+2,complete_route_food,한국에서 미국 갈 때 미숫가루 가져가도 돼?,KR,US,미숫가루,,농산물/식품,False
+3,complete_route_food,한국에서 미국 갈 때 김치 가져가도 돼?,KR,US,김치,액체·분무·겔류,농산물/식품,False
+4,complete_route_food,한국에서 미국 갈 때 사과 가져가도 돼?,KR,US,사과,,신선·냉동 과일/야채,False
+5,complete_route_food,한국에서 미국 갈 때 햄 가져가도 돼?,KR,US,햄,,고기/가축/가금류 및 생산품,False
+6,complete_route_food,한국에서 미국 갈 때 참치캔 가져가도 돼?,KR,US,참치캔,,가공/캔 식품,False
+7,complete_route_medicine,한국에서 미국 갈 때 감기약 가져가도 돼?,KR,US,감기약,,처방약 분량,False
+8,complete_route_medicine,한국에서 미국 갈 때 수면제 가져가도 돼?,KR,US,수면제,,통제/중독 가능 약물,False
+9,complete_route_medicine,한국에서 미국 갈 때 해외 처방약 가져가도 돼?,KR,US,처방약,,처방약 분량,False
+10,complete_route_liquid,한국에서 미국 갈 때 샴푸 가져가도 돼?,KR,US,샴푸,액체·분무·겔류,,False
+11,complete_route_liquid,한국에서 미국 갈 때 향수 가져가도 돼?,KR,US,향수,액체·분무·겔류,,False
+12,complete_route_liquid,한국에서 미국 갈 때 스킨로션 가져가도 돼?,KR,US,스킨로션,액체·분무·겔류,,False
+13,complete_route_alcohol,한국에서 미국 갈 때 40도 위스키 가져가도 돼?,KR,US,위스키,알코올 음료 (24도 초과~70도 이하),,False
+14,complete_route_alcohol,한국에서 미국 갈 때 75도 술 가져가도 돼?,KR,US,술,알코올 음료(70도 초과),,False
+15,complete_route_tool,한국에서 미국 갈 때 과도 가져가도 돼?,KR,US,과도,도끼·손도끼·큰 식칼 등 절단용 칼,,False
+16,complete_route_tool,한국에서 미국 갈 때 커터칼 가져가도 돼?,KR,US,커터칼,면도칼날·커터칼날·접이식칼·외과용 메스,,False
+17,complete_route_tool,한국에서 미국 갈 때 송곳 가져가도 돼?,KR,US,송곳,쇄빙도끼·송곳,,False
+18,complete_route_weapon,한국에서 미국 갈 때 장난감 총 가져가도 돼?,KR,US,장난감 총,장난감 총(발사 기능 없음)·물총,,False
+19,complete_route_weapon,한국에서 미국 갈 때 전자충격기 가져가도 돼?,KR,US,전자충격기,전자충격기 등 충격 장치,,False
+20,complete_route_weapon,한국에서 미국 갈 때 호신용 스프레이 가져가도 돼?,KR,US,호신용 스프레이,최루가스·고추스프레이 등 분사기/화학물질 용기,,False
+21,complete_route_special,한국에서 미국 갈 때 축구공 가져가도 돼?,KR,US,축구공,공기 1/3 이상 주입된 공·풍선류,,False
+22,complete_route_special,한국에서 미국 갈 때 토치 가져가도 돼?,KR,US,토치,토치,,False
+23,slang_item,한국에서 미국 갈 때 보배 들고 가도 돼?,KR,US,보조배터리,,,False
+24,typo_item,한국에서 미국 갈 때 고쥬장 가져가도 돼?,KR,US,고추장,액체·분무·겔류,농산물/식품,False
+25,missing_departure,보배 들고 미국 가도 돼?,,US,보조배터리,,,True
+26,missing_departure,미숫가루 미국 가져가도 돼?,,US,미숫가루,,농산물/식품,True
+27,missing_route,보조배터리 가져가도 돼?,,,보조배터리,,,True
+28,missing_item,한국에서 미국 갈 때 이거 가져가도 돼?,KR,US,,,,True
+29,unsupported_route,한국에서 일본 갈 때 액체류 돼?,KR,JP,액체류,액체·분무·겔류,,False
+30,unsupported_route,중국에서 미국 갈 때 김치 가져가도 돼?,CN,US,김치,,농산물/식품,False
