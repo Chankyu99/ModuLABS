@@ -18,7 +18,7 @@ from typing import Optional, Iterator
 
 import streamlit as st
 from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 from langchain_chroma import Chroma
 from langchain_core.messages import SystemMessage, HumanMessage
 
@@ -33,9 +33,9 @@ TOP_K           = 5          # 검색 결과 수
 MAX_MAPPED      = 3          # LLM이 선택할 최대 DB 항목 수
 
 # 모델 초기화 
-embeddings  = OpenAIEmbeddings(model="text-embedding-3-small")
-llm         = ChatOpenAI(model="gpt-5-mini", reasoning_effort="low")
-advanced_llm = ChatOpenAI(model="gpt-5.2", reasoning_effort="low")
+embeddings  = GoogleGenerativeAIEmbeddings(model="gemini-embedding-001")
+llm         = ChatGoogleGenerativeAI(model="gemini-3.1-flash-lite")
+advanced_llm = ChatGoogleGenerativeAI(model="gemini-3.5-flash-lite")
 vectorstore = Chroma(
     collection_name=COLLECTION_NAME,
     embedding_function=embeddings,
@@ -119,7 +119,7 @@ def extract_slots_and_map(user_message: str, chat_history: list[dict], current_s
     ])
 
     try:
-        raw = response.content.strip()
+        raw = response.text.strip()
         if raw.startswith("```"):
             raw = "\n".join(raw.split("\n")[1:-1])
         parsed = json.loads(raw)
@@ -318,6 +318,37 @@ def general_knowledge_answer(user_message: str, slots: dict):
 def stream_string(s: str) -> Iterator[str]:
     yield s
 
+def chunk_to_text(chunk) -> str:
+    """OpenAI/Gemini/LangChain 스트리밍 chunk를 문자열로 안전하게 변환."""
+    content = chunk.content if hasattr(chunk, "content") else chunk
+
+    if content is None:
+        return ""
+
+    if isinstance(content, str):
+        return content
+
+    if isinstance(content, list):
+        parts = []
+        for block in content:
+            if isinstance(block, str):
+                parts.append(block)
+            elif isinstance(block, dict):
+                # Gemini content block 예: {"type": "text", "text": "..."}
+                if "text" in block:
+                    parts.append(block["text"])
+                elif "content" in block:
+                    parts.append(str(block["content"]))
+            else:
+                text = getattr(block, "text", None)
+                if text:
+                    parts.append(text)
+                else:
+                    parts.append(str(block))
+        return "".join(parts)
+
+    return str(content)
+
 def run_pipeline(
     user_message: str,
     chat_history: list[dict],
@@ -346,6 +377,9 @@ def run_pipeline(
     t0 = time.time()
     updated_slots, mapped_items = extract_slots_and_map(user_message, chat_history, slots)
     t1 = time.time()
+    print("[user_message]", user_message)
+    print("[updated_slots]", updated_slots)
+    print("[mapped_items]", mapped_items)
     print(f"⏱️ [1] 슬롯 추출 및 매핑 소요 시간: {t1 - t0:.2f}초")
 
     # 슬롯 미확정 시 재질문
@@ -383,11 +417,9 @@ def run_pipeline(
             yield "⚠️ 현재 기내뭐돼 서비스는 한국(KR)과 미국(US) 노선 정밀 규정만 지원합니다. 타 국가 노선은 아래 안내와 다를 수 있으니 주의해 주세요.\n\n"
 
         for chunk in raw_stream:
-            # chunk.content가 있는 경우(AIMessageChunk)와 바로 문자열(generator)인 경우 모두 처리
-            if hasattr(chunk, "content"):
-                yield chunk.content
-            else:
-                yield chunk
+            text = chunk_to_text(chunk)
+            if text:
+                yield text
         t5 = time.time()
         print(f"⏱️ [3] 최종 답변 생성(스트리밍 완료) 소요 시간: {t5 - t4:.2f}초")
         print(f"⏱️ [Total] 전체 파이프라인 소요 시간: {t5 - start_time:.2f}초")

@@ -132,3 +132,7 @@ websockets==15.0.1
 yarl==1.22.0
 zipp==3.23.0
 zstandard==0.25.0
+
+# 평가지표 계산 추가를 위한 API 교체
+langchain-google-genai
+google-genai

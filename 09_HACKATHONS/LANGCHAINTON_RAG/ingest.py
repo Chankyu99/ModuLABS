@@ -10,7 +10,7 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
-from langchain_openai import OpenAIEmbeddings
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 
@@ -88,8 +88,8 @@ def main():
     print(f"   → {len(docs)}개 문서 변환 완료")
 
     # 3) 임베딩 모델 초기화
-    print("\n🔑 OpenAI 임베딩 모델 초기화 중 (text-embedding-3-small)...")
-    embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+    print("\n🔑 Google Generative AI 임베딩 모델 초기화 중 (gemini-embedding-001)...")
+    embeddings = GoogleGenerativeAIEmbeddings(model="gemini-embedding-001")
 
     # 4) ChromaDB 저장
     print(f"\n ChromaDB 저장 중: {CHROMA_DIR}")
