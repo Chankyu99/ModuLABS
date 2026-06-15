@@ -64,22 +64,20 @@
 ## 문제 정의 및 해결 전략
 
 ### 1. 사용자 입력 물품명과 DB 규정 내 물품명 매핑 오류
-
-- 흔히 사용하는 일상단어와 규정 내 법률용어의 차이로 Retrieval을 실패하는 경우가 빈번함
-- 예 : "보조배터리"는 "리튬이온"으로, "미숫가루"는 "농산물/가공식품"으로 매핑되어야 하지만, 이를 자동으로 처리하지 못해 Retrieval을 실패하는 경우가 많았음
-- GPT-4o-mini를 활용해 DB 문서별 동의어·하위 품목 키워드를 10~15개 생성하고, 사용자 표현과 규정 용어가 달라 검색에 실패하는 문제를 줄이고자 함
+   
+흔히 사용하는 일상단어와 규정 내 법률용어의 차이로 Retrieval을 실패하는 경우가 빈번함
+예 : "보조배터리"는 "리튬이온", "미숫가루"는 "농산물/가공식품"처럼 실제 규정 DB의 상위 항목으로 매핑되어야 하지만, 이를 자동으로 처리하지 못해 Retrieval을 실패하는 경우가 많았음
+Gemini API를 활용해 사용자 입력에서 출발국, 도착국, 물품명을 추출하고, 동시에 DB 규정 항목으로 매핑하는 One-shot Slot Filling & Mapping 구조를 설계함
 
 ### 2. 챗봇 응답 속도가 너무 느림
-
-- RAG 파이프라인 초기 구성단계에서 슬롯 추출과 DB 매핑과정에서 각각 API를 호출해 평균 응답 대기 시간이 50초로 매우 느림
-- 슬롯 추출과 DB 매핑 로직을 하나의 프롬프트로 통합해 API 호출 횟수를 2회에서 1회로 단축
-- GPT-5-mini의 `reasoning_effort` 파라미터를 `low`로 설정해 대표 질문 기준으로 답변 형식을 유지하면서 평균 응답 시간을 50초에서 15초 수준으로 줄였습니다. (약 **3.3배** 향상)
+RAG 파이프라인 초기 구성 단계에서 슬롯 추출과 DB 매핑 과정이 분리되어 평균 응답 대기 시간이 길어지는 문제가 있었음
+슬롯 추출과 DB 매핑 로직을 하나의 프롬프트로 통합해 API 호출 횟수를 줄이고, 검색 범위 필터링과 질의 구조화를 통해 검색 효율을 개선함
+Gemini API 기반 파이프라인으로 전환한 뒤, 오타·줄임말·조사 생략 등 비정형 입력 100개 기준 평균 파이프라인 레이턴시를 3.53초로 측정함
 
 ### 3. 환각(Hallucination) 문제 대응
-
-- LLM의 고질적인 문제인 환각 현상으로 인해 잘못된 정보를 제공하는 경우를 방지하고자 했음
-- DB에 없는 물품 질문 시 성능이 더 좋은 **GPT-5.2로 Fallback**해 항공 일반 지식 기반으로 답변하고, 하단에 별도의 안내 문구 명시
-- 신조어(ex. 두쫀쿠 등)에 대해 관련 정보를 알아보게끔 하고 DB에 없는 물품일 경우 통상 규정 기반으로 답변
+LLM의 고질적인 문제인 환각 현상으로 인해 잘못된 정보를 제공하는 경우를 방지하고자 했음
+국가·물품 metadata 기반 검색 결과를 우선 사용하고, DB에 없는 물품이나 미지원 노선에 대해서는 Fallback 응답과 별도 안내 문구를 제공하도록 설계함
+검색 결과가 부족한 경우에도 규정 근거가 불명확한 내용을 단정하지 않도록, 답변 하단에 “일반 안내이며 항공사·세관 확인이 필요하다”는 안전장치를 추가함
 ---
 
 ## RAG 파이프라인
@@ -88,11 +86,11 @@
 
 | 단계 | 이름 | 내용 |
 |------|------|------|
-| 0단계 | Data Augmentation | GPT-4o-mini로 규정 문서당 동의어·키워드 15개 이상 증강 (오프라인) |
-| 1단계 | Data Ingestion | Augmented Data → text-embedding-3-small → ChromaDB |
-| 2단계 | Router & Slot Filling | 슬롯 추출 + DB 매핑 One-shot 통합 처리 (API 1회) |
+| 0단계 | Data Augmentation | 규정 문서별 동의어·하위 품목 키워드 증강 |
+| 1단계 | Data Ingestion | Augmented Data → Google Generative AI Embeddings → ChromaDB |
+| 2단계 | Router & Slot Filling | Gemini API 기반 슬롯 추출 + DB 매핑 One-shot 통합 처리 |
 | 3단계 | Retriever | 메타데이터 필터 기반 유사도 검색 + Two-Track Fallback |
-| 4단계 | Judge & Generator | 이모지 판정 + Bullet Point 형태 가이드 답변 생성 |
+| 4단계 | Judge & Generator | Gemini API 기반 이모지 판정 + Bullet Point 형태 가이드 답변 생성 |
 
 ---
 
@@ -119,9 +117,11 @@ LANGCHAINTON_RAG/
 
 ## 한계 및 개선 방향
 
-- 본 프로젝트는 해커톤 기간 내 RAG 챗봇의 핵심 흐름을 구현하는 데 집중했기 때문에, 별도의 정량 평가 테스트셋은 구축하지 못했다.
-- 향후 개선한다면 사용자 질문을 일반 질문, 용어 불일치, 오타·은어, 슬롯 누락, 미지원 노선, DB 미등재 물품으로 나누어 테스트셋을 만들고,
-- Slot Accuracy, Mapping Hit@3, Retrieval Hit@5, Fallback Accuracy, Average Latency를 기준으로 파이프라인을 단계별로 평가할 계획이다.
+* 오타, 줄임말, 조사 생략, 띄어쓰기 오류, 한영 혼합 입력을 포함한 100개 Robustness 평가셋을 구축해 RAG 파이프라인 앞단을 검증했다.
+* 평가 결과 Departure/Arrival Accuracy 100%, Item Accuracy 91.0%, Mapping Hit 97.7%, Retrieval Hit 98.9%, 평균 Pipeline Latency 3.53초를 기록했다.
+* 다만 복수 물품 질문에서는 현재 단일 item 슬롯 구조로 인해 일부 물품만 추출되는 한계가 있었다.
+* 일부 물품은 사용자의 실제 표현보다 상위 카테고리로 정규화되었으며, 향후 별칭 사전과 category-level 평가 기준을 도입할 필요가 있다.
+* 향후 개선한다면 item 슬롯을 list 구조로 확장하고, 최종 답변의 판정 정확성·근거 일치성·환각 여부까지 별도 평가할 계획이다.
 
 ---
 
@@ -129,12 +129,12 @@ LANGCHAINTON_RAG/
 
 | 분류 | 기술 | 선택 이유 |
 |---|---|---|
-| LLM (슬롯 추출·답변 생성) | GPT-5-mini | `reasoning_effort` 파라미터로 추론 깊이 조정이 가능해 속도 최적화에 유리 |
-| LLM (Fallback) | GPT-5.2 | DB 미등재 물품에 대해 항공 일반 지식 기반의 깊이 있는 추론이 필요해 플래그십 모델 활용 |
-| LLM (Data Augmentation) | GPT-4o-mini | 84개 문서에 반복적으로 키워드를 증강하는 오프라인 배치 작업으로, 비용 효율적인 모델 선택 |
-| Embedding | text-embedding-3-small | OpenAI 임베딩 중 비용 대비 성능이 우수하며, 한국어·영어 혼용 규정 문서에 안정적 |
+| LLM (슬롯 추출·답변 생성) | Gemini API | 슬롯 추출, 물품명 정규화, DB 항목 매핑, 답변 생성을 하나의 RAG 파이프라인에서 처리하기 위해 활용 |
+| LLM (Fallback) | Gemini API | DB 미등재 물품이나 미지원 노선에서 일반 항공 규정 기반의 보조 답변을 생성하기 위해 활용 |
+| LLM (Data Augmentation) | Google Generative AI Embeddings | 한국어·영어 혼용 규정 문서와 사용자 질문을 벡터화해 ChromaDB 검색에 활용 |
+| Embedding | Google Generative AI Embeddings | OpenAI 임베딩 중 비용 대비 성능이 우수하며, 한국어·영어 혼용 규정 문서에 안정적 |
 | Vector DB | ChromaDB | 로컬 환경에서 별도 서버 없이 메타데이터 필터 검색을 바로 쓸 수 있어 빠른 프로토타이핑에 적합 |
-| Framework | LangChain | Retriever, Chain 등 RAG 구성 요소를 모듈 단위로 조합하기 쉬워 파이프라인 설계에 활용 |
+| Framework | LangChain | LLM 호출, Embedding, Retriever 등 RAG 구성 요소를 모듈 단위로 조합하기 쉬워 파이프라인 설계에 활용 |
 | UI | Streamlit | 별도 프론트엔드 없이 Python만으로 챗봇 인터페이스를 빠르게 구성 가능 |
 
 ---
