@@ -1,20 +1,25 @@
 """
-bot_logic.py
-------
-RAG 파이프라인 구현
 
-  Router & Slot Filling  — 슬롯 추출 + DB 매핑 
-  Retriever   — 메타데이터 필터 기반 유사도 검색 + Two-Track Fallback
-  Judge & Generator      — 	이모지 판정 + Bullet Point 형태 가이드 답변 생성
+bot_logic.py : RAG 파이프라인 구현 모듈
+
+실행 흐름은 다음과 같다.
+
+1) 사용자 질문 입력 → 슬롯 추출 및 DB 항목 매핑
+2) 필수 슬롯 누락 여부 체크 → 누락 시 사용자에게 재질문 
+3) ChromaDB에서 문서 검색
+4) 검색된 문서 + 슬롯 정보를 기반으로 최종 답변 생성
+5) Streamlit에 스트리밍 출력
 
 """
 
+# 필요한 모듈 임포트
+
 import json
-import os
-import time
-import concurrent.futures
+# import os
+# import time
+# import concurrent.futures
 from pathlib import Path
-from typing import Optional, Iterator
+# from typing import Optional, Iterator
 
 import streamlit as st
 from dotenv import load_dotenv
@@ -22,20 +27,25 @@ from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmb
 from langchain_chroma import Chroma
 from langchain_core.messages import SystemMessage, HumanMessage
 
+# API KEY 환경변수 로드
 load_dotenv()
 
-# 경로 / 상수 
-BASE_DIR        = Path(__file__).parent
-CHROMA_DIR      = BASE_DIR / "chroma_db"
-DATA_FILE       = BASE_DIR / "data" / "index_docstore_export.jsonl"
-COLLECTION_NAME = "airline_regulations"
-TOP_K           = 5          # 검색 결과 수
-MAX_MAPPED      = 3          # LLM이 선택할 최대 DB 항목 수
+# 경로 설정
+BASE_DIR = Path(__file__).resolve().parent
+CHROMA_DIR = BASE_DIR / "chroma_db"
+DATA_FILE = BASE_DIR / "data" / "index_docstore_export.jsonl"
 
-# 모델 초기화 
-embeddings  = GoogleGenerativeAIEmbeddings(model="gemini-embedding-001")
-llm         = ChatGoogleGenerativeAI(model="gemini-3.1-flash-lite")
-advanced_llm = ChatGoogleGenerativeAI(model="gemini-3.5-flash-lite")
+# 검색 설정
+COLLECTION_NAME = "airline_regulations"
+RETRIEVAL_TOP_K = 5                     # 검색 결과 수
+RETRIEVAL_SCORE_THRESHOLD = 1.2         # 검색 점수 임계값 (낮을수록 더 유사한 문서만 반환)
+MAX_MAPPED_ITEMS = 3                    # LLM이 선택할 최대 DB 항목 수
+
+# LLM 및 ChromaDB 초기화
+embeddings = GoogleGenerativeAIEmbeddings(model="gemini-embedding-001")
+llm = ChatGoogleGenerativeAI(model="gemini-3.5-flash", max_tokens=2048, temperature=1.0)
+
+
 vectorstore = Chroma(
     collection_name=COLLECTION_NAME,
     embedding_function=embeddings,
@@ -43,75 +53,151 @@ vectorstore = Chroma(
 )
 
 
-# DB 항목 목록 로드 (시작 시 1회)
+# 1. 국가별 물품 카탈로그 생성 (추후 슬롯 매핑에 활용)
 
-def load_db_items() -> dict[str, list[str]]:
+COUNTRIES = {"KR","US"} # 지원 국가 목록 (한국 -> 미국 시나리오 설정)
+
+def load_country_item_catalog():
     """
-    JSONL에서 국가별 item 목록을 로드.
-    반환: {"KR": [...], "US": [...]}
+    원본 JSONL(DATA_FILE)에서 국가별 공식 물품 카탈로그 생성
+    
+    반환 형식: {"KR": ["액체·분무·겔류"], "US": ["농산물/식품"]}
     """
-    items: dict[str, list[str]] = {}
+    
+    # 카탈로그 초기화
+    items_by_country: dict[str, set[str]] = {country: set() for country in COUNTRIES}
+
+    # JSONL 파일 읽고 국가별 물품 추출
     with open(DATA_FILE, "r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line:
+        for line_num, line in enumerate(f, start=1):
+            stripped_line = line.strip()
+
+            if not stripped_line:
                 continue
-            rec = json.loads(line)
-            country = rec.get("country", "?")
-            item    = rec.get("item", "")
-            if country not in items:
-                items[country] = []
-            if item and item not in items[country]:
-                items[country].append(item)
-    return items
+            try:
+                record = json.loads(stripped_line)
+            except json.JSONDecodeError as e:
+                raise ValueError(f"JSON 디코딩 오류 (라인 {line_num}): {e}") from e
+            
+            country = record.get("country")
+            item = record.get("item")
+
+            if country not in COUNTRIES:
+                continue
+
+            if not isinstance(item, str) or not item.strip():
+                continue
+
+            items_by_country[country].add(item.strip())
+
+    return {
+        country: sorted(items)
+        for country, items in items_by_country.items()
+    }
+
+# 모듈 로드 시 1회만 실행 -> 국가별 물품 카탈로그를 메모리에 저장해 매 질문마다 재사용
+DB_ITEM_CATALOG : dict[str, list[str]] = load_country_item_catalog()
 
 
-# 모듈 로드 시 1회만 실행
-DB_ITEMS: dict[str, list[str]] = load_db_items()
+# 2. Router & Slot Filling  (슬롯 추출)
 
+# LLM 시스템 프롬프트로 답변 방식 정의 (슬롯 추출 + DB 매핑을 한 번에 수행하도록 유도)
 
-# 2단계: 슬롯 추출 (Router & Slot Filling)
+COMBINED_SYSTEM_PROMPT = """
+You are an expert slot extraction and database item mapping engine
+for an airline baggage regulation chatbot.
 
-COMBINED_SYSTEM_PROMPT = """당신은 항공 규정 챗봇 전문가입니다.
-사용자 메시지와 대화 기록을 분석하여 다음 JSON 구조로만 정확히 출력하세요:
+Your task is to analyze the user's latest message and recent chat history,
+then return only a valid JSON object with the following structure:
+
 {
   "slots": {
-    "departure": "출발국코드(KR/US/JP 등. 사용자가 새로운 출발지를 말하면 기존 값을 무시하고 새 출발국코드를 출력. 대화에 명시적으로 언급되지 않았다면 사용자의 언어나 정황으로 절대 유추하지 말고 반드시 null로 표기할 것)",
-    "arrival": "도착국코드(사용자가 새로운 도착지를 말하면 기존 값을 무시하고 새 도착국코드를 출력. 대화에 명시되지 않았다면 반드시 null)",
-    "item": "물품명(추출된 물품명 단 하나. '보배'(보조배터리), '전담'(전자담배), '놋북'(노트북) 등 은어나, '고쥬장'(고추장) 같이 오타/맞춤법 오류가 있는 단어도 문맥을 파악해 반드시 정식 명칭으로 교정하여 추출할 것. 모르면 null)",
-    "quantity": "수량/용량(모르면 null)"
+    "departure": "Departure country code such as KR, US, JP. If unknown, use null.",
+    "arrival": "Arrival country code such as KR, US, JP. If unknown, use null.",
+    "item": "One normalized item name. Correct Korean slang, abbreviations, and typos. If unknown, use null.",
+    "quantity": "Quantity, capacity, volume, weight, or battery capacity such as 100ml, 2 items, 100Wh. If unknown, use null."
   },
   "mapped_db_items": {
-    "KR": ["출발/도착국 중 KR이 포함될 경우 아래 [KR DB 목록] 중 물품명과 관련된 항목 최대 3개 배열(없으면 [])"],
-    "US": ["출발/도착국 중 US가 포함될 경우 아래 [US DB 목록] 중 물품명과 관련된 항목 최대 3개 배열(없으면 [])"]
+    "KR": ["Up to 3 related KR database item names from the provided KR DB list. Use [] if none."],
+    "US": ["Up to 3 related US database item names from the provided US DB list. Use [] if none."]
   }
 }
-오직 순수 JSON 데이터만 출력하세요. 마크다운(```json)이나 다른 설명은 절대 추가하지 마세요.
+
+Rules:
+- Return only valid JSON.
+- Do not use markdown code fences.
+- Do not add explanations.
+- The user message may be in Korean.
+- Understand Korean slang, abbreviations, typos, and informal expressions.
+- Normalize item names into standard Korean item names when possible.
+- If the user clearly changes the route, prefer the newly mentioned departure or arrival.
+- Do not infer a country from language alone.
+- If a value is not explicitly mentioned or cannot be reliably inferred from chat history, use null.
+- For mapped_db_items, choose only exact item names that appear in the provided DB lists.
 """
 
-def extract_slots_and_map(user_message: str, chat_history: list[dict], current_slots: dict) -> tuple[dict, dict[str, list[str]]]:
-    """대화 메시지에서 슬롯을 추출하고 DB 항목에 대한 매핑까지 한 번의 프롬프트로 처리."""
-    history_text = ""
-    for msg in chat_history[-6:]:
-        role = "사용자" if msg["role"] == "user" else "봇"
-        history_text += f"{role}: {msg['content']}\n"
+# 사용자 메시지 + 대화 히스토리 + 현재 슬롯 상태 → LLM 프롬프트 생성
+def build_slot_prompt(user_message: str, chat_history: list[dict], current_slots: dict,) -> str:
+    
+    history_lines = []
 
-    kr_db_str = "\n".join(f"  - {it}" for it in DB_ITEMS.get("KR", []))
-    us_db_str = "\n".join(f"  - {it}" for it in DB_ITEMS.get("US", []))
+    for message in chat_history[-6:]:
+        role = "사용자" if message["role"] == "user" else "봇"
+        history_lines.append(f"{role}: {message['content']}")
 
-    prompt = f"""현재 슬롯 상태: {json.dumps(current_slots, ensure_ascii=False)}
+    history_text = "\n".join(history_lines)
 
-최근 대화:
-{history_text}
-사용자 최신 메시지: {user_message}
+    kr_db_text = "\n".join(f"  - {item}" for item in DB_ITEM_CATALOG.get("KR", []))
+    us_db_text = "\n".join(f"  - {item}" for item in DB_ITEM_CATALOG.get("US", []))
 
-[KR DB 목록]
-{kr_db_str}
+    return f"""
+            Current slot state:
+            {json.dumps(current_slots, ensure_ascii=False)}
 
-[US DB 목록]
-{us_db_str}
+            Recent chat history:
+            {history_text}
 
-위 정보를 바탕으로 슬롯과 매핑 항목(mapped_db_items)을 한 번에 JSON으로 추출하세요."""
+            User's latest message:
+            {user_message}
+
+            [KR DB List]
+            {kr_db_text}
+
+            [US DB List]
+            {us_db_text}
+
+            Return the extracted slots and mapped_db_items as valid JSON only.
+            """
+
+
+# LLM 응답 문자열을 딕셔너리로 바꾸고 파싱 → 슬롯 병합
+def parse_slot_response(response_text: str, current_slots: dict,) -> tuple[dict, dict[str, list[str]]]:
+
+    raw_text = response_text.strip()
+
+    if raw_text.startswith("```"):
+        raw_text = "\n".join(raw_text.split("\n")[1:-1])
+
+    parsed = json.loads(raw_text)
+
+    new_slots = parsed.get("slots", {})
+    mapped_items = parsed.get("mapped_db_items", {"KR": [], "US": []})
+
+    merged_slots = {**current_slots}
+
+    for key, value in new_slots.items():
+        if value is not None and value != "":
+            merged_slots[key] = value
+
+    return merged_slots, mapped_items
+
+
+# 사용자 메시지로부터 슬롯 추출 → DB 매핑
+def extract_slots_and_map(user_message: str, chat_history: list[dict], current_slots: dict,) -> tuple[dict, dict[str, list[str]]]:
+
+    prompt = build_slot_prompt(user_message=user_message, 
+                               chat_history=chat_history, 
+                               current_slots=current_slots,)
 
     response = llm.invoke([
         SystemMessage(content=COMBINED_SYSTEM_PROMPT),
@@ -119,354 +205,303 @@ def extract_slots_and_map(user_message: str, chat_history: list[dict], current_s
     ])
 
     try:
-        raw = response.text.strip()
-        if raw.startswith("```"):
-            raw = "\n".join(raw.split("\n")[1:-1])
-        parsed = json.loads(raw)
-        
-        new_slots = parsed.get("slots", {})
-        mapped_items = parsed.get("mapped_db_items", {"KR": [], "US": []})
-        
-        merged = {**current_slots}
-        for k, v in new_slots.items():
-            if v is not None:
-                merged[k] = v
-                
-        return merged, mapped_items
-    except Exception:
+        return parse_slot_response(
+            response_text=chunk_to_text(response),
+            current_slots=current_slots,
+        )
+    except Exception as error:
+        print(f"[extract_slots_and_map] 슬롯 추출 실패: {error}")
         return current_slots, {"KR": [], "US": []}
 
+# 3. 필수 슬롯 누락 여부 체크 -> 사용자의 첫 질문에서 출발지/도착지/물품 중 하나라도 빠졌다면 누락된 정보를 재질문하도록 설계
+def check_missing_slots(slots: dict) -> str | None:
 
-def check_missing_slots(slots: dict) -> Optional[str]:
-    """미확정 슬롯에 대한 재질문 문자열 반환. 모두 확정이면 None."""
-    dep = slots.get("departure")
-    arr = slots.get("arrival")
+    departure = slots.get("departure")
+    arrival = slots.get("arrival")
     item = slots.get("item")
-    
-    if not dep and not arr:
-        return "✈️ 어디에서 출발하여 어디로 가시나요? (예: 한국 → 미국)"
-    elif not dep:
-        return "🛫 출발하시는 국가(또는 공항)를 알려주세요."
-    elif not arr:
-        return "🛬 도착하시는 국가(또는 공항)를 알려주세요."
-        
+
+    if not departure and not arrival:
+        return "✈️ 어디에서 출발해서 어디로 가시나요? 예: 한국에서 미국"
+
+    if not departure:
+        return "🛫 출발 국가를 알려주세요."
+
+    if not arrival:
+        return "🛬 도착 국가를 알려주세요."
+
+    if departure == arrival:
+        return "⚠️ 출발지와 도착지가 같습니다. 다시 입력해 주세요."
+
     if not item:
         return "🎒 어떤 물건의 반입 규정이 궁금하신가요?"
-        
-    if dep == arr:
-        return "⚠️ 출발지와 도착지가 같습니다. 다시 입력해 주세요."
-        
+
     return None
 
+# 4. ChromaDB에서 문서 검색
 
-def retrieve_docs(slots: dict, mapped: dict[str, list[str]]) -> tuple[list[dict], bool]:
+def retrieve_docs(slots: dict, mapped_items: dict[str, list[str]],) -> tuple[list[dict], bool]:
+
     """
-    확정된 슬롯과 매핑 결과로 ChromaDB에서 관련 문서 검색.
-    매핑 전체 실패 여부를 두 번째 반환값으로 제공.
+    슬롯 정보 + 매핑된 DB 항목을 활용해 어떤 국가의 규정을 봐야할지 결정하고, 관련 문서를 검색해 리스트로 반환
     """
-    item          = slots.get("item", "")
-    departure     = slots.get("departure", "KR")
-    arrival       = slots.get("arrival", "US")
-    jurisdictions = list({departure, arrival})
 
-    print(f"[retrieve_docs] mapped: {mapped}")  # 디버그 로그
+    item = slots.get("item", "")
+    departure = slots.get("departure")
+    arrival = slots.get("arrival")
 
-    # 모든 jurisdiction에서 매핑이 비었는지 체크
-    all_mapping_failed = all(len(mapped.get(jur, [])) == 0 for jur in jurisdictions)
+    jurisdictions = []  # 검색할 관할 국가 코드 리스트 (프로젝트에서는 ["KR", "US"])
 
-    all_docs = []
-    seen_ids = set()
+    for country_code in [departure, arrival]:
+        if country_code and country_code not in jurisdictions: # 출발지와 도착지 중복 방지
+            jurisdictions.append(country_code)
+    
+    # 매핑된 DB 항목이 있으면 해당 국가의 규정을 우선적으로 검색
+    all_mapping_failed = all(
+        len(mapped_items.get(country_code, [])) == 0
+        for country_code in jurisdictions
+    )
 
-    for jur in jurisdictions:
-        matched_items = mapped.get(jur, [])
+    retrieved_docs = []
+    seen_doc_ids = set()    # 같은 문서가 여러 번 검색되는 것을 방지
+
+    for country_code in jurisdictions:
+        matched_items = mapped_items.get(country_code, [])
 
         if matched_items:
             query = " ".join(matched_items) + " " + item
         else:
             query = item
 
-        results = vectorstore.similarity_search_with_score(
+        search_results = vectorstore.similarity_search_with_score(
             query=query,
-            k=TOP_K,
-            filter={"jurisdiction": jur},
+            k=RETRIEVAL_TOP_K,
+            filter={"jurisdiction": country_code},
         )
 
-        for doc, score in results:
-            doc_id       = doc.metadata.get("doc_id", id(doc))
-            db_item_name = doc.metadata.get("item", "")
+        for doc, score in search_results:
+            metadata = doc.metadata
+            doc_id = metadata.get("doc_id", id(doc))
+            db_item_name = metadata.get("item", "")
 
-            if matched_items:
-                if db_item_name in matched_items:
-                    if doc_id not in seen_ids:
-                        seen_ids.add(doc_id)
-                        all_docs.append({
-                            "doc": doc, "score": score,
-                            "jurisdiction": jur, "mapped": True
-                        })
-            else:
-                if score <= 1.2 and doc_id not in seen_ids:
-                    seen_ids.add(doc_id)
-                    all_docs.append({
-                        "doc": doc, "score": score,
-                        "jurisdiction": jur, "mapped": False
-                    })
+            if doc_id in seen_doc_ids:  # 이미 처리한 문서면 스킵
+                continue
 
-    return all_docs, all_mapping_failed
+            if matched_items and db_item_name not in matched_items: # 매핑된 DB 항목이 있는데 검색 결과 문서의 항목이 매핑된 항목과 일치하지 않으면 스킵
+                continue
 
+            if not matched_items and score > RETRIEVAL_SCORE_THRESHOLD: # 검색 점수가 임계값보다 높으면 스킵 
+                continue
 
-# 4단계: 최종 판정 + 답변 생성
+            seen_doc_ids.add(doc_id)
+            retrieved_docs.append({
+                "doc": doc,
+                "score": score,
+                "jurisdiction": country_code,
+                "mapped": bool(matched_items),
+            })
 
-JUDGE_SYSTEM_PROMPT = """친절한 항공 규정 안내원입니다. 가장 쉽고 가독성 좋게 답변하세요.
+    return retrieved_docs, all_mapping_failed
 
-규칙:
-1. 답변에서 마크다운 형태의 볼드체(**), 기울임체(*) 등 별표(*) 기호를 **절대** 사용하지 마세요. 오직 평문 문자열과 하이픈(-) 기호만 사용합니다.
-2. 출력 형식은 아래 [출력 예시]의 구조를 반드시 따르세요.
-3. 첫 줄: 이모지(🟢/🟡/🔴)와 '기내/위탁' 가능 여부 한 줄 요약.
-4. 중간 줄: 하이픈(-)을 사용해 항목별 상세 설명 (배터리 내장 여부 등 특이사항 분리).
-5. 띄어쓰기를 철저히 지키고, 문단(의미)이 바뀔 때는 반드시 줄바꿈(엔터 2번)을 해서 널찍하고 읽기 쉽게 작성하세요.
-6. 마지막 단락: 출처를 아래 형식의 공식 HTML 하이퍼링크로 제공하세요 (단순 텍스트나 마크다운 링크 출력 불가).
-   - 한국(KR) 규정 참조 시: <a href="https://www.avsec365.or.kr/" target="_blank">항공보안365</a>
-   - 미국(US) 규정 참조 시: <a href="https://www.cbp.gov/travel/us-citizens/know-before-you-go/prohibited-and-restricted-items" target="_blank">미국 관세국경보호청(CBP)</a>
+# 5. 검색된 문서 + 슬롯 정보를 기반으로 최종 답변 생성 -> app.py에서 스트리밍 출력과 함께 호출
 
-[출력 예시]
-🟢 기내·위탁 모두 가능(일반 제품) — 단, 특수 상황이면 제한될 수 있어요.
+# 최종 답변 생성을 위한 시스템 프롬프트
+JUDGE_SYSTEM_PROMPT = """
+You are a friendly airline baggage regulation assistant.
 
-- 일반 제품: 규정 적용 없이 기내 반입·위탁 수하물 모두 통상 허용.
-- 특정 조건(예: 배터리 내장형)이라면: 리튬배터리 규정 적용 → 보통 기내 반입 권장/위탁 제한 가능이라 항공사 확인 권장.
+Use the retrieved regulation context to answer the user's question in Korean.
 
-출처 확인: <a href="https://www.avsec365.or.kr/" target="_blank">항공보안365</a>
+Rules:
+- Answer in Korean.
+- Do not use markdown bold, markdown tables, or code blocks.
+- Start with one short summary line using one of these emojis:
+  🟢 allowed, 🟡 conditional, 🔴 prohibited
+- Then explain the details with short bullet points using hyphens.
+- If the regulation differs between carry-on and checked baggage, explain both.
+- If the user's item is a sub-item of a retrieved database category, naturally mention which category was used.
+- Do not invent rules that are not supported by the provided context.
+- End with official source links when relevant.
+
+Source link rules:
+- For KR regulations, include:
+  <a href="https://www.avsec365.or.kr/" target="_blank">항공보안365</a>
+- For US regulations, include:
+  <a href="https://www.cbp.gov/travel/us-citizens/know-before-you-go/prohibited-and-restricted-items" target="_blank">미국 관세국경보호청(CBP)</a>
 """
 
-GENERAL_KNOWLEDGE_SYSTEM_PROMPT = """친절한 항공 규정 안내원입니다. DB에 없지만 일반 규정을 추론해 쉽고 가독성 좋게 답변하세요.
+# 검색된 문서 리스트를 LLM 프롬프트에 넣을 context 문자열로 변환
+def build_retrieved_context(retrieved_docs: list[dict]) -> str:
 
-규칙:
-1. 답변에서 마크다운 형태의 볼드체(**), 기울임체(*) 등 별표(*) 기호를 **절대** 사용하지 마세요. 오직 평문 문자열과 하이픈(-) 기호만 사용합니다.
-2. 출력 형식은 아래 [출력 예시]의 구조를 반드시 따르세요.
-3. 첫 줄: 이모지(🟢/🟡/🔴)와 '기내/위탁' 가능 여부 한 줄 요약.
-4. 중간 줄: 하이픈(-)을 사용해 항목별 상세 설명 (배터리 내장 여부 등 특이사항 분리).
-5. 띄어쓰기를 철저히 지키고, 문단이 바뀔 때는 반드시 줄바꿈(엔터 2번)을 해서 널찍하고 읽기 쉽게 작성하세요.
-
-[출력 예시]
-🟢 기내·위탁 모두 가능(일반 전기 소형가전) — 단, 배터리 내장형/가스충전식이면 제한될 수 있어요.
-
-- 일반 콘센트형 제품(배터리 없음): IATA 일반 기준으로 기내 반입·위탁 수하물 모두 통상 허용.
-- 배터리(리튬이온) 내장형 무선 제품이라면: 리튬배터리 규정 적용 → 보통 기내 반입 권장/위탁 제한 가능(배터리 용량 확인 필요)이라 항공사 확인 권장.
-
-⚠️ 정확한 규정은 이용 항공사 또는 <a href="https://www.avsec365.or.kr" target="_blank">항공보안365</a>에서 확인하세요."""
-
-FALLBACK_MSG = (
-    "😓 죄송합니다. 해당 물품에 대한 규정 정보를 데이터베이스에서 찾지 못했습니다.\n\n"
-    "정확한 정보를 위해 이용하실 항공사 고객센터 또는 "
-    "<a href='https://www.avsec365.or.kr' target='_blank'>항공보안365</a>를 통해 확인해 주세요."
-)
-
-
-def generate_answer(user_message: str, slots: dict, retrieved: list[dict]):
-    """[DB 매핑 성공] 검색 결과 기반 최종 답변 생성 (스트리밍)."""
     context_parts = []
-    for r in retrieved:
-        doc  = r["doc"]
-        meta = doc.metadata
+
+    for result in retrieved_docs:
+        # LangChain Document 객체에 맞게 doc과 metadata 추출
+        doc = result["doc"]
+        metadata = doc.metadata
+
+        jurisdiction = metadata.get("jurisdiction", "?") # 있으면 가져오고 없으면 ?로 표시 
+        stage = metadata.get("stage", "?")
+        item = metadata.get("item", "?")
+
         context_parts.append(
-            f"[{meta.get('jurisdiction', '?')} 규정 / {meta.get('stage', '?')}]\n"
-            f"항목: {meta.get('item', '?')}\n"
+            f"[{jurisdiction} regulation / {stage}]\n"
+            f"Database item: {item}\n"
             f"{doc.page_content}"
         )
-    context = "\n\n".join(context_parts)
+
+    return "\n\n".join(context_parts) # 검색된 문서들을 구분자를 연결해 하나의 문자열로 반환
+
+# 최종 답변 생성
+def generate_answer(user_message: str, slots: dict, retrieved_docs: list[dict],):
+
+    context = build_retrieved_context(retrieved_docs)
 
     departure = slots.get("departure", "?")
-    arrival   = slots.get("arrival", "?")
-    item      = slots.get("item", "?")
+    arrival = slots.get("arrival", "?")
+    item = slots.get("item", "?")
+    quantity = slots.get("quantity", "")
 
-    prompt = f"""노선: {departure} → {arrival}
-사용자가 물어본 물품: {item}
-사용자 질문: {user_message}
+    prompt = f"""
+                Route:
+                {departure} -> {arrival}
 
-검색된 규정:
-{context}
+                User item:
+                {item}
 
-위 규정을 바탕으로 답변해주세요.
-만약 사용자 물품이 DB 항목의 하위 개념이라면(예: '칼' → '날 길이 6cm 초과 칼'), 어떤 규정을 참조했는지 자연스럽게 안내해주세요."""
+                Quantity or capacity:
+                {quantity}
 
+                User's original question:
+                {user_message}
+
+                Retrieved regulation context:
+                {context}
+
+                Answer the user's question based only on the retrieved regulation context.
+                """
+
+    # invoke()대신 사용해 답변 생성과 동시에 스트리밍 출력으로 UX 개선
     return llm.stream([
         SystemMessage(content=JUDGE_SYSTEM_PROMPT),
         HumanMessage(content=prompt),
     ])
 
 
-def general_knowledge_answer(user_message: str, slots: dict):
-    """[v3] DB 매핑 전체 실패 시 LLM 일반 항공 지식으로 추론·답변 (스트리밍)."""
-    departure = slots.get("departure", "?")
-    arrival   = slots.get("arrival", "?")
-    item      = slots.get("item", "?")
+# 6. 검색 결과가 없을 때, 없는 지식을 지어내기 보다 항공 규정을 근거 없이 추측하지 않고 정확한 출처를 참고하라고 권유
 
-    prompt = f"""노선: {departure} → {arrival}
-사용자가 물어본 물품: "{item}"
-사용자 질문: {user_message}
-위 조건에 맞는 답변 부탁해."""
+NO_MAPPING_FALLBACK_MSG = (
+    "😓 죄송합니다. 질문하신 물품과 직접 연결되는 규정 항목을 찾지 못했습니다.\n\n"
+    "물품명을 더 구체적으로 입력해 보시거나, 항공사 또는 공식 규정 사이트에서 확인해 주세요."
+)
 
-    return advanced_llm.stream([
-        SystemMessage(content=GENERAL_KNOWLEDGE_SYSTEM_PROMPT),
-        HumanMessage(content=prompt),
-    ])
+NO_RETRIEVAL_FALLBACK_MSG = (
+    "😓 죄송합니다. 관련 항목은 추정했지만, 신뢰할 만한 규정 문서를 찾지 못했습니다.\n\n"
+    "정확한 확인을 위해 항공사 또는 공식 규정 사이트를 확인해 주세요."
+)
 
+# 7. Streamlit 출력용 반복가능한 스트림 처리 helper 함수 
 
-# ─────────────────────────────────────────────────────────────
-# 전체 파이프라인 진입점
-# ─────────────────────────────────────────────────────────────
+def stream_string(message: str):
+    """
+    일반 문자열도 LLM 스트리밍 응답처럼 for문으로 순회할 수 있게 만든다.
+    """
 
-def stream_string(s: str) -> Iterator[str]:
-    yield s
+    yield message
+
 
 def chunk_to_text(chunk) -> str:
-    """OpenAI/Gemini/LangChain 스트리밍 chunk를 문자열로 안전하게 변환."""
-    content = chunk.content if hasattr(chunk, "content") else chunk
 
+    # LangChain의 AIMessageChunk는 보통 chunk.content에 실제 텍스트가 들어 있어 hasattr로 content 속성 존재 여부를 체크
+    if hasattr(chunk, "content"):
+        content = chunk.content
+    else:
+        content = chunk
+
+    # 출력할 텍스트가 없으면 빈 문자열로 처리
     if content is None:
         return ""
 
+    # 이미 문자열이면 그대로 반환
     if isinstance(content, str):
         return content
 
+    # 모델에 따라 content가 여러 조각이 담긴 list로 올 때
     if isinstance(content, list):
-        parts = []
+        text_parts = []
+
         for block in content:
             if isinstance(block, str):
-                parts.append(block)
-            elif isinstance(block, dict):
-                # Gemini content block 예: {"type": "text", "text": "..."}
-                if "text" in block:
-                    parts.append(block["text"])
-                elif "content" in block:
-                    parts.append(str(block["content"]))
-            else:
-                text = getattr(block, "text", None)
-                if text:
-                    parts.append(text)
-                else:
-                    parts.append(str(block))
-        return "".join(parts)
+                text_parts.append(block)
 
+            elif isinstance(block, dict):
+                if "text" in block:
+                    text_parts.append(block["text"])
+                elif "content" in block:
+                    text_parts.append(str(block["content"]))
+
+            else:
+                # getattr로 obj.text가 있으면 가져오고, 없으면 None을 반환
+                block_text = getattr(block, "text", None)
+
+                if block_text:
+                    text_parts.append(block_text)
+                else:
+                    text_parts.append(str(block))
+
+        return "".join(text_parts)
+
+    # 위 경우에 해당하지 않는 값은 마지막으로 문자열 변환해서 반환
     return str(content)
 
-def run_pipeline(
-    user_message: str,
-    chat_history: list[dict],
-    slots: dict,
-) -> tuple[Iterator[str], dict]:
-    """RAG 파이프라인 실행. Returns: (bot_response_stream, updated_slots)"""
-    
-    start_time = time.time()
+# 8. 파이프라인 함수 : 지금까지 만든 함수를 연결
 
-    # 포괄적 질문 감지
-    broad_keywords = ["다 알려", "전부", "모두", "목록", "리스트"]
-    if any(kw in user_message for kw in broad_keywords) and not slots.get("item"):
-        return stream_string(
-            "🗂️ 어떤 카테고리의 규정이 궁금하신가요?\n\n"
-            "아래 중 하나를 선택하거나, 직접 물품명을 입력해 주세요.\n"
-            "- 🔫 총기·무기류\n"
-            "- 🔪 도검·공구류\n"
-            "- 💊 의약품·의료기기\n"
-            "- 🧴 액체·겔·분무류\n"
-            "- 🔋 배터리·전자기기\n"
-            "- 🍎 식품·농산물\n"
-            "- 💰 현금·귀중품"
-        ), slots
+def run_pipeline(user_message: str, chat_history: list[dict], slots: dict):
+    """
+    전체 RAG 파이프라인을 실행 (슬롯 추출 → 누락 체크 → 문서 검색 → 답변 생성)
 
-    # 2단계: 슬롯 추출 및 DB 매핑 동시 처리
-    t0 = time.time()
-    updated_slots, mapped_items = extract_slots_and_map(user_message, chat_history, slots)
-    t1 = time.time()
-    print("[user_message]", user_message)
-    print("[updated_slots]", updated_slots)
-    print("[mapped_items]", mapped_items)
-    print(f"⏱️ [1] 슬롯 추출 및 매핑 소요 시간: {t1 - t0:.2f}초")
+    최종 반환값:
+    - bot_response_stream: Streamlit에서 for문으로 출력할 수 있는 응답 스트림
+    - updated_slots: 이번 질문을 반영한 최신 슬롯 상태
+    """
 
-    # 슬롯 미확정 시 재질문
-    missing_q = check_missing_slots(updated_slots)
-    if missing_q:
-        return stream_string(missing_q), updated_slots
+    # 사용자 메시지에서 슬롯 추출 + DB 항목 매핑
+    updated_slots, mapped_items = extract_slots_and_map(
+        user_message=user_message,
+        chat_history=chat_history,
+        current_slots=slots,
+    )
 
-    # 3단계: 검색
-    t2 = time.time()
-    retrieved, all_mapping_failed = retrieve_docs(updated_slots, mapped_items)
-    t3 = time.time()
-    print(f"⏱️ [2] 벡터 DB 검색 소요 시간: {t3 - t2:.2f}초")
+    # 출발지/도착지/물품 중 빠진 값이 있으면 검색하지 않고 재질문
+    missing_question = check_missing_slots(updated_slots)
 
-    # 4단계: 답변 생성 (스트리밍 연결용)
-    if retrieved:
-        # DB에서 문서를 찾은 경우 → 정규 RAG 답변
-        raw_stream = generate_answer(user_message, updated_slots, retrieved)
+    if missing_question:
+        return stream_string(missing_question), updated_slots
+
+    # 슬롯이 충분하면 ChromaDB에서 관련 규정 문서 검색
+    retrieved_docs, all_mapping_failed = retrieve_docs(
+        slots=updated_slots,
+        mapped_items=mapped_items,
+    )
+
+    # 검색 결과에 따라 답변 스트림 결정
+    if retrieved_docs:
+        raw_stream = generate_answer(
+            user_message=user_message,
+            slots=updated_slots,
+            retrieved_docs=retrieved_docs,
+        )
+
     elif all_mapping_failed:
-        # [v3] DB 매핑 자체가 전혀 안 된 경우 → LLM 일반 지식 답변
-        print(f"[run_pipeline] DB 매핑 실패 → 일반 지식 Fallback: {updated_slots.get('item')}")
-        raw_stream = general_knowledge_answer(user_message, updated_slots)
+        raw_stream = stream_string(NO_MAPPING_FALLBACK_MSG)
+
     else:
-        # 매핑은 됐으나 score 초과로 문서 없음 → 기존 Fallback
-        raw_stream = stream_string(FALLBACK_MSG)
+        raw_stream = stream_string(NO_RETRIEVAL_FALLBACK_MSG)
 
-    def traced_stream() -> Iterator[str]:
-        t4 = time.time()
-        
-        # [v4] 타국가 등 미지원 노선에 대한 경고문 선출력
-        supported = {"KR", "US"}
-        dep = updated_slots.get("departure")
-        arr = updated_slots.get("arrival")
-        
-        if (dep and dep not in supported) or (arr and arr not in supported):
-            yield "⚠️ 현재 기내뭐돼 서비스는 한국(KR)과 미국(US) 노선 정밀 규정만 지원합니다. 타 국가 노선은 아래 안내와 다를 수 있으니 주의해 주세요.\n\n"
-
+    # LLM chunk 또는 fallback 문자열을 모두 순수 문자열 stream으로 변환
+    def response_stream():
         for chunk in raw_stream:
             text = chunk_to_text(chunk)
+
             if text:
                 yield text
-        t5 = time.time()
-        print(f"⏱️ [3] 최종 답변 생성(스트리밍 완료) 소요 시간: {t5 - t4:.2f}초")
-        print(f"⏱️ [Total] 전체 파이프라인 소요 시간: {t5 - start_time:.2f}초")
 
-    return traced_stream(), updated_slots
-
-
-# 단독 테스트
-if __name__ == "__main__":
-    print("=" * 60)
-    print("🛫 기내뭐돼 v3 — 일반지식 Fallback 테스트")
-    print("=" * 60)
-
-    test_cases = [
-        {
-            "desc": "insight 1, 2: 물품만 있는 질문 (출발/도착지 묻는지 확인)",
-            "message": "고추장 기내에 들고가도 돼?",
-            "slots": {},
-        },
-        {
-            "desc": "insight 3: 물품과 상세 항목이 있는 질문 (출발/도착지 묻는지 확인)",
-            "message": "100Wh 보조배터 기내 반입 가능?",
-            "slots": {},
-        },
-        {
-            "desc": "insight 4: 타국가(일본) 질문에 대한 처리",
-            "message": "나 한국에서 일본 가는데 액체류 돼?",
-            "slots": {},
-        },
-        {
-            "desc": "v4: 경로 중간 변경 처리 (한국->미국 대화 중 한국->중국으로 바꿈)",
-            "message": "아 미안 나 미국 아니고 중국 가는데 그래도 똑같아?",
-            "slots": {"departure": "KR", "arrival": "US", "item": "고추장"},
-        },
-        {
-            "desc": "v4: 경로 중간 변경 처리 (한국->미국 대화 중 중국->캐나다로 전면 교체)",
-            "message": "중국에서 캐나다로 갈 때는 초콜릿 어떻게 해야해?",
-            "slots": {"departure": "KR", "arrival": "US", "item": "보조배터리"},
-        },
-    ]
-
-    for i, tc in enumerate(test_cases, 1):
-        print(f"\n[테스트 {i}] {tc['desc']}")
-        print(f"  입력: {tc['message']}")
-        response_stream, new_slots = run_pipeline(tc["message"], [], tc["slots"])
-        print(f"  → 슬롯: {new_slots}")
-        print("  → 응답: ", end="")
-        for chunk in response_stream:
-            print(chunk, end="", flush=True)
-        print("\n" + "-" * 60)
+    return response_stream(), updated_slots

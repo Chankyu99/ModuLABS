@@ -1,0 +1,1 @@
+id,case_type,noise_type,user_query,pred_departure,pred_arrival,pred_item,retrieved_items,num_contexts,answer_preview,faithfulness,answer_latency_sec,ragas_latency_sec,status,error
