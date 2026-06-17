@@ -1,6 +1,6 @@
 import pandas as pd
 
-df = pd.read_csv("eval_results.csv")
+df = pd.read_csv("eval/results/eval_results.csv")
 
 summary_by_noise = (
     df.groupby("noise_type")
@@ -16,5 +16,5 @@ summary_by_noise = (
     .reset_index()
 )
 
-summary_by_noise.to_csv("eval_summary_by_noise_type.csv", index=False, encoding="utf-8-sig")
+summary_by_noise.to_csv("eval/results/eval_summary_by_noise_type.csv", index=False, encoding="utf-8-sig")
 print(summary_by_noise)

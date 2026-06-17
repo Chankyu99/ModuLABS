@@ -11,6 +11,8 @@ eval_rag.py : RAG 파이프라인 중간 평가 모듈
 # 필요한 라이브러리 임포트
 
 import time
+from pathlib import Path
+
 import pandas as pd
 
 from bot_logic import (
@@ -21,10 +23,15 @@ from bot_logic import (
 
 # 설정값 모음
 
-EVAL_DATASET_FILE = "eval_dataset.csv"
-EVAL_RESULTS_FILE = "eval_results.csv"
-EVAL_SUMMARY_FILE = "eval_summary.csv"
-EVAL_NOISE_SUMMARY_FILE = "eval_summary_by_noise_type.csv"
+BASE_DIR = Path(__file__).resolve().parent
+EVAL_DIR = BASE_DIR / "eval"
+EVAL_DATASET_DIR = EVAL_DIR / "datasets"
+EVAL_RESULTS_DIR = EVAL_DIR / "results"
+
+EVAL_DATASET_FILE = EVAL_DATASET_DIR / "eval_dataset.csv"
+EVAL_RESULTS_FILE = EVAL_RESULTS_DIR / "eval_results.csv"
+EVAL_SUMMARY_FILE = EVAL_RESULTS_DIR / "eval_summary.csv"
+EVAL_NOISE_SUMMARY_FILE = EVAL_RESULTS_DIR / "eval_summary_by_noise_type.csv"
 
 EVAL_LIMIT = 5              # 전체 평가 시 None으로 설정
 RUN_RETRIEVAL_EVAL = True
@@ -72,7 +79,7 @@ def list_contains(candidates, expected) -> bool | None:
 
 
 # 평가 데이터셋 로드
-def load_eval_dataset(filepath: str) -> pd.DataFrame:
+def load_eval_dataset(filepath: str | Path) -> pd.DataFrame:
    
     df = pd.read_csv(filepath)
 
@@ -338,6 +345,8 @@ def summarize_by_noise_type(result_df: pd.DataFrame) -> pd.DataFrame:
 
 # 메인 함수: 전체 평가 실행
 def main():
+    EVAL_RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+
     df = load_eval_dataset(EVAL_DATASET_FILE)
 
     print(f"평가 대상: {len(df)}개")

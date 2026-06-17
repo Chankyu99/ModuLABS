@@ -284,7 +284,7 @@ def stream_bot_response(placeholder, response_stream) -> str:
 
 # 사용자 입력 처리 
 def handle_user_input(user_input: str) -> None:
-    """사용자 입력을 받아 RAG 파이프라인을 실행하고 응답을 저장한다."""
+   
     st.session_state.messages.append({
         "role": "user",
         "content": user_input,
