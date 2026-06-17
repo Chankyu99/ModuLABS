@@ -1,0 +1,51 @@
+id,case_type,noise_type,user_query,expected_departure,expected_arrival,expected_item,mapped_kr,mapped_us
+1,food,normal,한국에서 미국 갈 때 고추장 가져가도 돼?,KR,US,고추장,액체·분무·겔류,가공/캔 식품|농산물/식품
+2,food,typo,한국에서 미국 갈 때 고쥬장 가져가도 돼?,KR,US,고추장,액체·분무·겔류,가공/캔 식품|농산물/식품
+3,food,normal,한국에서 미국 갈 때 미숫가루 가져가도 돼?,KR,US,미숫가루,,농산물/식품|가공/캔 식품|씨앗/쌀
+4,food,typo,한국에서 미국 갈 때 미수까루 가능?,KR,US,미숫가루,,농산물/식품|가공/캔 식품
+5,food,normal,한국에서 미국 갈 때 김치 가져가도 돼?,KR,US,김치,,농산물/식품|가공/캔 식품
+6,food,particle_drop,한국 미국 라면 가능?,KR,US,라면,,농산물/식품|가공/캔 식품
+7,food,normal,한국에서 미국 갈 때 컵라면 가져가도 돼?,KR,US,컵라면,,농산물/식품|가공/캔 식품
+8,food,normal,한국에서 미국 갈 때 참치캔 가져가도 돼?,KR,US,참치캔,,가공/캔 식품|해산물(Seafood)
+9,food,normal,한국에서 미국 갈 때 사과 가져가도 돼?,KR,US,사과,,신선·냉동 과일/야채|농산물/식품
+10,food,normal,한국에서 미국 갈 때 망고 가져가도 돼?,KR,US,망고,,신선·냉동 과일/야채|농산물/식품
+11,food,normal,한국에서 미국 갈 때 바나나 가져가도 돼?,KR,US,바나나,,신선·냉동 과일/야채|농산물/식품
+12,food,normal,한국에서 미국 갈 때 쌀 가져가도 돼?,KR,US,쌀,,씨앗/쌀|농산물/식품
+13,food,normal,한국에서 미국 갈 때 육포 가져가도 돼?,KR,US,육포,,고기/가축/가금류 및 생산품
+14,food,spacing_noise,한국에서미국갈때라면스프가능?,KR,US,라면스프,,고기/가축/가금류 및 생산품|농산물/식품
+15,food,normal,한국에서 미국 갈 때 고춧가루 가져가도 돼?,KR,US,고춧가루,,가공/캔 식품|농산물/식품
+16,food,normal,한국에서 미국 갈 때 김 가져가도 돼?,KR,US,김,,가공/캔 식품|농산물/식품
+17,food,normal,한국에서 미국 갈 때 커피 가져가도 돼?,KR,US,커피,,가공/캔 식품
+18,food,normal,한국에서 미국 갈 때 견과류 가져가도 돼?,KR,US,견과류,,농산물/식품
+19,alcohol,normal,한국에서 미국 갈 때 위스키 가져가도 돼?,KR,US,위스키,알코올 음료 (24도 초과~70도 이하),주류(Alcohol)
+20,alcohol,normal,한국에서 미국 갈 때 40도 위스키 가져가도 돼?,KR,US,위스키,알코올 음료 (24도 초과~70도 이하),주류(Alcohol)
+21,alcohol,normal,한국에서 미국 갈 때 와인 가져가도 돼?,KR,US,와인,,주류(Alcohol)
+22,alcohol,normal,한국에서 미국 갈 때 소주 가져가도 돼?,KR,US,소주,알코올 음료 (24도 초과~70도 이하),주류(Alcohol)
+23,alcohol,normal,한국에서 미국 갈 때 고량주 가져가도 돼?,KR,US,고량주,알코올 음료 (24도 초과~70도 이하),주류(Alcohol)
+24,alcohol,normal,한국에서 미국 갈 때 보드카 가져가도 돼?,KR,US,보드카,알코올 음료 (24도 초과~70도 이하),주류(Alcohol)
+25,alcohol,particle_drop,한국 미국 75도 술 가능?,KR,US,75도 술,알코올 음료(70도 초과),주류(Alcohol)
+26,alcohol,normal,한국에서 미국 갈 때 맥주 가져가도 돼?,KR,US,맥주,,주류(Alcohol)
+27,liquid,normal,한국에서 미국 갈 때 샴푸 가져가도 돼?,KR,US,샴푸,액체·분무·겔류,
+28,liquid,normal,한국에서 미국 갈 때 렌즈액 가져가도 돼?,KR,US,렌즈액,액체·분무·겔류,
+29,liquid,normal,한국에서 미국 갈 때 콘택트렌즈 세정액 가져가도 돼?,KR,US,콘택트렌즈 세정액,액체·분무·겔류,
+30,liquid,normal,한국에서 미국 갈 때 선크림 가져가도 돼?,KR,US,선크림,액체·분무·겔류,
+31,liquid,normal,한국에서 미국 갈 때 치약 가져가도 돼?,KR,US,치약,액체·분무·겔류,
+32,liquid,normal,한국에서 미국 갈 때 로션 가져가도 돼?,KR,US,로션,액체·분무·겔류,
+33,liquid,normal,한국에서 미국 갈 때 향수 가져가도 돼?,KR,US,향수,액체·분무·겔류,향수(Perfume)
+34,liquid,normal,한국에서 미국 갈 때 마스카라 가져가도 돼?,KR,US,마스카라,액체·분무·겔류,
+35,medicine,normal,한국에서 미국 갈 때 감기약 가져가도 돼?,KR,US,감기약,,처방약|처방약 분량
+36,medicine,typo,한국에서 미국 갈 때 감긱약 가져가도 돼?,KR,US,감기약,,처방약
+37,medicine,normal,한국에서 미국 갈 때 타이레놀 가져가도 돼?,KR,US,타이레놀,,처방약|처방약 분량
+38,medicine,normal,한국에서 미국 갈 때 소화제 가져가도 돼?,KR,US,소화제,,처방약|처방약 분량
+39,medicine,normal,한국에서 미국 갈 때 멀미약 가져가도 돼?,KR,US,멀미약,,처방약|처방약 분량
+40,medicine,normal,한국에서 미국 갈 때 알레르기약 가져가도 돼?,KR,US,알레르기약,,처방약|처방약 분량
+41,medicine,normal,한국에서 미국 갈 때 수면제 가져가도 돼?,KR,US,수면제,,통제/중독 가능 약물|처방약
+42,medicine,normal,한국에서 미국 갈 때 ADHD 약 가져가도 돼?,KR,US,ADHD 약,,통제/중독 가능 약물|처방약
+43,tobacco,slang,한국에서 미국 갈 때 전담 가져가도 돼?,KR,US,전자담배,,담배(Tobacco)
+44,tobacco,normal,한국에서 미국 갈 때 전자담배 가져가도 돼?,KR,US,전자담배,,담배(Tobacco)
+45,weapon,spacing_noise,한국에서미국갈때장난감총가능?,KR,US,장난감총,장난감 총(발사 기능 없음)·물총,약물류·무기류·폭발물|금지·제한 품목 예시
+46,weapon,normal,한국에서 미국 갈 때 물총 가져가도 돼?,KR,US,물총,장난감 총(발사 기능 없음)·물총,
+47,tool,normal,한국에서 미국 갈 때 과도 가져가도 돼?,KR,US,과도,날 길이 6cm 초과 칼,
+48,tool,typo,한국에서 미국 갈 때 컷터칼 가져가도 돼?,KR,US,커터칼,면도칼날·커터칼날·접이식칼·외과용 메스,
+49,tool,normal,한국에서 미국 갈 때 가위 가져가도 돼?,KR,US,가위,날 길이 6cm 초과 가위,
+50,special,normal,한국에서 미국 갈 때 축구공 가져가도 돼?,KR,US,축구공,공기 1/3 이상 주입된 공·풍선류,

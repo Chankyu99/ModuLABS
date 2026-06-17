@@ -43,7 +43,7 @@ MAX_MAPPED_ITEMS = 3                    # LLM이 선택할 최대 DB 항목 수
 
 # LLM 및 ChromaDB 초기화
 embeddings = GoogleGenerativeAIEmbeddings(model="gemini-embedding-001")
-llm = ChatGoogleGenerativeAI(model="gemini-3.5-flash", max_tokens=2048, temperature=1.0)
+llm = ChatGoogleGenerativeAI(model="gemini-3.1-flash-lite", max_tokens=2048, temperature=1.0)
 
 
 vectorstore = Chroma(
@@ -452,6 +452,32 @@ def chunk_to_text(chunk) -> str:
     # 위 경우에 해당하지 않는 값은 마지막으로 문자열 변환해서 반환
     return str(content)
 
+# 규정에 없는 물품을 억지로 매핑하지 하지 않도록 방지하는 함수
+def normalize_for_match(value: str) -> str:
+    return str(value or "").replace(" ", "").lower()
+
+
+def retrieved_docs_support_item(item: str, retrieved_docs: list[dict]) -> bool:
+    """검색된 문서 안에 사용자 물품명이 실제로 언급되는지 확인."""
+    item_norm = normalize_for_match(item)
+
+    if not item_norm:
+        return False
+
+    for result in retrieved_docs:
+        doc = result["doc"]
+        metadata = doc.metadata
+
+        searchable_text = " ".join([
+            metadata.get("item", ""),
+            doc.page_content,
+        ])
+
+        if item_norm in normalize_for_match(searchable_text):
+            return True
+
+    return False
+
 # 8. 파이프라인 함수 : 지금까지 만든 함수를 연결
 
 def run_pipeline(user_message: str, chat_history: list[dict], slots: dict):
@@ -483,18 +509,24 @@ def run_pipeline(user_message: str, chat_history: list[dict], slots: dict):
     )
 
     # 검색 결과에 따라 답변 스트림 결정
-    if retrieved_docs:
+    if all_mapping_failed:
+        raw_stream = stream_string(NO_MAPPING_FALLBACK_MSG)
+
+    elif not retrieved_docs:
+        raw_stream = stream_string(NO_RETRIEVAL_FALLBACK_MSG)
+
+    elif not retrieved_docs_support_item(
+        item=updated_slots.get("item", ""),
+        retrieved_docs=retrieved_docs,
+    ):
+        raw_stream = stream_string(NO_MAPPING_FALLBACK_MSG)
+
+    else:
         raw_stream = generate_answer(
             user_message=user_message,
             slots=updated_slots,
             retrieved_docs=retrieved_docs,
         )
-
-    elif all_mapping_failed:
-        raw_stream = stream_string(NO_MAPPING_FALLBACK_MSG)
-
-    else:
-        raw_stream = stream_string(NO_RETRIEVAL_FALLBACK_MSG)
 
     # LLM chunk 또는 fallback 문자열을 모두 순수 문자열 stream으로 변환
     def response_stream():
